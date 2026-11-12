@@ -58,15 +58,18 @@ function testSection() {
   const t = testSettings();
   const n = now();
   const p = (x) => String(x).padStart(2, '0');
-  const d = t.date || `${n.getFullYear()}-${p(n.getMonth() + 1)}-${p(n.getDate())}`;
-  const h = t.hour ?? Math.round(hour() * 2) / 2;
+  // 沒設定的欄位留空＝用真實的日期或時間
+  const d = t.date || '';
+  const h = t.hour ?? '';
   const days = snapshotDays();
   return `
     <p class="note">${testing ? `<b style="color:#c9462c">測試模式中</b>：遊戲時間是 ${dateKey()} ${p(n.getHours())}:${p(n.getMinutes())}${t.weather ? `，天氣假裝成「${WX_TEST.find((w) => w[0] === t.weather)?.[1]}」` : ''}。` : '目前使用真實的日期、時間與天氣。'}
       測試時的蓋章、領獎、聖誕進度都會真的寫進存檔，測完可用下面的「清除資料」回復。</p>
     <label>日期 <input type="date" data-t="date" value="${d}"></label>
-    <label>時間 <input type="number" data-t="hour" min="0" max="23.5" step="0.5" value="${h}"> 點（可用 .5 表示半點）</label>
+    <label>時間 <input type="number" data-t="hour" min="0" max="23.5" step="0.5" value="${h}" placeholder="真實"> 點（可用 .5 表示半點）</label>
+    <p class="note">日期或時間留空，就用真實的日期或時間。</p>
     <label>天氣 <select data-t="weather">${WX_TEST.map(([v, l]) => `<option value="${v}" ${v === (t.weather || '') ? 'selected' : ''}>${l}</option>`).join('')}</select></label><br>
+    <label><input type="checkbox" data-t="nolimit" ${t.nolimit ? 'checked' : ''}> 不限制每次遊玩時間（測試時角色不會下班）</label><br>
     <button data-act="t-apply">套用並重新開始</button>
     <button class="quiet" data-act="t-real">恢復真實時間與天氣</button><br>
     <span class="note">快速設定：</span>
@@ -175,12 +178,15 @@ export function openParent(onClose, { onStamp } = {}) {
         t.date = `${now().getFullYear()}-${e.target.dataset.d}`;
         t.hour = parseFloat(e.target.dataset.h);
         t.weather = node.querySelector('[data-t="weather"]').value || undefined;
+        t.nolimit = node.querySelector('[data-t="nolimit"]').checked || undefined;
       } else {
         t.date = node.querySelector('[data-t="date"]').value || undefined;
         const hv = node.querySelector('[data-t="hour"]').value;
         t.hour = hv === '' ? undefined : parseFloat(hv);
         t.weather = node.querySelector('[data-t="weather"]').value || undefined;
+        t.nolimit = node.querySelector('[data-t="nolimit"]').checked || undefined;
       }
+      if (t.nolimit) { state.session.usedMs = 0; state.session.restUntil = 0; save(); }
       localStorage.setItem(TEST_KEY, JSON.stringify(t));
       location.reload();
       return;

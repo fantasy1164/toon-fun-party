@@ -19,7 +19,7 @@ const stage = document.getElementById('stage');
 const params = new URLSearchParams(location.search);
 // 測試用：?session=1 把每次遊玩時間改成 1 分鐘
 const sessionOverride = params.has('session') ? parseFloat(params.get('session')) : null;
-const sessionMs = () => (sessionOverride ?? state.settings.sessionMin) * 60000;
+const sessionMs = () => (testSettings().nolimit ? Infinity : (sessionOverride ?? state.settings.sessionMin) * 60000);
 
 // ---------- 畫面縮放 ----------
 function fit() {

@@ -10,7 +10,7 @@ const hourRaw = params.has('hour') ? params.get('hour') : saved.hour;
 const hourOverride = hourRaw !== undefined && hourRaw !== null && hourRaw !== '' ? parseFloat(hourRaw) : null;
 const dateRaw = params.get('date') || saved.date || '';
 const dateOverride = /^\d{4}-\d{2}-\d{2}$/.test(dateRaw) ? dateRaw.split('-').map(Number) : null;
-export const testing = !!(dateOverride || hourOverride !== null || params.get('weather') || saved.weather);
+export const testing = !!(dateOverride || hourOverride !== null || params.get('weather') || saved.weather || saved.nolimit);
 
 export function now() {
   const d = new Date();

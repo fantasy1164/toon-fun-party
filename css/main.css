@@ -455,3 +455,11 @@ html, body {
 .kitchen .counter .knife { position: relative; width: 130px; height: 130px; }
 .flyer { position: absolute; z-index: 40; pointer-events: none; transform-origin: 0 0; }
 .flyer > svg { width: 100%; height: 100%; }
+
+/* ---------- 角色下班休息中 ---------- */
+.closed.resting { background: #e6f7ff; }
+.closed.resting .char { animation: jump .45s ease-out infinite alternate; }
+.closed.resting.lounge .char { animation: bob 1.6s ease-in-out infinite alternate; }
+.closed.resting.lounge .char .eyelid { animation: none; transform: scaleY(.45); }
+.closed.resting .rest-clock { position: absolute; left: 505px; top: 30px; }
+.closed.resting .pie { transition: stroke-dasharray 1s; }
