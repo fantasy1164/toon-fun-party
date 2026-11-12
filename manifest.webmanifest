@@ -1,0 +1,14 @@
+{
+  "name": "明星總動員歡樂派對",
+  "short_name": "歡樂派對",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#7fd3e6",
+  "theme_color": "#7fd3e6",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

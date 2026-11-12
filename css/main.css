@@ -1,0 +1,214 @@
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden; background: #7fd3e6;
+  position: fixed; inset: 0; overscroll-behavior: none;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  touch-action: none;
+  font-family: -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+
+/* 舞台固定 1200x900，整體縮放置中 */
+#stage {
+  position: absolute; left: 50%; top: 50%; width: 1200px; height: 900px;
+  transform: translate(-50%, -50%) scale(var(--s, 1));
+  overflow: hidden; background: #dcf3f5; border-radius: 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+}
+.screen { position: absolute; inset: 0; overflow: hidden; }
+.screen svg { display: block; }
+.hidden { display: none !important; }
+
+#rotate {
+  position: fixed; inset: 0; z-index: 100; background: #2f3e5c;
+  display: none; align-items: center; justify-content: center;
+}
+#rotate svg { animation: tilt 1.6s ease-in-out infinite alternate; }
+@media (orientation: portrait) { #rotate { display: flex; } }
+@keyframes tilt { from { transform: rotate(0); } to { transform: rotate(-90deg); } }
+
+/* ---------- 共用動畫 ---------- */
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.08); } }
+@keyframes bob { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popin { 0% { transform: scale(0); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-7deg); } 75% { transform: rotate(7deg); } }
+@keyframes twinkle { from { opacity: .3; } to { opacity: 1; } }
+
+.round-btn {
+  position: absolute; border: 0; padding: 0; border-radius: 50%;
+  background: #fff; box-shadow: 0 8px 0 rgba(0, 0, 0, .15);
+  display: flex; align-items: center; justify-content: center;
+}
+.round-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 rgba(0, 0, 0, .15); }
+
+/* ---------- 開場 ---------- */
+.splash { background: linear-gradient(#7fd3e6, #d7f5ff 60%, #b6e6a8 60%, #8fd67a); }
+.splash .play {
+  left: 480px; top: 300px; width: 240px; height: 240px; background: #ffd34d;
+  animation: pulse .8s ease-in-out infinite alternate;
+}
+.splash .cast { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; }
+
+/* ---------- 選人 ---------- */
+.profiles { background: linear-gradient(#ffe9a8, #ffd0e0); }
+.profiles .who {
+  position: absolute; top: 250px; width: 280px; height: 280px; border: 12px solid #fff;
+  border-radius: 50%; padding: 0; background: none; overflow: hidden;
+  box-shadow: 0 14px 0 rgba(0, 0, 0, .12); animation: bob 1.4s ease-in-out infinite alternate;
+}
+.profiles .who svg { width: 100%; height: 100%; }
+.profiles .who:nth-child(1) { left: 110px; }
+.profiles .who:nth-child(2) { left: 460px; animation-delay: .3s; }
+.profiles .who:nth-child(3) { left: 810px; animation-delay: .6s; }
+.profiles .who.chosen { animation: pulse .25s ease-in-out 4 alternate; border-color: #ffd34d; }
+.profiles .host { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; }
+
+.lock {
+  left: 24px; bottom: 24px; width: 76px; height: 76px; background: rgba(255, 255, 255, .55);
+  box-shadow: none;
+}
+.lock .ring { position: absolute; inset: -6px; }
+.lock .ring circle { fill: none; stroke: #ff7fa8; stroke-width: 8; stroke-dasharray: 264; stroke-dashoffset: 264; transform: rotate(-90deg); transform-origin: 50% 50%; }
+.lock.holding .ring circle { transition: stroke-dashoffset 3s linear; stroke-dashoffset: 0; }
+
+/* ---------- 場景與 2.5D 圖層 ---------- */
+.view { position: absolute; inset: 0; --px: 0px; --py: 0px; }
+.layer {
+  position: absolute; inset: -30px; pointer-events: none;
+  transform: translate3d(calc(var(--px) * var(--d)), calc(var(--py) * var(--d)), 0);
+  will-change: transform;
+}
+.layer svg, .view > svg { width: 100%; height: 100%; }
+.view > svg { position: absolute; inset: 0; }
+.prop { pointer-events: auto; cursor: pointer; }
+.prop .halo { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.prop.glow .halo { animation: halo .7s ease-in-out infinite alternate; }
+.prop.glow { animation: propbounce .7s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+.prop.nope { animation: wiggle .35s ease-in-out; transform-box: fill-box; transform-origin: 50% 100%; }
+.prop.used { animation: popin .35s ease-out; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes halo { from { opacity: .35; transform: scale(.85); } to { opacity: .85; transform: scale(1.12); } }
+@keyframes propbounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+
+.light { position: absolute; inset: 0; pointer-events: none; transition: background 1s; }
+.light.night { background: radial-gradient(circle at 42% 30%, rgba(255, 214, 120, .18) 0, rgba(20, 30, 90, .42) 60%); }
+.light.dusk { background: linear-gradient(rgba(255, 140, 80, .14), rgba(255, 180, 90, .08)); }
+.light.dawn { background: linear-gradient(rgba(255, 200, 150, .12), rgba(255, 255, 255, 0)); }
+
+.star { animation: twinkle 1.2s ease-in-out infinite alternate; }
+.cloud { animation: drift 16s linear infinite alternate; }
+@keyframes drift { from { transform: translateX(-30px); } to { transform: translateX(160px); } }
+.sun { animation: pulse 2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+
+.paste-blob { opacity: 0; transition: opacity .3s; }
+.pasted .paste-blob { opacity: 1; }
+.cup-water { transition: opacity .3s; }
+
+.scene .fade { position: absolute; inset: 0; background: #0d1b4a; opacity: 0; pointer-events: none; transition: opacity 1.4s; z-index: 20; }
+.scene.lights-out .fade { opacity: 1; }
+.scene .view { transition: opacity .35s; }
+.scene .view.off { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .35s, visibility 0s .35s; }
+.scene .view.off .prop { pointer-events: none; }
+
+.hud { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+.hud .round-btn { pointer-events: auto; width: 92px; height: 92px; top: 22px; }
+.hud .home { left: 22px; }
+.hud .cab { right: 22px; }
+
+/* ---------- 角色動作 ---------- */
+.char { animation: bob 1.3s ease-in-out infinite alternate; }
+.char .mouth { transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(.25); }
+.talking .char .mouth, .char.talking .mouth { animation: talk .16s ease-in-out infinite alternate; }
+@keyframes talk { from { transform: scaleY(.25); } to { transform: scaleY(1.2); } }
+.char .eyelid { transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); animation: blink 4.2s infinite; }
+@keyframes blink { 0%, 94%, 100% { transform: scaleY(0); } 97% { transform: scaleY(1); } }
+.sleepy .char .eyelid { animation: none; transform: scaleY(.55); }
+.asleep .char .eyelid { animation: none; transform: scaleY(1); }
+.asleep .char { animation: breathe 2.4s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes breathe { from { transform: scale(1, 1); } to { transform: scale(1.02, .97); } }
+.char .arm { transform-box: fill-box; transform-origin: 50% 10%; }
+.happy .char { animation: jump .32s ease-out infinite alternate; }
+.happy .char .arm-l { transform: rotate(150deg); }
+.happy .char .arm-r { transform: rotate(-150deg); }
+@keyframes jump { from { transform: translateY(0); } to { transform: translateY(-38px); } }
+.gargle .char { animation: garg .14s linear infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes garg { from { transform: rotate(-5deg); } to { transform: rotate(-9deg); } }
+.char .tail { transform-box: fill-box; transform-origin: 0 100%; animation: wag 1s ease-in-out infinite alternate; }
+@keyframes wag { from { transform: rotate(-4deg); } to { transform: rotate(8deg); } }
+.char .zzz, .char .shut { display: none; }
+.asleep .char .shut { display: block; }
+.asleep .char .zzz { display: block; }
+.asleep .char .z { animation: zfloat 2.4s ease-in-out infinite; opacity: 0; }
+.asleep .char .z2 { animation-delay: 1.2s; }
+@keyframes zfloat { 0% { opacity: 0; transform: translate(0, 10px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(10px, -24px); } }
+
+/* ---------- 刷牙特寫 ---------- */
+.tooth .t-dirt { opacity: 1; transition: opacity .15s; }
+.tooth .t-shine { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.tooth.clean .t-shine { animation: shine .7s ease-out 1 forwards; }
+@keyframes shine { 0% { opacity: 0; transform: scale(0) rotate(0); } 50% { opacity: 1; transform: scale(1.3) rotate(40deg); } 100% { opacity: .9; transform: scale(.7) rotate(80deg); } }
+.germ { transform-box: fill-box; transform-origin: center; animation: wiggle .5s ease-in-out infinite; }
+.germ.gone { animation: germout .3s ease-in forwards; }
+@keyframes germout { to { transform: scale(0) rotate(90deg); opacity: 0; } }
+.tooth.hint { animation: wiggle .4s ease-in-out 3; transform-box: fill-box; transform-origin: center; }
+
+#cursor { position: fixed; left: 0; top: 0; width: 160px; height: 160px; margin: -30px 0 0 -110px; pointer-events: none; z-index: 50; display: none; }
+#cursor.on { display: block; }
+#cursor.scrubbing svg { animation: scrubmove .12s linear infinite alternate; }
+@keyframes scrubmove { from { transform: translate(-6px, 2px); } to { transform: translate(6px, -2px); } }
+
+/* ---------- 洗手特寫 ---------- */
+.stream { opacity: 0; transition: opacity .2s; }
+.water .stream { opacity: .85; animation: flow .18s linear infinite alternate; }
+@keyframes flow { from { transform: translateX(-2px); } to { transform: translateX(2px); } }
+.hands .film { opacity: 0; transition: opacity .5s; }
+.soapy .hands .film { opacity: .45; }
+.hands .dirt { transition: opacity .4s; }
+.hands .h-shine { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.dry .hands .h-shine { animation: shine .8s ease-out 1 forwards; }
+.foam { position: absolute; inset: 0; pointer-events: none; }
+.foam i {
+  position: absolute; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #e6f8ff 60%, #bfe9f8);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .7); animation: popin .25s ease-out;
+}
+.foam.rinse i { transition: transform .9s ease-in, opacity .9s; transform: translateY(260px) scale(.3); opacity: 0; }
+
+/* ---------- 粒子 ---------- */
+.particle { position: fixed; pointer-events: none; z-index: 60; border-radius: 50%; animation: fly 1s ease-out forwards; margin: -10px 0 0 -10px; }
+.particle.bubble { background: radial-gradient(circle at 35% 30%, #fff, #d6f4ff 55%, #8fd8f5); }
+.particle.star { background: #ffd34d; border-radius: 0; clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 60%, 80% 100%, 50% 76%, 20% 100%, 30% 60%, 0 38%, 38% 36%); }
+@keyframes fly { to { transform: translate(var(--dx), var(--dy)) scale(.3); opacity: 0; } }
+
+/* ---------- 禮物 ---------- */
+.gift { position: absolute; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; gap: 60px; background: rgba(255, 255, 255, .35); animation: fadein .3s; }
+.gift .card { width: 300px; height: 300px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 0 16px #ffd34d, 0 0 80px #fff7c2; animation: popin .5s ease-out; }
+.gift .card .owner { position: absolute; left: -20px; top: -20px; width: 110px; height: 110px; border-radius: 50%; border: 6px solid #fff; overflow: hidden; }
+.gift.away .card { transition: transform .6s ease-in, opacity .6s; transform: translate(480px, -420px) scale(.1); opacity: 0; }
+
+/* ---------- 陳列櫃 ---------- */
+.cabinet { position: absolute; inset: 0; z-index: 40; background: rgba(40, 30, 20, .55); display: flex; align-items: center; justify-content: center; gap: 30px; animation: fadein .25s; }
+.cabinet .unit { background: #b9824f; border: 14px solid #8a5a2b; border-radius: 28px; padding: 70px 22px 22px; position: relative; }
+.cabinet .unit .owner { position: absolute; left: 50%; top: -60px; width: 120px; height: 120px; margin-left: -60px; border-radius: 50%; border: 8px solid #fff; overflow: hidden; background: #fff; }
+.cabinet .shelf { display: grid; grid-template-columns: repeat(3, 130px); gap: 14px; }
+.cabinet .slot { width: 130px; height: 130px; background: #e9c89c; border-radius: 16px; border-bottom: 10px solid #8a5a2b; display: flex; align-items: center; justify-content: center; position: relative; }
+.cabinet .slot.none svg { filter: grayscale(1); opacity: .16; }
+.cabinet .slot .dots { position: absolute; right: 6px; top: 6px; display: flex; gap: 3px; }
+.cabinet .slot .dots i { width: 10px; height: 10px; border-radius: 50%; background: #ff7fa8; }
+.cabinet .close { right: 30px; top: 30px; width: 92px; height: 92px; }
+
+/* ---------- 休息／睡覺 ---------- */
+.closed { background: linear-gradient(#0d1b4a, #25357a); }
+.closed.daytime { background: linear-gradient(#7fd3e6, #d7f5ff 62%, #b6e6a8 62%, #8fd67a); }
+.closed .art { position: absolute; inset: 0; width: 1200px; height: 900px; }
+
+/* ---------- 家長頁面（給大人看，所以有文字） ---------- */
+.parent { position: absolute; inset: 0; z-index: 80; background: #fffaf0; padding: 40px 60px; overflow: auto; color: #3a2a22; font-size: 26px; touch-action: pan-y; -webkit-user-select: text; user-select: text; }
+.parent h1 { margin: 0 0 20px; font-size: 40px; }
+.parent h2 { margin: 28px 0 10px; font-size: 30px; }
+.parent table { border-collapse: collapse; }
+.parent td, .parent th { padding: 8px 22px; border-bottom: 2px solid #eadcc4; text-align: left; }
+.parent label { display: inline-flex; align-items: center; gap: 10px; margin: 6px 26px 6px 0; }
+.parent input[type=number] { width: 110px; font-size: 26px; padding: 6px 10px; border: 2px solid #d9c8a8; border-radius: 10px; }
+.parent textarea { width: 100%; height: 120px; font-size: 16px; border: 2px solid #d9c8a8; border-radius: 10px; }
+.parent button { font-size: 26px; padding: 12px 26px; border: 0; border-radius: 14px; background: #ffd34d; margin: 8px 12px 8px 0; }
+.parent button.quiet { background: #eadcc4; }
+.parent .note { font-size: 20px; color: #8a7a66; }
