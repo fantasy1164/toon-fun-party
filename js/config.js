@@ -15,6 +15,9 @@ export const PROFILES = {
   both: { id: 'both', name: '妍卉、向澤', level: 'easy', members: ['yh', 'xz'] },
 };
 
+// 好寶寶印章卡一張幾格
+export const CARD_SIZE = { yh: 10, xz: 5 };
+
 export const CHARACTERS = {
   dudu: { id: 'dudu', name: '嘟嘟', tts: { pitch: 1.25, rate: 0.95 } },
   kiki: { id: 'kiki', name: '奇奇', tts: { pitch: 1.7, rate: 1.15 } },

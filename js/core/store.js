@@ -1,11 +1,13 @@
 // 遊戲進度：全部存在這台裝置的 localStorage。
-import { DEFAULT_SETTINGS } from '../config.js';
+import { DEFAULT_SETTINGS, CARD_SIZE } from '../config.js';
 import { dateKey } from './clock.js';
 
 const KEY = 'toon-fun-party';
 
 function blankProfile() {
-  return { collection: {}, claims: {}, playMs: {}, stamps: [], stamp: null };
+  // stamp：選好的印章 { shape, color }；card：目前這張卡上的章；log：所有蓋章紀錄
+  // owed：集滿但家長還沒發的獎品數；repick：下次進來可以換印章圖案
+  return { collection: {}, claims: {}, playMs: {}, stamp: null, card: [], log: [], owed: 0, cardsDone: 0, repick: false };
 }
 
 function blank() {
@@ -71,6 +73,46 @@ export function claim(id, claimKey) {
 export function addItem(id, itemId) {
   const c = state.profiles[id].collection;
   c[itemId] = (c[itemId] || 0) + 1;
+}
+
+// ---------- 好寶寶印章 ----------
+export function setStamp(id, shape, color) {
+  const p = state.profiles[id];
+  p.stamp = { shape, color };
+  p.repick = false;
+  save();
+}
+
+export function stampedToday(id) {
+  const k = dateKey();
+  return state.profiles[id].log.some((e) => e.d === k);
+}
+
+export function cardInfo(id) {
+  const p = state.profiles[id];
+  const size = CARD_SIZE[id];
+  // 上一張集滿後，下一次蓋章時才換新卡，所以集滿的卡在那之前還看得到
+  return { size, stamps: p.card, full: p.card.length >= size };
+}
+
+// 蓋一個章。回傳這次是否剛好集滿。
+export function addStamp(id, reasons) {
+  const p = state.profiles[id];
+  const size = CARD_SIZE[id];
+  if (p.card.length >= size) p.card = [];
+  const entry = { d: dateKey(), r: reasons, s: p.stamp?.shape, c: p.stamp?.color, rot: Math.round(Math.random() * 30 - 15) };
+  p.card.push(entry);
+  p.log.push({ d: entry.d, r: reasons });
+  const full = p.card.length >= size;
+  if (full) { p.owed += 1; p.cardsDone += 1; p.repick = true; }
+  save();
+  return full;
+}
+
+export function redeem(id) {
+  const p = state.profiles[id];
+  p.owed = Math.max(0, p.owed - 1);
+  save();
 }
 
 export function exportData() {

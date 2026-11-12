@@ -186,13 +186,15 @@ html, body {
 
 /* ---------- 陳列櫃 ---------- */
 .cabinet { position: absolute; inset: 0; z-index: 40; background: rgba(40, 30, 20, .55); display: flex; align-items: center; justify-content: center; gap: 30px; animation: fadein .25s; }
+.cabinet.two { --cell: 104px; }
+.cabinet .shelf .slot svg { width: 80%; height: 80%; }
 .cabinet .unit { background: #b9824f; border: 14px solid #8a5a2b; border-radius: 28px; padding: 70px 22px 22px; position: relative; }
 .cabinet .unit .owner { position: absolute; left: 50%; top: -60px; width: 120px; height: 120px; margin-left: -60px; border-radius: 50%; border: 8px solid #fff; overflow: hidden; background: #fff; }
-.cabinet .shelf { display: grid; grid-template-columns: repeat(3, 130px); gap: 14px; }
-.cabinet .slot { width: 130px; height: 130px; background: #e9c89c; border-radius: 16px; border-bottom: 10px solid #8a5a2b; display: flex; align-items: center; justify-content: center; position: relative; }
-.cabinet .slot.none svg { filter: grayscale(1); opacity: .16; }
-.cabinet .slot .dots { position: absolute; right: 6px; top: 6px; display: flex; gap: 3px; }
-.cabinet .slot .dots i { width: 10px; height: 10px; border-radius: 50%; background: #ff7fa8; }
+.cabinet .shelf { display: grid; grid-template-columns: repeat(4, var(--cell, 120px)); gap: 12px; }
+.cabinet .shelf .slot { width: var(--cell, 120px); height: var(--cell, 120px); background: #e9c89c; border-radius: 16px; border-bottom: 10px solid #8a5a2b; display: flex; align-items: center; justify-content: center; position: relative; }
+.cabinet .shelf .slot.none svg { filter: grayscale(1); opacity: .16; }
+.cabinet .shelf .slot .dots { position: absolute; right: 6px; top: 6px; display: flex; gap: 3px; }
+.cabinet .shelf .slot .dots i { width: 10px; height: 10px; border-radius: 50%; background: #ff7fa8; }
 .cabinet .close { right: 30px; top: 30px; width: 92px; height: 92px; }
 
 /* ---------- 休息／睡覺 ---------- */
@@ -212,3 +214,60 @@ html, body {
 .parent button { font-size: 26px; padding: 12px 26px; border: 0; border-radius: 14px; background: #ffd34d; margin: 8px 12px 8px 0; }
 .parent button.quiet { background: #eadcc4; }
 .parent .note { font-size: 20px; color: #8a7a66; }
+
+/* ---------- 好寶寶印章：印章卡 ---------- */
+.stamp-card { display: inline-flex; align-items: center; gap: 22px; background: #fffdf6; border-radius: 28px; padding: 24px 30px; box-shadow: 0 10px 0 rgba(0, 0, 0, .12); border: 6px solid #ffd34d; }
+.stamp-card .card-head { border-radius: 50%; overflow: hidden; flex: none; }
+.stamp-card .card-grid { display: grid; grid-template-columns: repeat(var(--cols, 5), auto); gap: 16px; }
+.stamp-card .slot { border-radius: 50%; border: 5px dashed #e6d3b8; display: flex; align-items: center; justify-content: center; }
+.stamp-card .slot.done { border-color: transparent; }
+.stamp-card .slot.next { border-color: #ffb300; animation: pulse .6s ease-in-out infinite alternate; background: rgba(255, 211, 77, .18); }
+.stamp-card .slot.fresh svg { animation: inkin .45s ease-out; }
+@keyframes inkin { from { transform: scale(1.35); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* ---------- 挑印章 ---------- */
+.picker { background: linear-gradient(#fff3d6, #ffe0ec); }
+.picker .who { position: absolute; left: 40px; top: 36px; width: 130px; height: 130px; border-radius: 50%; overflow: hidden; border: 8px solid #fff; box-shadow: 0 8px 0 rgba(0, 0, 0, .1); }
+.picker .tiles { position: absolute; left: 220px; top: 36px; width: 940px; display: grid; grid-template-columns: repeat(6, 140px); gap: 18px 20px; }
+.picker .tile { width: 140px; height: 140px; border: 0; border-radius: 28px; background: #fff; box-shadow: 0 8px 0 rgba(0, 0, 0, .1); display: flex; align-items: center; justify-content: center; padding: 0; }
+.picker .tile.on { box-shadow: 0 0 0 8px #ffb300, 0 8px 0 rgba(0, 0, 0, .1); transform: scale(1.06); }
+.picker .pads { position: absolute; left: 220px; top: 400px; display: flex; gap: 26px; }
+.picker .pad { width: 96px; height: 96px; border-radius: 50%; border: 10px solid #fff; background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--ink) 70%, #fff), var(--ink)); box-shadow: 0 8px 0 rgba(0, 0, 0, .12); padding: 0; }
+.picker .pad.on { border-color: #ffd34d; transform: scale(1.15); }
+.picker .paper { position: absolute; left: 420px; top: 540px; width: 520px; height: 320px; background: #fffdf6; border-radius: 18px; box-shadow: 0 10px 0 rgba(0, 0, 0, .1); overflow: hidden; }
+.picker .paper.ready { box-shadow: 0 0 0 8px rgba(255, 211, 77, .7), 0 10px 0 rgba(0, 0, 0, .1); }
+.picker .paper .mark { position: absolute; pointer-events: none; animation: inkin .35s ease-out; }
+.picker .ok { left: 990px; top: 640px; width: 150px; height: 150px; background: #2ea05a; animation: pulse .7s ease-in-out infinite alternate; }
+.picker .host, .stamping .host { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; }
+
+/* ---------- 蓋章 ---------- */
+.stamping { z-index: 70; background: linear-gradient(#ffe9b8, #f6d79a); transition: opacity .4s; }
+.stamping.fadeout { opacity: 0; }
+.stamping .desk { position: absolute; left: 0; right: 0; bottom: 0; height: 260px; background: #c8915a; border-top: 14px solid #b9824f; }
+.stamping .card-wrap { position: absolute; left: 0; right: 0; top: 70px; display: flex; justify-content: center; }
+.stamping .tool { position: absolute; left: 0; top: 0; transform: translate(950px, 620px); transition: transform .5s cubic-bezier(.3, 1.3, .5, 1); }
+.stamping .tool svg { animation: bob 1s ease-in-out infinite alternate; }
+.stamping .tool.flying svg { animation: none; }
+.stamping .tool.press svg { transform: translateY(70px) scaleY(.94); transition: transform .12s ease-in; }
+.stamping .tool.lift svg { transform: translateY(-40px); opacity: 0; transition: transform .5s ease-out, opacity .5s; }
+.stamping .party { position: absolute; inset: 0; pointer-events: none; }
+.stamping .party svg { width: 100%; height: 100%; }
+.stamping .party .char { animation: jump .32s ease-out infinite alternate; }
+
+/* 陳列櫃裡的印章卡 */
+.cabinet .unit .card-row { margin-bottom: 18px; display: flex; justify-content: center; }
+.cabinet .unit .stamp-card { padding: 10px 14px; gap: 10px; border-width: 4px; border-radius: 18px; }
+.cabinet .unit .stamp-card .card-head { display: none; }
+.cabinet .unit .stamp-card .card-grid { gap: 8px; }
+.cabinet .unit .stamp-card .slot { border-width: 3px; }
+
+.parent .stamp-row { background: #fff; border: 2px solid #eadcc4; border-radius: 18px; padding: 14px 20px; margin-bottom: 14px; }
+.parent .stamp-row .title { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.parent .stamp-row .owed { color: #c9462c; font-weight: bold; }
+.parent .chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
+.parent .chip { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 3px solid #eadcc4; padding: 6px 14px 6px 8px; margin: 0; font-size: 24px; }
+.parent .chip svg, .parent .chip span { pointer-events: none; }
+.parent .chip.on { border-color: #2ea05a; background: #e6f6ec; }
+.parent .chip:disabled { opacity: .4; }
+.parent button:disabled { opacity: .45; }
+.parent button.small { font-size: 20px; padding: 8px 16px; }

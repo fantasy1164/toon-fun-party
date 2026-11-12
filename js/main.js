@@ -7,6 +7,7 @@ import { loadVoiceManifest, hush, primeTts } from './core/voice.js';
 import { showSplash, showProfiles, showClosed } from './ui/screens.js';
 import { openParent } from './ui/parent.js';
 import { mountBathroom } from './scenes/bathroom.js';
+import { pickStamp, stampSession } from './ui/stamps.js';
 
 const stage = document.getElementById('stage');
 const params = new URLSearchParams(location.search);
@@ -52,7 +53,15 @@ function leaveScene() {
 
 function parentGate() {
   hush();
-  openParent(() => route());
+  openParent(() => route(), {
+    // 家長選好原因後，把畫面交給小孩自己蓋章
+    async onStamp(id, reasons) {
+      clearInterval(closedTimer);
+      if (!state.profiles[id].stamp) await pickStamp(stage, id);
+      await stampSession(stage, id, reasons);
+      route();
+    },
+  });
 }
 
 async function route() {
@@ -67,6 +76,11 @@ async function route() {
   }
   const chosen = await showProfiles(stage, { onParent: parentGate });
   if (closedReason()) { route(); return; }
+  // 還沒有印章，或上一張卡集滿可以換印章：先挑印章
+  for (const id of chosen.members) {
+    const p = state.profiles[id];
+    if (!p.stamp || p.repick) await pickStamp(stage, id);
+  }
   profile = chosen;
   scene = mountBathroom(stage, {
     profile,

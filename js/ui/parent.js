@@ -1,7 +1,8 @@
 // 家長頁面：遊玩時間、今日領獎、時間設定、備份。這一頁給大人看，所以有文字。
 import { el } from '../core/dom.js';
-import { state, save, exportData, importData } from '../core/store.js';
+import { state, save, exportData, importData, stampedToday, cardInfo, redeem } from '../core/store.js';
 import { dateKey } from '../core/clock.js';
+import { REASONS, reasonIcon, shapeSvg, ensureInkFilter } from '../art/stamps.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
@@ -9,7 +10,32 @@ const CLAIM_NAMES = {
   wash_morning: '早上洗手', wash_noon: '中午洗手', wash_evening: '傍晚洗手',
 };
 
-export function openParent(onClose) {
+function stampSection(id) {
+  const p = state.profiles[id];
+  const { size, stamps, full } = cardInfo(id);
+  const count = full ? 0 : stamps.length;
+  const month = dateKey().slice(0, 7);
+  const monthCount = p.log.filter((e) => e.d.startsWith(month)).length;
+  const done = stampedToday(id);
+  const chips = Object.entries(REASONS).map(([r, v]) =>
+    `<button class="chip" data-r="${r}" ${done ? 'disabled' : ''}>${reasonIcon(r, 44)}<span>${v.label}</span></button>`).join('');
+  const mine = p.stamp ? shapeSvg(p.stamp.shape, p.stamp.color, 44) : '<span class="note">（還沒挑印章，蓋章前會先讓他挑）</span>';
+  return `
+    <div class="stamp-row" data-id="${id}">
+      <div class="title"><b>${NAMES[id]}</b> ${mine}
+        <span>這張卡 ${count} / ${size}</span><span>本月 ${monthCount} 個章</span>
+        ${p.owed ? `<span class="owed">待發獎品 ${p.owed} 份 <button class="quiet" data-act="redeem" data-id="${id}">已發一份</button></span>` : ''}
+      </div>
+      ${done ? '<p class="note">今天已經蓋過章了。</p>' : `
+        <p class="note">今天表現好的地方（可以複選），選好後把 iPad 交給${NAMES[id]}自己蓋：</p>
+        <div class="chips">${chips}</div>
+        <button data-act="stamp" data-id="${id}" disabled>開始蓋章</button>`}
+      ${p.stamp && !p.repick ? `<button class="quiet small" data-act="repick" data-id="${id}">下次讓他換印章</button>` : ''}
+    </div>`;
+}
+
+export function openParent(onClose, { onStamp } = {}) {
+  ensureInkFilter();
   const k = dateKey();
   const rows = ['yh', 'xz'].map((id) => {
     const p = state.profiles[id];
@@ -23,6 +49,9 @@ export function openParent(onClose) {
   const node = el(`
     <div class="parent">
       <h1>家長頁面</h1>
+      <h2>好寶寶蓋章</h2>
+      ${stampSection('yh')}
+      ${stampSection('xz')}
       <h2>今天</h2>
       <table><tr><th></th><th>遊玩時間</th><th>已領獎的活動</th><th>收藏品總數</th></tr>${rows}</table>
 
@@ -56,7 +85,35 @@ export function openParent(onClose) {
     if (!Number.isNaN(v)) { state.settings[key] = v; save(); }
   });
   node.addEventListener('click', (e) => {
+    const chip = e.target.closest?.('.chip');
+    if (chip && !chip.disabled) {
+      chip.classList.toggle('on');
+      const row = chip.closest('.stamp-row');
+      row.querySelector('[data-act="stamp"]').disabled = !row.querySelector('.chip.on');
+      return;
+    }
     const act = e.target.dataset?.act;
+    const id = e.target.dataset?.id;
+    if (act === 'stamp') {
+      const row = e.target.closest('.stamp-row');
+      const reasons = [...row.querySelectorAll('.chip.on')].map((c) => c.dataset.r);
+      if (!reasons.length) return;
+      node.remove();
+      onStamp?.(id, reasons);
+      return;
+    }
+    if (act === 'redeem') {
+      redeem(id);
+      node.remove();
+      openParent(onClose, { onStamp });
+      return;
+    }
+    if (act === 'repick') {
+      state.profiles[id].repick = true; save();
+      e.target.textContent = '下次進遊戲時會讓他換印章';
+      e.target.disabled = true;
+      return;
+    }
     if (act === 'wake') {
       state.session.restUntil = 0; state.session.usedMs = 0; save();
       e.target.textContent = '已結束休息';

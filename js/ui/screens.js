@@ -7,6 +7,8 @@ import { phase } from '../core/clock.js';
 import { state } from '../core/store.js';
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import { SERIES, itemSvg } from '../art/items.js';
+import { cardHtml } from './stamps.js';
+import { ensureInkFilter } from '../art/stamps.js';
 
 const ICON = {
   play: `<svg viewBox="0 0 100 100" width="130" height="130"><path d="M34 20L82 50L34 80Z" fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"/></svg>`,
@@ -115,6 +117,7 @@ export function showClosed(stage, { reason, onParent }) {
 
 // ---------- 陳列櫃 ----------
 export function openCabinet(root, memberIds) {
+  ensureInkFilter();
   const units = memberIds.map((id) => {
     const col = state.profiles[id].collection;
     const slots = [...SERIES.dudu, ...SERIES.kiki].map((item) => {
@@ -122,9 +125,10 @@ export function openCabinet(root, memberIds) {
       const dots = n > 1 ? `<span class="dots">${'<i></i>'.repeat(Math.min(n, 5))}</span>` : '';
       return `<div class="slot ${n ? 'have' : 'none'}">${itemSvg(item, 96)}${dots}</div>`;
     }).join('');
-    return `<div class="unit"><div class="owner">${avatarSvg(id, 104)}</div><div class="shelf">${slots}</div></div>`;
+    const card = state.profiles[id].stamp ? `<div class="card-row">${cardHtml(id, memberIds.length > 1 ? 46 : 64)}</div>` : '';
+    return `<div class="unit"><div class="owner">${avatarSvg(id, 104)}</div>${card}<div class="shelf">${slots}</div></div>`;
   }).join('');
-  const node = el(`<div class="cabinet">${units}<button class="round-btn close">${ICON.close}</button></div>`);
+  const node = el(`<div class="cabinet ${memberIds.length > 1 ? 'two' : ''}">${units}<button class="round-btn close">${ICON.close}</button></div>`);
   root.appendChild(node);
   sfx('whoosh');
   onTap(node, () => { sfx('tap'); node.remove(); });

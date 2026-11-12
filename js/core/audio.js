@@ -88,6 +88,7 @@ const SFX = {
     [523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * 0.13, 0.3, { type: 'triangle', gain: 0.25 }));
     [1047, 1319, 1568].forEach((f) => tone(f, t + 0.55, 0.8, { type: 'triangle', gain: 0.16 }));
   },
+  stamp: (t) => { tone(140, t, 0.22, { type: 'sine', to: 60, gain: 0.6 }); noise(t, 0.12, { freq: 500, q: 0.8, gain: 0.35 }); },
   whoosh: (t) => noise(t, 0.4, { freq: 400, to: 3000, q: 0.7, gain: 0.2 }),
   snore: (t) => { noise(t, 0.9, { freq: 140, to: 260, q: 4, gain: 0.5 }); tone(700, t + 1.1, 0.6, { to: 500, gain: 0.05 }); },
   bye: (t) => [784, 659, 523].forEach((f, i) => tone(f, t + i * 0.25, 0.5, { type: 'sine', gain: 0.22 })),

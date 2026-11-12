@@ -42,6 +42,32 @@ export const LINES = {
   en_towel: 'Towel！毛巾！',
 };
 
+// ---- 好寶寶印章：挑選 ----
+Object.assign(LINES, {
+  stamp_pick: { dudu: '{name}，選一個你最喜歡的印章吧。', kiki: '{name}！挑一個最酷的印章！' },
+  stamp_repick: { dudu: '{name}，要換新的印章嗎？想換就再選一次。', kiki: '新的一張卡！{name}要不要換一個印章？' },
+  stamp_color: { dudu: '要什麼顏色呢？', kiki: '選一個顏色！' },
+  stamp_try: { dudu: '在紙上蓋蓋看。', kiki: '在紙上咚一下試試看！' },
+  stamp_ok: { dudu: '喜歡的話，按綠色的勾勾。', kiki: '喜歡就按綠色勾勾！' },
+  stamp_mine: { dudu: '這是{name}的印章，好漂亮。', kiki: '耶！這是{name}專屬的印章！' },
+  sh_star: '星星', sh_heart: '愛心', sh_dino: '恐龍', sh_rocket: '火箭', sh_rainbow: '彩虹', sh_crown: '皇冠',
+  sh_cat: '小貓', sh_sun: '太陽', sh_flower: '花朵', sh_car: '汽車', sh_butterfly: '蝴蝶', sh_moon: '月亮',
+  co_red: '紅色', co_orange: '橘色', co_yellow: '黃色', co_green: '綠色', co_blue: '藍色', co_purple: '紫色', co_pink: '粉紅色',
+
+  // ---- 好寶寶印章：蓋章 ----
+  stamp_intro: { dudu: '{name}今天表現很好，可以蓋章喔。把印章按下去。', kiki: '{name}今天超棒的！快把印章咚下去！' },
+  r_teeth: { dudu: '牙齒刷得乾乾淨淨。', kiki: '牙齒刷得亮晶晶！' },
+  r_eat: { dudu: '吃飯吃得很好。', kiki: '吃飯吃光光！' },
+  r_toys: { dudu: '玩具都收好了。', kiki: '玩具全部收好了！' },
+  r_sleep: { dudu: '有準時上床睡覺。', kiki: '準時上床睡覺！' },
+  r_polite: { dudu: '很有禮貌。', kiki: '超有禮貌！' },
+  r_help: { dudu: '會幫忙做家事。', kiki: '會幫忙做家事！' },
+  r_share: { dudu: '願意跟別人分享。', kiki: '會分享，好大方！' },
+  r_other: { dudu: '今天整天都很棒。', kiki: '今天整天都超棒！' },
+  stamp_next: { dudu: '明天也要加油喔。', kiki: '明天也要繼續加油！' },
+  card_full: { dudu: '{name}集滿了！好厲害。快去找爸爸媽媽領獎品。', kiki: '哇！{name}集滿了！快去找爸爸媽媽拿獎品！' },
+});
+
 export function lineText(id, charId, name) {
   const l = LINES[id];
   if (!l) return '';
