@@ -342,3 +342,48 @@ html, body {
 .kiki-in.w-scarf .w.scarf { display: block; }
 .kiki-in.w-hat .w.hat { display: block; }
 .kiki-in.w-bottle .w.bottle { display: block; }
+
+/* ---------- 聖誕節 ---------- */
+.xtree, .xmorning { background: #f7dcc0; }
+.xtree .room, .xmorning .room { position: absolute; inset: 0; width: 1200px; height: 900px; }
+.bulb { animation: twinkle .8s ease-in-out infinite alternate; }
+.snow { animation: snowfall 4s linear infinite; }
+@keyframes snowfall { from { transform: translateY(-20px); } to { transform: translateY(40px); } }
+.top-star { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.top-star.on { opacity: 1; animation: pulse 1s ease-in-out infinite alternate; }
+.orn.fresh { animation: popin .5s ease-out; transform-box: fill-box; transform-origin: center; }
+.xtree .advent { position: absolute; right: 40px; top: 120px; width: 560px; display: grid; grid-template-columns: repeat(6, 80px); gap: 14px; }
+.xtree .adv { width: 80px; height: 80px; border-radius: 16px; border: 0; padding: 0; font: bold 34px/80px sans-serif; color: #fff; background: #d93a3a; box-shadow: 0 6px 0 rgba(0, 0, 0, .15); display: flex; align-items: center; justify-content: center; }
+.xtree .adv:nth-child(3n) { background: #2e8b57; } .xtree .adv:nth-child(4n) { background: #2f7fe0; }
+.xtree .adv.locked { opacity: .35; }
+.xtree .adv.today { animation: pulse .6s ease-in-out infinite alternate; box-shadow: 0 0 0 8px #ffd34d, 0 6px 0 rgba(0, 0, 0, .15); }
+.xtree .adv.past { box-shadow: 0 0 0 5px rgba(255, 211, 77, .7), 0 6px 0 rgba(0, 0, 0, .15); }
+.xtree .adv.open { background: #fff7e8; }
+.xtree .adv.opening { animation: wiggle .2s linear infinite; }
+.xtree .home, .xmorning .home { left: 22px; top: 22px; width: 92px; height: 92px; }
+.xtree .home { left: auto; right: 22px; }
+.xtree .tray { left: 640px; top: 470px; width: 170px; height: 110px; border-radius: 28px; animation: pulse .6s ease-in-out infinite alternate; box-shadow: 0 0 0 8px #ffd34d; }
+.plate { opacity: 0; transition: opacity .4s; } .plate.on { opacity: 1; }
+.cookies .eaten { display: none; } .plate.eaten .cookies .full { display: none; } .plate.eaten .cookies .eaten { display: block; }
+.plate.eaten .milk-level { height: 8px; y: -15px; }
+.hub .xlights { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; }
+.hub .roof { z-index: 0; }
+.hub .treebtn { left: 530px; top: 690px; width: 150px; height: 150px; animation: pulse .9s ease-in-out infinite alternate; }
+.santa-pop { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; transform: translateX(420px); transition: transform .8s cubic-bezier(.3, 1.3, .5, 1); }
+.santa-pop.up { transform: translateX(0); }
+.closed-tree { position: absolute; right: 60px; bottom: 60px; }
+.xmorning .giftbox { position: absolute; left: 300px; top: 560px; width: 260px; height: 240px; }
+.xmorning .giftbox.glow { animation: pulse .6s ease-in-out infinite alternate; filter: drop-shadow(0 0 18px #ffd34d); }
+.xmorning .giftbox.shake { animation: wiggle .3s ease-in-out; }
+.xmorning .giftbox .lid { transform-box: fill-box; transform-origin: 0 100%; transition: transform .5s ease-out; }
+.xmorning .giftbox.open .lid { transform: translate(-40px, -80px) rotate(-30deg); }
+.xmorning .santa-in { position: absolute; inset: 0; pointer-events: none; transform: translateX(500px); transition: transform .7s ease-out; }
+.xmorning .santa-in svg { width: 100%; height: 100%; }
+.xmorning .santa-in.in { transform: translateX(0); }
+.xmorning .books { position: absolute; left: 60px; top: 60px; display: flex; flex-direction: column; gap: 20px; z-index: 30; animation: fadein .4s; }
+.xmorning .bookwrap { display: flex; align-items: center; gap: 14px; }
+.xmorning .bookwrap .owner { width: 90px; height: 90px; border-radius: 50%; overflow: hidden; border: 6px solid #fff; flex: none; }
+.stampbook .page { background: #fff7e8; border: 8px solid #b9824f; border-radius: 18px; padding: 12px; display: grid; grid-template-columns: repeat(8, 64px); gap: 6px; box-shadow: 0 8px 0 rgba(0, 0, 0, .15); }
+.stampbook .bslot { width: 64px; height: 64px; border-radius: 50%; border: 3px dashed #e6d3b8; display: flex; align-items: center; justify-content: center; }
+.stampbook .bstamp { opacity: 0; animation: bookin .4s ease-out forwards; }
+@keyframes bookin { from { opacity: 0; transform: translateY(300px) scale(2); } to { opacity: 1; transform: none; } }

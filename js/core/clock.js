@@ -1,9 +1,12 @@
 // 與現實同步的時間。測試時可用網址參數 ?hour=20.5 指定小時。
 const params = new URLSearchParams(location.search);
 const hourOverride = params.has('hour') ? parseFloat(params.get('hour')) : null;
+// 測試用：?date=2026-12-24 指定日期
+const dateOverride = /^\d{4}-\d{2}-\d{2}$/.test(params.get('date') || '') ? params.get('date').split('-').map(Number) : null;
 
 export function now() {
   const d = new Date();
+  if (dateOverride) d.setFullYear(dateOverride[0], dateOverride[1] - 1, dateOverride[2]);
   if (hourOverride !== null && !Number.isNaN(hourOverride)) {
     d.setHours(Math.floor(hourOverride), Math.round((hourOverride % 1) * 60), 0, 0);
   }

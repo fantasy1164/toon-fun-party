@@ -9,6 +9,8 @@ import { openParent } from './ui/parent.js';
 import { mountBathroom } from './scenes/bathroom.js';
 import { mountDoor } from './scenes/door.js';
 import { showHub } from './ui/hub.js';
+import { treeScreen, christmasMorning } from './ui/xmas.js';
+import * as fest from './core/festival.js';
 import { pickStamp, stampSession } from './ui/stamps.js';
 import * as weather from './core/weather.js';
 
@@ -92,8 +94,13 @@ async function route() {
 async function goHub() {
   if (!profile) { route(); return; }
   if (closedReason()) { route(); return; }
+  // 聖誕節當天：還沒拆禮物的先拆禮物
+  if (fest.isChristmas() && profile.members.some((id) => !fest.xmas().gift[id])) {
+    await christmasMorning(stage, profile);
+  }
   const room = await showHub(stage, profile);
   if (room === 'back') { profile = null; route(); return; }
+  if (room === 'tree') { await treeScreen(stage, profile); goHub(); return; }
   if (closedReason()) { route(); return; }
   const mount = room === 'door' ? mountDoor : mountBathroom;
   scene = mount(stage, {

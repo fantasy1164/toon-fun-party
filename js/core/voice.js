@@ -1,6 +1,6 @@
 // 角色說話。優先播放 assets/voice 裡的語音檔；還沒有檔案時，
 // 暫時用裝置內建的語音合成（依角色調整音高與語速）當佔位。
-import { CHARACTERS } from '../config.js';
+import { CHARACTERS, GUESTS } from '../config.js';
 import { lineText, lineHasName } from '../data/lines.js';
 import { getCtx, getVoiceBus, duck } from './audio.js';
 
@@ -100,7 +100,7 @@ function playTts(text, charId, my) {
     const v = pickTtsVoice();
     if (v) u.voice = v;
     u.lang = 'zh-TW';
-    const cfg = CHARACTERS[charId]?.tts || {};
+    const cfg = (CHARACTERS[charId] || GUESTS[charId])?.tts || {};
     u.pitch = cfg.pitch ?? 1;
     u.rate = cfg.rate ?? 1;
     u.onstart = () => { ttsReady = true; dbg(`start: ${text.slice(0, 8)}`); };

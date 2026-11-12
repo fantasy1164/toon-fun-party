@@ -5,6 +5,9 @@ import { sfx, playMusic, stopMusic } from '../core/audio.js';
 import { speak } from '../core/voice.js';
 import { phase } from '../core/clock.js';
 import * as weather from '../core/weather.js';
+import * as fest from '../core/festival.js';
+import { NIGHTCAP } from '../art/characters.js';
+import { TREE_ICON } from '../art/xmas.js';
 import { state } from '../core/store.js';
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import { SERIES, itemSvg } from '../art/items.js';
@@ -88,6 +91,7 @@ export function showProfiles(stage, { onParent }) {
 export function showClosed(stage, { reason, onParent }) {
   const ph = phase();
   const day = reason === 'rest' && ph !== 'night';
+  const eveNight = reason === 'bedtime' && fest.isDecember() && fest.day() === 24;
   const stars = day ? '' : Array.from({ length: 14 }, (_, i) =>
     `<circle class="star" style="animation-delay:${(i % 5) * 0.3}s" cx="${80 + (i * 83) % 1080}" cy="${60 + (i * 137) % 360}" r="${3 + (i % 3)}" fill="#fff"/>`).join('');
   const sky = day
@@ -98,9 +102,10 @@ export function showClosed(stage, { reason, onParent }) {
       <svg class="art" viewBox="0 0 1200 900">
         ${stars}${sky}
         ${day ? '' : '<rect y="640" width="1200" height="260" fill="#16224f"/>'}
-        ${characterSvg('dudu', { x: 250, y: 420, s: 1.2 })}
-        ${characterSvg('kiki', { x: 660, y: 420, s: 1.2 })}
+        ${characterSvg('dudu', { x: 250, y: 420, s: 1.2, extra: eveNight ? NIGHTCAP.dudu : '' })}
+        ${characterSvg('kiki', { x: 660, y: 420, s: 1.2, extra: eveNight ? NIGHTCAP.kiki : '' })}
       </svg>
+      ${fest.isDecember() && fest.day() <= 25 ? `<div class="closed-tree">${TREE_ICON}</div>` : ''}
     </div>`);
   node.appendChild(lockButton(onParent));
   stage.replaceChildren(node);
@@ -111,7 +116,7 @@ export function showClosed(stage, { reason, onParent }) {
     if (t - last < 5000) return;
     last = t;
     sfx('snore');
-    speak(pick(['dudu', 'kiki']), reason === 'bedtime' ? 'sleeping' : weather.niceOutside(phase()) ? 'resting_sunny' : 'resting', { name: '', who: '' });
+    speak(pick(['dudu', 'kiki']), reason === 'bedtime' ? (eveNight ? 'sleeping_eve' : 'sleeping') : weather.niceOutside(phase()) ? 'resting_sunny' : 'resting', { name: '', who: '' });
   });
   return node;
 }
@@ -121,7 +126,8 @@ export function openCabinet(root, memberIds) {
   ensureInkFilter();
   const units = memberIds.map((id) => {
     const col = state.profiles[id].collection;
-    const slots = [...SERIES.dudu, ...SERIES.kiki].map((item) => {
+    const special = SERIES.special.filter((i) => col[i]);
+    const slots = [...SERIES.dudu, ...SERIES.kiki, ...special].map((item) => {
       const n = col[item] || 0;
       const dots = n > 1 ? `<span class="dots">${'<i></i>'.repeat(Math.min(n, 5))}</span>` : '';
       return `<div class="slot ${n ? 'have' : 'none'}">${itemSvg(item, 96)}${dots}</div>`;

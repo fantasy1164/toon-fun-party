@@ -6,6 +6,9 @@ import { speak, hush } from '../core/voice.js';
 import { phase } from '../core/clock.js';
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import { ICON } from './screens.js';
+import * as fest from '../core/festival.js';
+import { ROOF_LIGHTS, TREE_ICON } from '../art/xmas.js';
+import { santaPop } from './xmas.js';
 
 const BATH = `<svg viewBox="0 0 420 420" width="420" height="420">
   <rect width="420" height="420" rx="40" fill="#dcf3f5"/>
@@ -45,6 +48,7 @@ export function showHub(stage, profile) {
         <button class="room" data-room="bathroom">${BATH}</button>
         <button class="room" data-room="door">${LIVING}</button>
         <button class="round-btn home">${ICON.home}</button>
+        ${fest.isDecember() ? `${ROOF_LIGHTS}<button class="round-btn treebtn">${TREE_ICON}</button>` : ''}
       </div>`);
     stage.replaceChildren(node);
     playMusic('lobby');
@@ -64,6 +68,14 @@ export function showHub(stage, profile) {
     };
     $$('.room', node).forEach((b) => onTap(b, () => go(b.dataset.room, b)));
     onTap($('.home', node), () => { sfx('tap'); go('back'); });
-    speak(host, 'hub_pick', { name: profile.name, who: profile.id });
+    const tb = $('.treebtn', node);
+    if (tb) onTap(tb, () => go('tree', tb));
+    // 12 月第一次進來：聖誕老公公從煙囪探頭打招呼
+    const x = fest.isDecember() ? fest.xmas() : null;
+    if (x && fest.day() <= 24 && profile.members.some((id) => !x.greeted[id])) {
+      santaPop(node, profile).then(() => { if (!done) speak(host, 'hub_pick', { name: profile.name, who: profile.id }); });
+    } else {
+      speak(host, 'hub_pick', { name: profile.name, who: profile.id });
+    }
   });
 }

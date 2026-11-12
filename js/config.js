@@ -23,6 +23,11 @@ export const CHARACTERS = {
   kiki: { id: 'kiki', name: '奇奇', tts: { pitch: 1.7, rate: 1.15 } },
 };
 
+// 不參加一般輪替的角色（只在特定時候出現）
+export const GUESTS = {
+  santa: { id: 'santa', name: '聖誕老公公', tts: { pitch: 0.7, rate: 0.85 } },
+};
+
 // 各活動每天可領獎的時段（對應現實作息）。[開始小時, 結束小時)
 export const REWARD_SLOTS = {
   brush: { morning: [5, 11], evening: [18, 22] },

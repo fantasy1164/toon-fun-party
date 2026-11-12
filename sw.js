@@ -1,11 +1,11 @@
 // 離線快取：有網路時一律抓最新版並更新快取，沒網路時用快取。
-const CACHE = 'tfp-v7';
+const CACHE = 'tfp-v8';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest', 'css/main.css',
   'js/main.js', 'js/config.js', 'js/core/store.js', 'js/core/clock.js',
   'js/core/audio.js', 'js/core/voice.js', 'js/core/weather.js', 'js/core/dom.js',
   'js/data/lines.js', 'js/art/characters.js', 'js/art/items.js',
-  'js/art/bathroom.js', 'js/scenes/bathroom.js', 'js/scenes/door.js', 'js/art/door.js', 'js/ui/hub.js', 'js/ui/screens.js',
+  'js/art/bathroom.js', 'js/scenes/bathroom.js', 'js/scenes/door.js', 'js/art/door.js', 'js/ui/hub.js', 'js/ui/xmas.js', 'js/art/xmas.js', 'js/core/festival.js', 'js/ui/screens.js',
   'js/ui/parent.js', 'js/ui/stamps.js', 'js/art/stamps.js', 'assets/voice/manifest.json',
   'assets/icons/icon-180.png', 'assets/icons/icon-192.png', 'assets/icons/icon-512.png',
 ];

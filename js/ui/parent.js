@@ -4,6 +4,7 @@ import { state, save, exportData, importData, stampedToday, cardInfo, redeem } f
 import { dateKey } from '../core/clock.js';
 import { REASONS, reasonIcon, shapeSvg, ensureInkFilter } from '../art/stamps.js';
 import * as weather from '../core/weather.js';
+import * as fest from '../core/festival.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
@@ -72,6 +73,11 @@ export function openParent(onClose, { onStamp } = {}) {
       <h2>今天</h2>
       <table><tr><th></th><th>遊玩時間</th><th>已領獎的活動</th><th>收藏品總數</th></tr>${rows}</table>
 
+      <h2>聖誕節</h2>
+      <label><input type="checkbox" data-xmas="real" ${fest.xmas().realGift ? 'checked' : ''}> 今年床邊有準備真禮物（12/25 早上聖誕老公公會說「快去看看你的床邊」）</label>
+      <p class="note">12 月：選房間畫面會出現聖誕樹與降臨月曆；12/24 晚上可以擺餅乾牛奶；12/25 打開就會拆禮物。</p>
+      <button class="quiet small" data-act="xreset">重設今年的聖誕進度</button>
+
       <h2>天氣</h2>
       <div class="wx">${weatherSection()}</div>
 
@@ -99,6 +105,7 @@ export function openParent(onClose, { onStamp } = {}) {
   const msg = node.querySelector('.msg');
 
   node.addEventListener('change', (e) => {
+    if (e.target.dataset?.xmas === 'real') { fest.setRealGift(e.target.checked); return; }
     const key = e.target.dataset?.k;
     if (!key) return;
     const v = parseFloat(e.target.value);
@@ -126,6 +133,12 @@ export function openParent(onClose, { onStamp } = {}) {
       redeem(id);
       node.remove();
       openParent(onClose, { onStamp });
+      return;
+    }
+    if (act === 'xreset') {
+      fest.resetXmas();
+      e.target.textContent = '已重設';
+      e.target.disabled = true;
       return;
     }
     if (act === 'repick') {

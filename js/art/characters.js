@@ -63,7 +63,42 @@ function kiki(extra = '') {
   </g>`;
 }
 
-const BUILDERS = { dudu, kiki };
+// 聖誕老公公（原創造型）
+function santa(extra = '') {
+  return `
+  <g class="char santa">
+    <ellipse cx="120" cy="312" rx="100" ry="10" fill="#000" opacity=".12"/>
+    <ellipse cx="88" cy="304" rx="32" ry="14" fill="#2b2320"/><ellipse cx="152" cy="304" rx="32" ry="14" fill="#2b2320"/>
+    <g class="arm arm-l"><ellipse cx="34" cy="214" rx="24" ry="54" fill="#d93a3a" transform="rotate(18 34 214)"/><circle cx="22" cy="262" r="20" fill="#3a8f4f"/></g>
+    <g class="arm arm-r"><ellipse cx="206" cy="214" rx="24" ry="54" fill="#d93a3a" transform="rotate(-18 206 214)"/><circle cx="218" cy="262" r="20" fill="#3a8f4f"/></g>
+    <ellipse cx="120" cy="230" rx="92" ry="82" fill="#d93a3a"/>
+    <rect x="108" y="160" width="24" height="146" fill="#fff"/>
+    <rect x="30" y="234" width="180" height="26" fill="#2b2320"/>
+    <rect x="102" y="230" width="36" height="34" rx="4" fill="none" stroke="#ffd34d" stroke-width="7"/>
+    <circle cx="120" cy="110" r="62" fill="#ffd9b8"/>
+    <path d="M56 112Q46 196 120 220Q194 196 184 112Q160 152 120 150Q80 152 56 112Z" fill="#fff"/>
+    ${eyes(98, 142, 102, '#ffd9b8')}
+    <circle cx="98" cy="102" r="20" fill="none" stroke="#8a5a2b" stroke-width="4"/><circle cx="142" cy="102" r="20" fill="none" stroke="#8a5a2b" stroke-width="4"/>
+    <path d="M118 102h4" stroke="#8a5a2b" stroke-width="4"/>
+    <circle cx="70" cy="126" r="11" fill="#ff9fb0" opacity=".8"/><circle cx="170" cy="126" r="11" fill="#ff9fb0" opacity=".8"/>
+    <ellipse class="mouth" cx="120" cy="156" rx="12" ry="10" fill="#c9462c"/>
+    <ellipse cx="100" cy="140" rx="24" ry="12" fill="#fff"/><ellipse cx="140" cy="140" rx="24" ry="12" fill="#fff"/>
+    <circle cx="120" cy="128" r="11" fill="#ff9f8a"/>
+    <path d="M52 80Q58 16 128 12Q192 8 218 70L198 84Z" fill="#d93a3a"/>
+    <rect x="48" y="72" width="146" height="28" rx="14" fill="#fff"/>
+    <circle cx="218" cy="72" r="18" fill="#fff"/>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
+// 睡帽（平安夜用）
+export const NIGHTCAP = {
+  dudu: `<g class="cap"><path d="M64 60Q96 -14 176 44L180 60Q120 40 62 74Z" fill="#7a8cff"/><path d="M62 66Q120 44 182 62" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/><circle cx="182" cy="40" r="13" fill="#fff"/></g>`,
+  kiki: `<g class="cap"><path d="M70 56Q100 -4 168 34L170 50Q120 36 70 66Z" fill="#7a8cff"/><path d="M70 60Q120 40 172 52" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="174" cy="32" r="12" fill="#fff"/></g>`,
+};
+
+const BUILDERS = { dudu, kiki, santa };
 
 // 回傳可放進 <svg> 的角色群組，x、y 為左上角，s 為縮放。
 export function characterSvg(id, { x = 0, y = 0, s = 1, extra = '' } = {}) {
