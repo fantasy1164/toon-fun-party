@@ -181,7 +181,7 @@ if (flag('dry')) {
     } catch (e) {
       failed.push(j.key);
       console.log(`    失敗：${e.message}`);
-      if (e.quota) { console.log('免費額度一天只有很少次。請到 AI Studio 開啟付費（Billing）後再執行一次，已完成的會自動跳過。'); break; }
+      if (e.quota) { console.log('今天的每日額度用完了（依方案等級每天有固定次數，台灣時間下午 4 點左右重置）。重置後再執行一次，已完成的會自動跳過。'); break; }
       // 連續失敗多半是金鑰或格式問題，不要整批硬跑
       if (failed.length >= 3 && ok === 0) { console.log('連續失敗，先停下來。請把上面的錯誤訊息給 Claude 看。'); break; }
     }
