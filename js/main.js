@@ -9,6 +9,7 @@ import { openParent } from './ui/parent.js';
 import { mountBathroom } from './scenes/bathroom.js';
 import { mountDoor } from './scenes/door.js';
 import { mountKitchen } from './scenes/kitchen.js';
+import { mountBedroom } from './scenes/bedroom.js';
 import { showHub } from './ui/hub.js';
 import { treeScreen, christmasMorning } from './ui/xmas.js';
 import * as fest from './core/festival.js';
@@ -103,7 +104,7 @@ async function goHub() {
   if (room === 'back') { profile = null; route(); return; }
   if (room === 'tree') { await treeScreen(stage, profile); goHub(); return; }
   if (closedReason()) { route(); return; }
-  const mount = { door: mountDoor, kitchen: mountKitchen }[room] || mountBathroom;
+  const mount = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom }[room] || mountBathroom;
   scene = mount(stage, {
     profile,
     onExit: (why) => {

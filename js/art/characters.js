@@ -89,6 +89,32 @@ function bobo(extra = '') {
   </g>`;
 }
 
+// 小羊棉棉：害羞、愛睡（原創造型）
+const wool = (pts, r, fill = '#fff') => pts.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}"/>`).join('');
+function mian(extra = '') {
+  return `
+  <g class="char mian">
+    <ellipse cx="120" cy="312" rx="90" ry="10" fill="#000" opacity=".12"/>
+    <rect x="80" y="262" width="22" height="50" rx="10" fill="#5a4a4a"/><rect x="138" y="262" width="22" height="50" rx="10" fill="#5a4a4a"/>
+    <g class="arm arm-l"><ellipse cx="44" cy="226" rx="18" ry="40" fill="#f6d6c8" transform="rotate(20 44 226)"/></g>
+    <g class="arm arm-r"><ellipse cx="196" cy="226" rx="18" ry="40" fill="#f6d6c8" transform="rotate(-20 196 226)"/></g>
+    ${wool([[70, 200], [120, 186], [170, 200], [56, 244], [184, 244], [76, 280], [120, 290], [164, 280], [120, 240]], 40, '#eee')}
+    ${wool([[70, 196], [120, 182], [170, 196], [58, 240], [182, 240], [78, 276], [120, 286], [162, 276], [120, 236]], 37)}
+    <ellipse cx="40" cy="104" rx="34" ry="16" fill="#f6d6c8" transform="rotate(-24 40 104)"/>
+    <ellipse cx="200" cy="104" rx="34" ry="16" fill="#f6d6c8" transform="rotate(24 200 104)"/>
+    <ellipse cx="120" cy="118" rx="66" ry="60" fill="#f6d6c8"/>
+    ${wool([[82, 64], [120, 52], [158, 64], [100, 48], [140, 48]], 24, '#eee')}
+    ${wool([[82, 60], [120, 48], [158, 60], [100, 44], [140, 44]], 22)}
+    ${eyes(94, 146, 116, '#f6d6c8')}
+    <circle cx="74" cy="140" r="11" fill="#ff9fb0" opacity=".8"/><circle cx="166" cy="140" r="11" fill="#ff9fb0" opacity=".8"/>
+    <ellipse cx="120" cy="140" rx="9" ry="6" fill="#c98a8a"/>
+    <ellipse class="mouth" cx="120" cy="154" rx="10" ry="8" fill="#c9462c"/>
+    <path d="M110 150Q120 158 130 150" fill="none" stroke="#7a4a4a" stroke-width="3" stroke-linecap="round"/>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
 // 聖誕老公公（原創造型）
 function santa(extra = '') {
   return `
@@ -124,7 +150,7 @@ export const NIGHTCAP = {
   kiki: `<g class="cap"><path d="M70 56Q100 -4 168 34L170 50Q120 36 70 66Z" fill="#7a8cff"/><path d="M70 60Q120 40 172 52" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="174" cy="32" r="12" fill="#fff"/></g>`,
 };
 
-const BUILDERS = { dudu, kiki, santa, bobo };
+const BUILDERS = { dudu, kiki, santa, bobo, mian };
 
 // 回傳可放進 <svg> 的角色群組，x、y 為左上角，s 為縮放。
 export function characterSvg(id, { x = 0, y = 0, s = 1, extra = '' } = {}) {

@@ -173,6 +173,16 @@ const TRACKS = {
     melody: seq('G4 . A4 B4 D5 . B4 . A4 . G4 . E4 . . .  G4 . A4 B4 D5 . E5 . D5 . B4 . A4 . . .'),
     bass: seq('G2 . D3 . E2 . B2 . C3 . G2 . D3 . . .  G2 . D3 . C3 . G2 . D3 . A2 . D3 . . .'),
   },
+  bedroom: {
+    bpm: 84, lead: 'sine', leadGain: 0.16,
+    melody: seq('E5 . D5 . C5 . D5 . E5 . E5 . E5 . . .  D5 . D5 . D5 . . . E5 . G5 . G5 . . .'),
+    bass: seq('C3 . . . G2 . . . C3 . . . C3 . . .  G2 . . . G2 . . . C3 . . . C3 . . .'),
+  },
+  lullaby: {
+    bpm: 60, lead: 'sine', leadGain: 0.13,
+    melody: seq('G4 . . E4 G4 . . E4 G4 . A4 G4 F4 . E4 .  D4 . . . E4 . F4 . E4 . . . . . . .'),
+    bass: seq('C3 . . . . . . . G2 . . . . . . .  G2 . . . . . . . C3 . . . . . . .'),
+  },
   kitchen: {
     bpm: 104, lead: 'triangle', leadGain: 0.18,
     melody: seq('C5 . E5 G5 . E5 C5 . D5 . F5 A5 . F5 D5 .  E5 . G5 C6 . G5 E5 . D5 . G5 . C5 . . .'),

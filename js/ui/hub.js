@@ -31,6 +31,15 @@ const KITCHEN = `<svg viewBox="0 0 420 420" width="420" height="420">
   <circle cx="186" cy="284" r="12" fill="#2e8b57"/><circle cx="214" cy="282" r="12" fill="#fff" stroke="#eee" stroke-width="2"/><circle cx="214" cy="282" r="6" fill="#ffc400"/><circle cx="240" cy="284" r="11" fill="#e5484d"/>
 </svg>`;
 
+const BED = `<svg viewBox="0 0 420 420" width="420" height="420">
+  <rect width="420" height="420" rx="40" fill="#5a5290"/>
+  <rect x="150" y="40" width="130" height="110" rx="12" fill="#26386e" stroke="#fff" stroke-width="8"/><circle cx="240" cy="80" r="18" fill="#fff6c8"/>
+  <rect y="300" width="420" height="120" fill="#8a6a52"/>
+  <rect x="200" y="240" width="200" height="70" rx="18" fill="#fff"/><rect x="240" y="250" width="160" height="80" rx="20" fill="#9b85f0"/>
+  ${characterSvg('mian', { x: 20, y: 150, s: 0.7 })}
+  <circle cx="380" cy="200" r="40" fill="#ffe08a" opacity=".35"/>
+</svg>`;
+
 const LIVING = `<svg viewBox="0 0 420 420" width="420" height="420">
   <rect width="420" height="420" rx="40" fill="#fbe3c4"/>
   <rect y="300" width="420" height="120" fill="#c8915a"/>
@@ -57,6 +66,7 @@ export function showHub(stage, profile) {
         <button class="room" data-room="bathroom">${BATH}</button>
         <button class="room" data-room="kitchen">${KITCHEN}</button>
         <button class="room" data-room="door">${LIVING}</button>
+        <button class="room" data-room="bedroom">${BED}</button>
         <button class="round-btn home">${ICON.home}</button>
         ${fest.isDecember() ? `${ROOF_LIGHTS}<button class="round-btn treebtn">${TREE_ICON}</button>` : ''}
       </div>`);

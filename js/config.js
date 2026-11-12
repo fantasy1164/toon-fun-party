@@ -26,6 +26,7 @@ export const CHARACTERS = {
 // 不參加一般輪替的角色（只在特定時候出現）
 export const GUESTS = {
   bobo: { id: 'bobo', name: '波波', tts: { pitch: 0.75, rate: 0.85 } },
+  mian: { id: 'mian', name: '棉棉', tts: { pitch: 1.4, rate: 0.85 } },
   santa: { id: 'santa', name: '聖誕老公公', tts: { pitch: 0.7, rate: 0.85 } },
 };
 
@@ -35,4 +36,5 @@ export const REWARD_SLOTS = {
   wash: { morning: [5, 11], noon: [11, 16], evening: [16, 22] },
   door: { morning: [5, 11] },
   kitchen: { breakfast: [5, 10], lunch: [10, 14], dinner: [16, 21] },
+  bedroom: { evening: [18, 21] },
 };
