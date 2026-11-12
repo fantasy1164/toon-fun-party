@@ -115,8 +115,8 @@
     "kiki/stamp_repick.xz.mp3",
     "kiki/stamp_repick.yh.mp3",
     "kiki/stamp_try.mp3",
-    "kiki/t_ready.xz.wav",
-    "kiki/t_ready.yh.wav",
+    "kiki/t_ready.xz.mp3",
+    "kiki/t_ready.yh.mp3",
     "kiki/w_done.mp3",
     "kiki/w_dry.mp3",
     "kiki/w_mission.both.mp3",
@@ -127,8 +127,8 @@
     "kiki/w_soap.mp3",
     "kiki/w_wet.mp3",
     "kiki/wrong.mp3",
-    "santa/en_cup.wav",
-    "santa/en_soap.wav",
-    "santa/en_toothbrush.wav"
+    "santa/en_cup.mp3",
+    "santa/en_soap.mp3",
+    "santa/en_toothbrush.mp3"
   ]
 }
