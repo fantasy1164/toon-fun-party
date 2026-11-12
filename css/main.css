@@ -387,3 +387,8 @@ html, body {
 .stampbook .bslot { width: 64px; height: 64px; border-radius: 50%; border: 3px dashed #e6d3b8; display: flex; align-items: center; justify-content: center; }
 .stampbook .bstamp { opacity: 0; animation: bookin .4s ease-out forwards; }
 @keyframes bookin { from { opacity: 0; transform: translateY(300px) scale(2); } to { opacity: 1; transform: none; } }
+
+.parent h3 { margin: 20px 0 6px; font-size: 26px; }
+.parent select, .parent input[type=date] { font-size: 24px; padding: 6px 10px; border: 2px solid #d9c8a8; border-radius: 10px; }
+.parent button.armed { outline: 5px solid #c9462c; }
+#testbadge { position: fixed; left: 50%; top: 4px; transform: translateX(-50%); z-index: 90; padding: 2px 12px; border-radius: 10px; background: rgba(201, 70, 44, .75); color: #fff; font: 14px sans-serif; pointer-events: none; }

@@ -1,7 +1,7 @@
 // 進入點：畫面縮放、開場、選人、進場景、角色下班與睡覺時間。
 import { STAGE_W, STAGE_H } from './config.js';
 import { state, save, addPlayTime } from './core/store.js';
-import { isAsleep } from './core/clock.js';
+import { isAsleep, testing, dateKey, hour, testSettings } from './core/clock.js';
 import { unlock, sfx } from './core/audio.js';
 import { loadVoiceManifest, hush, primeTts } from './core/voice.js';
 import { showSplash, showProfiles, showClosed } from './ui/screens.js';
@@ -122,7 +122,18 @@ setInterval(() => {
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 window.addEventListener('pagehide', save);
 
+function testBadge() {
+  if (!testing) return;
+  const b = document.createElement('div');
+  b.id = 'testbadge';
+  const h = hour();
+  const t = testSettings();
+  b.textContent = `測試 ${dateKey()} ${String(Math.floor(h)).padStart(2, '0')}:${String(Math.round((h % 1) * 60)).padStart(2, '0')}${t.weather ? ' ' + t.weather : ''}`;
+  document.body.appendChild(b);
+}
+
 async function boot() {
+  testBadge();
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }

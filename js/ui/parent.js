@@ -1,7 +1,7 @@
 // 家長頁面：遊玩時間、今日領獎、時間設定、備份。這一頁給大人看，所以有文字。
 import { el } from '../core/dom.js';
-import { state, save, exportData, importData, stampedToday, cardInfo, redeem } from '../core/store.js';
-import { dateKey } from '../core/clock.js';
+import { state, save, exportData, importData, stampedToday, cardInfo, redeem, restoreDaysAgo, clearAll, snapshotDays } from '../core/store.js';
+import { dateKey, now, hour, testSettings, TEST_KEY, testing } from '../core/clock.js';
 import { REASONS, reasonIcon, shapeSvg, ensureInkFilter } from '../art/stamps.js';
 import * as weather from '../core/weather.js';
 import * as fest from '../core/festival.js';
@@ -52,6 +52,36 @@ function weatherSection() {
     <span class="note geo-msg"></span>`;
 }
 
+const WX_TEST = [['', '真實天氣'], ['clear', '晴天'], ['cloudy', '多雲'], ['rain', '下雨'], ['storm', '雷雨'], ['fog', '起霧'], ['hot', '很熱'], ['cold', '很冷'], ['windy', '強風']];
+function testSection() {
+  const t = testSettings();
+  const n = now();
+  const p = (x) => String(x).padStart(2, '0');
+  const d = t.date || `${n.getFullYear()}-${p(n.getMonth() + 1)}-${p(n.getDate())}`;
+  const h = t.hour ?? Math.round(hour() * 2) / 2;
+  const days = snapshotDays();
+  return `
+    <p class="note">${testing ? `<b style="color:#c9462c">測試模式中</b>：遊戲時間是 ${dateKey()} ${p(n.getHours())}:${p(n.getMinutes())}${t.weather ? `，天氣假裝成「${WX_TEST.find((w) => w[0] === t.weather)?.[1]}」` : ''}。` : '目前使用真實的日期、時間與天氣。'}
+      測試時的蓋章、領獎、聖誕進度都會真的寫進存檔，測完可用下面的「清除資料」回復。</p>
+    <label>日期 <input type="date" data-t="date" value="${d}"></label>
+    <label>時間 <input type="number" data-t="hour" min="0" max="23.5" step="0.5" value="${h}"> 點（可用 .5 表示半點）</label>
+    <label>天氣 <select data-t="weather">${WX_TEST.map(([v, l]) => `<option value="${v}" ${v === (t.weather || '') ? 'selected' : ''}>${l}</option>`).join('')}</select></label><br>
+    <button data-act="t-apply">套用並重新開始</button>
+    <button class="quiet" data-act="t-real">恢復真實時間與天氣</button><br>
+    <span class="note">快速設定：</span>
+    <button class="quiet small" data-act="t-preset" data-d="12-01" data-h="9">12/1 早上</button>
+    <button class="quiet small" data-act="t-preset" data-d="12-24" data-h="19.5">平安夜晚上</button>
+    <button class="quiet small" data-act="t-preset" data-d="12-24" data-h="22">平安夜睡覺</button>
+    <button class="quiet small" data-act="t-preset" data-d="12-25" data-h="8">聖誕節早上</button>
+
+    <h3>清除資料</h3>
+    <p class="note">每天第一次使用時會自動記下當時的進度（保留 35 天，目前有 ${days.length} 天：${days[0] || '—'} 起）。回到今天一開始、回到 30 天前：家長頁面的設定（時間、天氣地點、聖誕開關）會保留；全部清除：連設定一起清掉，回到第一次打開的狀態。</p>
+    <button class="quiet" data-act="c-day">回到今天一開始</button>
+    <button class="quiet" data-act="c-month">回到 30 天前</button>
+    <button class="quiet" data-act="c-all" style="background:#f7c5bd">全部清除</button>
+    <span class="note c-msg"></span>`;
+}
+
 export function openParent(onClose, { onStamp } = {}) {
   ensureInkFilter();
   const k = dateKey();
@@ -96,6 +126,9 @@ export function openParent(onClose, { onStamp } = {}) {
       <button data-act="import" class="quiet">還原</button>
       <span class="note msg"></span>
 
+      <h2>開發測試</h2>
+      <div class="test">${testSection()}</div>
+
       <h2>&nbsp;</h2>
       <button data-act="close">完成</button>
       <p class="note">天氣資料來源：Open-Meteo.com（CC BY 4.0）</p>
@@ -133,6 +166,47 @@ export function openParent(onClose, { onStamp } = {}) {
       redeem(id);
       node.remove();
       openParent(onClose, { onStamp });
+      return;
+    }
+    if (act === 't-apply' || act === 't-preset') {
+      const t = {};
+      if (act === 't-preset') {
+        t.date = `${now().getFullYear()}-${e.target.dataset.d}`;
+        t.hour = parseFloat(e.target.dataset.h);
+        t.weather = node.querySelector('[data-t="weather"]').value || undefined;
+      } else {
+        t.date = node.querySelector('[data-t="date"]').value || undefined;
+        const hv = node.querySelector('[data-t="hour"]').value;
+        t.hour = hv === '' ? undefined : parseFloat(hv);
+        t.weather = node.querySelector('[data-t="weather"]').value || undefined;
+      }
+      localStorage.setItem(TEST_KEY, JSON.stringify(t));
+      location.reload();
+      return;
+    }
+    if (act === 't-real') {
+      localStorage.removeItem(TEST_KEY);
+      location.reload();
+      return;
+    }
+    if (act === 'c-day' || act === 'c-month' || act === 'c-all') {
+      // 按兩次才執行，避免誤按
+      const msg = node.querySelector('.c-msg');
+      if (!e.target.classList.contains('armed')) {
+        node.querySelectorAll('.armed').forEach((b) => b.classList.remove('armed'));
+        e.target.classList.add('armed');
+        msg.textContent = '確定的話，再按一次同一個按鈕。';
+        return;
+      }
+      if (act === 'c-all') {
+        clearAll();
+        msg.textContent = '已全部清除，重新開始…';
+      } else {
+        const k = restoreDaysAgo(act === 'c-day' ? 0 : 30);
+        msg.textContent = k ? `已回到 ${k} 一開始的進度，重新開始…` : '還沒有可以回復的紀錄。';
+        if (!k) return;
+      }
+      setTimeout(() => location.reload(), 700);
       return;
     }
     if (act === 'xreset') {

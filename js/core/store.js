@@ -19,9 +19,12 @@ function blank() {
   };
 }
 
+let rawAtLoad = null;
+
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
+    rawAtLoad = raw;
     if (!raw) return blank();
     const s = JSON.parse(raw);
     const b = blank();
@@ -41,10 +44,72 @@ function load() {
 
 export const state = load();
 
+// ---------- 每日快照：每天第一次存檔前，先把「今天開始時」的進度存一份，保留 35 天 ----------
+const SNAP_KEY = 'tfp-snaps';
+let frozen = false;               // 清除或回復後、重新載入前，不再存檔
+let lastSaved = rawAtLoad || JSON.stringify(state);
+
+function realDayKey(t = Date.now()) {
+  const d = new Date(t);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+function readSnaps() {
+  try { return JSON.parse(localStorage.getItem(SNAP_KEY) || '{}'); } catch { return {}; }
+}
+function writeSnaps(snaps) {
+  const keys = Object.keys(snaps).sort();
+  for (const k of keys.slice(0, -35)) delete snaps[k];
+  try { localStorage.setItem(SNAP_KEY, JSON.stringify(snaps)); } catch { /* 空間不夠就算了 */ }
+}
+function snapshotIfNeeded() {
+  const snaps = readSnaps();
+  const k = realDayKey();
+  if (snaps[k]) return;
+  snaps[k] = lastSaved;
+  writeSnaps(snaps);
+}
+snapshotIfNeeded();
+
 export function save() {
+  if (frozen) return;
   try {
-    localStorage.setItem(KEY, JSON.stringify(state));
+    snapshotIfNeeded();
+    const json = JSON.stringify(state);
+    localStorage.setItem(KEY, json);
+    lastSaved = json;
   } catch { /* 存不進去就算了，不要讓遊戲中斷 */ }
+}
+
+export function snapshotDays() {
+  return Object.keys(readSnaps()).sort();
+}
+
+// 回到 n 天前那一天開始時的進度（0＝今天一開始）。設定保留目前的。回傳實際回到的日期。
+export function restoreDaysAgo(n) {
+  const snaps = readSnaps();
+  const keys = Object.keys(snaps).sort();
+  if (!keys.length) return null;
+  const target = realDayKey(Date.now() - n * 86400000);
+  const k = keys.filter((x) => x <= target).pop() || keys[0];
+  const s = JSON.parse(snaps[k]);
+  s.settings = state.settings;
+  s.session = { usedMs: 0, restUntil: 0 };
+  const json = JSON.stringify(s);
+  frozen = true;
+  localStorage.setItem(KEY, json);
+  for (const x of keys) if (x > k) delete snaps[x];
+  snaps[realDayKey()] = json;
+  writeSnaps(snaps);
+  return k;
+}
+
+// 全部清除，回到第一次打開的狀態
+export function clearAll() {
+  frozen = true;
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i));
+  keys.filter((k) => k === KEY || k.startsWith('tfp-')).forEach((k) => localStorage.removeItem(k));
 }
 
 export function addPlayTime(memberIds, ms) {
@@ -122,5 +187,6 @@ export function exportData() {
 export function importData(text) {
   const s = JSON.parse(text);
   if (!s || typeof s !== 'object' || !s.profiles) throw new Error('bad data');
+  frozen = true;  // 避免重新載入前，舊進度又被存回去
   localStorage.setItem(KEY, JSON.stringify(s));
 }

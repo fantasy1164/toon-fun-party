@@ -1,8 +1,16 @@
-// 與現實同步的時間。測試時可用網址參數 ?hour=20.5 指定小時。
+// 與現實同步的時間。
+// 測試用：網址參數 ?hour=20.5、?date=2026-12-24，或家長頁面「開發測試」存在裝置裡的設定（網址優先）。
 const params = new URLSearchParams(location.search);
-const hourOverride = params.has('hour') ? parseFloat(params.get('hour')) : null;
-// 測試用：?date=2026-12-24 指定日期
-const dateOverride = /^\d{4}-\d{2}-\d{2}$/.test(params.get('date') || '') ? params.get('date').split('-').map(Number) : null;
+export const TEST_KEY = 'tfp-test';
+export function testSettings() {
+  try { return JSON.parse(localStorage.getItem(TEST_KEY) || 'null') || {}; } catch { return {}; }
+}
+const saved = testSettings();
+const hourRaw = params.has('hour') ? params.get('hour') : saved.hour;
+const hourOverride = hourRaw !== undefined && hourRaw !== null && hourRaw !== '' ? parseFloat(hourRaw) : null;
+const dateRaw = params.get('date') || saved.date || '';
+const dateOverride = /^\d{4}-\d{2}-\d{2}$/.test(dateRaw) ? dateRaw.split('-').map(Number) : null;
+export const testing = !!(dateOverride || hourOverride !== null || params.get('weather') || saved.weather);
 
 export function now() {
   const d = new Date();

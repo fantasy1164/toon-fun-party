@@ -2,12 +2,13 @@
 // 30 分鐘更新一次並存起來；沒網路時沿用上一次的結果。
 // 測試用：網址加 ?weather=rain（clear / cloudy / rain / storm / fog / hot / cold / windy）
 import { state, save } from './store.js';
+import { testSettings } from './clock.js';
 
 const CACHE_KEY = 'tfp-weather';
 const MAX_AGE = 30 * 60 * 1000;
 export const DEFAULT_PLACE = { name: '台中', lat: 24.1477, lon: 120.6736 };
 
-const override = new URLSearchParams(location.search).get('weather');
+const override = new URLSearchParams(location.search).get('weather') || testSettings().weather || null;
 let cache = null;
 try { cache = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch { cache = null; }
 
