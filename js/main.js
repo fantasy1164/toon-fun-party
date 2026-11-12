@@ -30,6 +30,8 @@ document.addEventListener('gesturestart', (e) => e.preventDefault());
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 document.addEventListener('dblclick', (e) => e.preventDefault());
 document.addEventListener('pointerdown', unlock);
+// iOS 只把「放開手指／點擊」當成使用者操作，聲音與語音都要在這些事件裡啟動
+['touchend', 'pointerup', 'click'].forEach((t) => document.addEventListener(t, () => { unlock(); primeTts(); }, true));
 
 // ---------- 流程 ----------
 let scene = null;
