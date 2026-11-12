@@ -57,7 +57,7 @@
     git add -A; git commit -m "角色語音"; git push
 
 - 已存在的檔案會跳過；改了台詞或聲音要重做，加 `--force`（可搭配 `--char dudu` 或 `--line hello`）。
-- 有安裝 ffmpeg 會輸出 mp3，沒有則輸出 wav，遊戲都能播。
+- 有安裝 ffmpeg 會輸出 mp3，沒有則輸出 wav，遊戲都能播。`--convert` 可把現有 wav 轉成 mp3，不呼叫 API。
 - 腳本會自動更新 `assets/voice/manifest.json`；沒有語音檔的句子，遊戲會退回裝置內建語音。
 
 新增 js 檔案時，記得加進 `sw.js` 的 `CORE` 清單，並把 `CACHE` 版本號加一。

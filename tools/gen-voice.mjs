@@ -7,6 +7,7 @@
 //   node tools/gen-voice.mjs --line hello # 只做某一句
 //   node tools/gen-voice.mjs --force      # 已存在的也重做
 //   node tools/gen-voice.mjs --dry        # 只列出要做什麼，不呼叫 API
+//   node tools/gen-voice.mjs --convert    # 把現有的 wav 轉成 mp3（需要 ffmpeg，不呼叫 API）
 //
 // 金鑰只放在環境變數，不要寫進任何檔案。
 // 角色的聲音與說話風格在 tools/voice-config.json。
@@ -143,6 +144,22 @@ function writeManifest() {
   files.sort();
   writeFileSync(join(VOICE_DIR, 'manifest.json'), JSON.stringify({ files }, null, 2) + '\n');
   return files.length;
+}
+
+if (flag('convert')) {
+  if (!hasFfmpeg) { console.error('找不到 ffmpeg'); process.exit(1); }
+  let n = 0;
+  for (const d of readdirSync(VOICE_DIR, { withFileTypes: true })) {
+    if (!d.isDirectory()) continue;
+    for (const f of readdirSync(join(VOICE_DIR, d.name))) {
+      if (!f.endsWith('.wav')) continue;
+      const wav = join(VOICE_DIR, d.name, f);
+      const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', wav, '-ac', '1', '-b:a', '64k', wav.replace(/\.wav$/, '.mp3')]);
+      if (r.status === 0) { unlinkSync(wav); n++; }
+    }
+  }
+  console.log(`已轉換 ${n} 個檔案；清單已更新：${writeManifest()} 個語音檔`);
+  process.exit(0);
 }
 
 const all = jobs();
