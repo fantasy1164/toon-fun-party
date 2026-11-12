@@ -27,6 +27,7 @@ export const CHARACTERS = {
 export const GUESTS = {
   bobo: { id: 'bobo', name: '波波', tts: { pitch: 0.75, rate: 0.85 } },
   mian: { id: 'mian', name: '棉棉', tts: { pitch: 1.4, rate: 0.85 } },
+  gugu: { id: 'gugu', name: '咕咕老師', tts: { pitch: 0.85, rate: 0.9 } },
   santa: { id: 'santa', name: '聖誕老公公', tts: { pitch: 0.7, rate: 0.85 } },
 };
 
@@ -38,4 +39,5 @@ export const REWARD_SLOTS = {
   kitchen: { breakfast: [5, 10], lunch: [10, 14], dinner: [16, 21] },
   bedroom: { evening: [18, 21] },
   car: { day: [0, 24] },
+  school: { day: [8, 17] },
 };

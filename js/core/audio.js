@@ -173,6 +173,11 @@ const TRACKS = {
     melody: seq('G4 . A4 B4 D5 . B4 . A4 . G4 . E4 . . .  G4 . A4 B4 D5 . E5 . D5 . B4 . A4 . . .'),
     bass: seq('G2 . D3 . E2 . B2 . C3 . G2 . D3 . . .  G2 . D3 . C3 . G2 . D3 . A2 . D3 . . .'),
   },
+  school: {
+    bpm: 112, lead: 'triangle', leadGain: 0.18,
+    melody: seq('E5 . D5 C5 D5 . E5 . G5 . E5 . D5 . . .  C5 . D5 E5 G5 . A5 . G5 E5 D5 . C5 . . .'),
+    bass: seq('C3 . G2 . A2 . E2 . F2 . C3 . G2 . . .  A2 . E2 . F2 . C3 . G2 . G2 . C3 . . .'),
+  },
   car: {
     bpm: 126, lead: 'square', leadGain: 0.08,
     melody: seq('C5 . C5 E5 G5 . G5 . A5 G5 E5 . C5 . . .  D5 . D5 F5 A5 . G5 . E5 D5 C5 . . . . .'),

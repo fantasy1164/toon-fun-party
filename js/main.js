@@ -11,6 +11,7 @@ import { mountDoor } from './scenes/door.js';
 import { mountKitchen } from './scenes/kitchen.js';
 import { mountBedroom } from './scenes/bedroom.js';
 import { mountCar } from './scenes/car.js';
+import { mountSchool } from './scenes/school.js';
 import { showHub } from './ui/hub.js';
 import { treeScreen, christmasMorning } from './ui/xmas.js';
 import * as fest from './core/festival.js';
@@ -105,7 +106,7 @@ async function goHub() {
   if (room === 'back') { profile = null; route(); return; }
   if (room === 'tree') { await treeScreen(stage, profile); goHub(); return; }
   if (closedReason()) { route(); return; }
-  const mount = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar }[room] || mountBathroom;
+  const mount = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool }[room] || mountBathroom;
   if (state.session.usedMs === 0) warned = false;
   scene = mount(stage, {
     profile,

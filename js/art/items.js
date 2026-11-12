@@ -14,6 +14,13 @@ export const ITEMS = {
   kiki_car: `<path d="M12 62V48L28 44L38 28H66L78 44L90 48V62Z" fill="#ff6b5c"/><rect x="42" y="33" width="20" height="12" rx="3" fill="#d6f4ff"/><circle cx="32" cy="66" r="11" fill="#3a2a22"/><circle cx="72" cy="66" r="11" fill="#3a2a22"/><circle cx="32" cy="66" r="4" fill="#ddd"/><circle cx="72" cy="66" r="4" fill="#ddd"/>`,
   kiki_star: `<path d="M50 8L61 36L92 38L68 57L76 88L50 71L24 88L32 57L8 38L39 36Z" fill="#ffd34d" stroke="#e0a800" stroke-width="5" stroke-linejoin="round"/>`,
   kiki_mush: `<path d="M12 52C12 16 88 16 88 52Z" fill="#ff6b5c"/><circle cx="36" cy="36" r="7" fill="#fff"/><circle cx="62" cy="30" r="9" fill="#fff"/><rect x="38" y="52" width="24" height="36" rx="10" fill="#fff7ea" stroke="#e6d3b8" stroke-width="4"/>`,
+  // 咕咕老師的學堂系列
+  gugu_pencil: `<g transform="rotate(-35 50 50)"><rect x="40" y="10" width="20" height="64" fill="#ffd34d"/><rect x="40" y="10" width="20" height="10" fill="#ff9fb0"/><rect x="40" y="20" width="20" height="5" fill="#c0c6d0"/><path d="M40 74H60L50 94Z" fill="#f3d2a4"/><path d="M46 86H54L50 94Z" fill="#3a2a22"/></g>`,
+  gugu_book: `<path d="M50 24Q30 14 10 20V80Q30 74 50 84Z" fill="#5fa8e8"/><path d="M50 24Q70 14 90 20V80Q70 74 50 84Z" fill="#7cc0f5"/><path d="M50 24V84" stroke="#2f6fb0" stroke-width="4"/><path d="M20 36Q32 32 42 38M20 50Q32 46 42 52M58 38Q68 32 80 36M58 52Q68 46 80 50" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  gugu_globe: `<rect x="30" y="84" width="40" height="8" rx="4" fill="#8a5a2b"/><rect x="47" y="70" width="6" height="16" fill="#8a5a2b"/><circle cx="50" cy="42" r="30" fill="#6cc7ea"/><path d="M32 30Q44 22 50 34Q44 46 34 44Z M56 46Q70 40 74 54Q64 66 56 58Z" fill="#4caf50"/><path d="M20 42A30 30 0 0 0 80 42" fill="none" stroke="#c0a060" stroke-width="4"/>`,
+  gugu_apple: `<path d="M50 30C30 18 12 34 16 58C20 82 38 92 50 84C62 92 80 82 84 58C88 34 70 18 50 30Z" fill="#e5484d"/><path d="M50 30Q50 18 56 10" stroke="#7a4a1e" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M54 20Q68 8 76 18Q64 28 54 20Z" fill="#4caf50"/><ellipse cx="32" cy="46" rx="6" ry="10" fill="#fff" opacity=".5"/>`,
+  gugu_bell: `<path d="M50 16Q76 18 78 52L84 72H16L22 52Q24 18 50 16Z" fill="#ffd34d" stroke="#e0a800" stroke-width="4"/><circle cx="50" cy="80" r="9" fill="#e0a800"/><rect x="44" y="6" width="12" height="12" rx="4" fill="#8a5a2b"/>`,
+  gugu_crayon: `${['#e5484d', '#ffd34d', '#4caf50', '#5fa8e8'].map((c, i) => `<g transform="translate(${16 + i * 18} 0)"><rect x="0" y="26" width="14" height="64" rx="3" fill="${c}"/><path d="M0 26L7 10L14 26Z" fill="${c}"/><rect x="0" y="44" width="14" height="8" fill="#fff" opacity=".6"/></g>`).join('')}`,
   // 特別收藏：聖誕節禮物
   xmas_globe: `<ellipse cx="50" cy="88" rx="30" ry="8" fill="#8a5a2b"/><rect x="24" y="74" width="52" height="16" rx="6" fill="#b9824f"/>
     <circle cx="50" cy="44" r="34" fill="#d6f4ff" stroke="#9fd8ee" stroke-width="4"/>
@@ -25,6 +32,7 @@ export const ITEMS = {
 export const SERIES = {
   dudu: ['dudu_bubble', 'dudu_brush', 'dudu_fish', 'dudu_snow', 'dudu_ice', 'dudu_bow'],
   special: ['xmas_globe'],
+  gugu: ['gugu_pencil', 'gugu_book', 'gugu_globe', 'gugu_apple', 'gugu_bell', 'gugu_crayon'],
   kiki: ['kiki_leaf', 'kiki_ball', 'kiki_kite', 'kiki_car', 'kiki_star', 'kiki_mush'],
 };
 

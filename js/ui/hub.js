@@ -9,6 +9,7 @@ import { ICON } from './screens.js';
 import * as fest from '../core/festival.js';
 import { ROOF_LIGHTS, TREE_ICON } from '../art/xmas.js';
 import { santaPop } from './xmas.js';
+import { SCHOOL_ICON } from '../art/school.js';
 
 const BATH = `<svg viewBox="0 0 420 420" width="420" height="420">
   <rect width="420" height="420" rx="40" fill="#dcf3f5"/>
@@ -78,6 +79,7 @@ export function showHub(stage, profile) {
         <button class="room" data-room="door">${LIVING}</button>
         <button class="room" data-room="bedroom">${BED}</button>
         <button class="room" data-room="car">${CAR}</button>
+        <button class="room" data-room="school">${SCHOOL_ICON}</button>
         <button class="round-btn home">${ICON.home}</button>
         ${fest.isDecember() ? `${ROOF_LIGHTS}<button class="round-btn treebtn">${TREE_ICON}</button>` : ''}
       </div>`);

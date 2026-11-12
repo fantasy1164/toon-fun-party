@@ -142,6 +142,67 @@ Object.assign(LINES, {
   c_mission: { dudu: '{name}坐車要坐安全座椅、繫好安全帶喔！' },
 });
 
+// ---- 學堂（咕咕老師） ----
+Object.assign(LINES, {
+  s_hello: { gugu: '各位同學好，我是咕咕老師。{name}，歡迎來上課！' },
+  s_morning: { kiki: '咕咕老師早安！', dudu: '咕咕老師早安。' },
+  s_noon: { kiki: '咕咕老師午安！', dudu: '咕咕老師午安。' },
+  s_wave: { gugu: '{name}，你也跟老師打招呼吧。點一下，揮揮手。' },
+  s_wave_hard: { gugu: '{name}，見到老師要說什麼呢？' },
+  s_hi_kid_m: { gugu: '{name}早安！真有禮貌。' },
+  s_hi_kid_n: { gugu: '{name}午安！真有禮貌。' },
+  s_ask_intro: { gugu: '老師要問問題囉。知道答案的人，要先舉手。' },
+  s_q_wash: { gugu: '吃飯以前，要先做什麼呢？' },
+  s_q_cough: { gugu: '咳嗽、打噴嚏的時候，要怎麼做呢？' },
+  s_q_cross: { gugu: '過馬路的時候，要怎麼做呢？' },
+  s_shout: { kiki: '我知道！我知道！' },
+  s_raise_hand: { dudu: '奇奇，要先舉手，等老師叫你喔。' },
+  s_ok_hand: { kiki: '對喔！我舉手！' },
+  s_kid_hand: { gugu: '{name}，你也舉手試試看。' },
+  s_call_kid: { gugu: '好，請{name}來回答。' },
+  s_a_wrong: { gugu: '嗯……再想一想喔。' },
+  s_a_wash: { gugu: '答對了！吃飯以前要用肥皂洗手。洗手的英文是 wash hands。' },
+  s_a_cough: { gugu: '答對了！咳嗽、打噴嚏要用手肘遮住嘴巴。' },
+  s_a_cross: { gugu: '答對了！過馬路要走斑馬線，牽好大人的手。' },
+  s_sort_intro: { gugu: '我們來做垃圾分類。垃圾要丟進對的桶子裡。' },
+  s_sort_easy: { gugu: '點一下亮亮的桶子，把垃圾丟進去。' },
+  s_sort_hard: { gugu: '紙類、寶特瓶、廚餘、一般垃圾，要放哪一個桶子呢？' },
+  s_h_recycle: { gugu: '這個可以回收，要放藍色的回收桶。' },
+  s_h_general: { gugu: '這個不能回收，要放一般垃圾桶。' },
+  s_h_paper: { gugu: '紙盒要放紙類回收桶。' },
+  s_h_plastic: { gugu: '寶特瓶要放寶特瓶回收桶。' },
+  s_h_food: { gugu: '吃剩的果皮要放廚餘桶。' },
+  s_en_bottle: { gugu: 'Bottle！寶特瓶！' },
+  s_en_paper: { gugu: 'Paper box！紙盒！' },
+  s_en_banana: { gugu: 'Banana peel！香蕉皮！' },
+  s_en_apple: { gugu: 'Apple core！蘋果核！' },
+  s_en_tissue: { gugu: 'Tissue！衛生紙！' },
+  s_en_mask: { gugu: 'Mask！口罩！' },
+  s_sort_done: { gugu: '全部分類好了，地球謝謝你！' },
+  s_free: { gugu: '下課時間到了，大家去玩吧。' },
+  s_build: { dudu: '我在疊積木，好高喔。' },
+  s_run: { kiki: '我要去溜滑梯！衝啊！' },
+  s_oops: { kiki: '哎呀！' },
+  s_cry: { dudu: '嗚嗚……我的積木倒了。' },
+  s_what_do: { gugu: '奇奇不小心撞倒了嘟嘟的積木。奇奇應該怎麼做呢？' },
+  s_runaway: { gugu: '跑走的話，嘟嘟會更難過喔。再想一想。' },
+  s_sorry: { kiki: '嘟嘟，對不起！我幫你撿起來。' },
+  s_its_ok: { dudu: '沒關係，謝謝你。' },
+  s_hi5: { gugu: '他們和好了！{name}，幫他們擊個掌吧！' },
+  s_friends: { gugu: '做錯事說對不起，大家都是好朋友。' },
+  s_mission: { gugu: '{name}，今天回家也幫忙做垃圾分類喔！' },
+  // 晚上看星星
+  s_night_hello: { gugu: '晚安，{name}。教室下課了，我們一起來看星星吧。點一下星星。' },
+  s_night_cloudy: { gugu: '今天雲好多，星星都躲起來了。點一下老師，聽老師說故事。' },
+  s_fact_moon: { gugu: '月亮自己不會發光，是太陽把它照亮的。' },
+  s_fact_star: { gugu: '星星其實是很遠很遠的太陽。' },
+  s_fact_owl: { gugu: '貓頭鷹的眼睛很大，晚上也看得很清楚。' },
+  s_fact_turn: { gugu: '地球一直在轉，轉到背對太陽，就變成晚上了。' },
+  s_fact_en: { gugu: '星星的英文是 star，月亮的英文是 moon。' },
+  s_dipper: { gugu: '七顆星星連起來，像一支大勺子！這叫做北斗七星。' },
+  s_night_bye: { gugu: '時間不早了，{name}也要準備睡覺囉。' },
+});
+
 // ---- 快到休息時間 ----
 Object.assign(LINES, {
   time_soon: { dudu: '再玩一下下，就要休息囉。', kiki: '再玩一下下就要休息了喔！', bobo: '再玩一下下，波波就要去休息囉。', mian: '再一下下……就要休息了喔。' },
@@ -279,3 +340,13 @@ export function lineHasName(id, charId) {
   const t = typeof l === 'string' ? l : l?.[charId] || '';
   return t.includes('{name}');
 }
+
+// 咕咕老師的通用句
+Object.assign(LINES.praise1, { gugu: '很好。' });
+Object.assign(LINES.praise2, { gugu: '非常好！' });
+Object.assign(LINES.praise3, { gugu: 'Excellent！太棒了！' });
+Object.assign(LINES.gift, { gugu: '這是老師送你的禮物。' });
+Object.assign(LINES.practice, { gugu: '今天練習得很好，下次再送你禮物。' });
+Object.assign(LINES.bye, { gugu: '下課囉！{name}，明天見。' });
+Object.assign(LINES.bye_sunny, { gugu: '外面天氣很好，{name}，去外面跑一跑吧！明天見。' });
+Object.assign(LINES.time_soon, { gugu: '快要下課囉。' });

@@ -115,6 +115,32 @@ function mian(extra = '') {
   </g>`;
 }
 
+// 貓頭鷹咕咕老師：博學、溫和（原創造型）
+function gugu(extra = '') {
+  const chev = [[100, 214], [140, 214], [120, 238], [100, 262], [140, 262], [120, 286]]
+    .map(([x, y]) => `<path d="M${x - 9} ${y}Q${x} ${y + 9} ${x + 9} ${y}" fill="none" stroke="#c9a77a" stroke-width="4" stroke-linecap="round"/>`).join('');
+  return `
+  <g class="char gugu">
+    <ellipse cx="120" cy="312" rx="92" ry="10" fill="#000" opacity=".12"/>
+    <path d="M88 296l-10 16M96 298v16M104 296l10 16M136 296l-10 16M144 298v16M152 296l10 16" stroke="#f0a43c" stroke-width="7" stroke-linecap="round"/>
+    <g class="arm arm-l"><path d="M44 150Q4 210 30 282Q60 262 66 200Z" fill="#6e5236"/></g>
+    <g class="arm arm-r"><path d="M196 150Q236 210 210 282Q180 262 174 200Z" fill="#6e5236"/></g>
+    <path d="M120 40C196 40 212 120 210 200C208 270 176 306 120 306C64 306 32 270 30 200C28 120 44 40 120 40Z" fill="#8a6a4a"/>
+    <path d="M36 70L48 16L86 50Z" fill="#8a6a4a"/><path d="M204 70L192 16L154 50Z" fill="#8a6a4a"/>
+    <ellipse cx="120" cy="246" rx="62" ry="58" fill="#f3e2c4"/>${chev}
+    <circle cx="86" cy="112" r="40" fill="#f3e2c4"/><circle cx="154" cy="112" r="40" fill="#f3e2c4"/>
+    ${eyes(88, 152, 112, '#f3e2c4')}
+    <circle cx="88" cy="112" r="25" fill="none" stroke="#3a2a22" stroke-width="5"/><circle cx="152" cy="112" r="25" fill="none" stroke="#3a2a22" stroke-width="5"/>
+    <path d="M113 110Q120 104 127 110" fill="none" stroke="#3a2a22" stroke-width="5"/>
+    <circle cx="58" cy="146" r="10" fill="#ff9fb0" opacity=".7"/><circle cx="182" cy="146" r="10" fill="#ff9fb0" opacity=".7"/>
+    <ellipse class="mouth" cx="120" cy="164" rx="9" ry="7" fill="#b8412f"/>
+    <path d="M108 136H132L120 160Z" fill="#f0a43c"/>
+    <g transform="translate(120 34) rotate(-8)"><path d="M-62 0L0 -24L62 0L0 24Z" fill="#2b2f3a"/><path d="M-30 6V24Q0 38 30 24V6" fill="#2b2f3a"/><path d="M40 4V42" stroke="#ffd34d" stroke-width="4"/><circle cx="40" cy="46" r="7" fill="#ffd34d"/></g>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
 // 聖誕老公公（原創造型）
 function santa(extra = '') {
   return `
@@ -150,7 +176,7 @@ export const NIGHTCAP = {
   kiki: `<g class="cap"><path d="M70 56Q100 -4 168 34L170 50Q120 36 70 66Z" fill="#7a8cff"/><path d="M70 60Q120 40 172 52" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="174" cy="32" r="12" fill="#fff"/></g>`,
 };
 
-const BUILDERS = { dudu, kiki, santa, bobo, mian };
+const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu };
 
 // 回傳可放進 <svg> 的角色群組，x、y 為左上角，s 為縮放。
 export function characterSvg(id, { x = 0, y = 0, s = 1, extra = '' } = {}) {

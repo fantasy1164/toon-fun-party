@@ -300,12 +300,13 @@ html, body {
 .hub .roof { position: absolute; left: 90px; top: 30px; width: 1020px; height: 140px; background: #e5734f; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .hub .avs { position: absolute; left: 50%; top: 70px; transform: translateX(-50%); display: flex; gap: 10px; }
 .hub .av { width: 96px; height: 96px; border-radius: 50%; overflow: hidden; border: 6px solid #fff; }
-.hub .room { border-width: 9px !important; position: absolute; top: 280px; width: 216px; height: 216px; padding: 0; border: 14px solid #fff; border-radius: 54px; background: none; overflow: hidden; box-shadow: 0 14px 0 rgba(0, 0, 0, .15); animation: bob 1.5s ease-in-out infinite alternate; }
-.hub .room[data-room="bathroom"] { left: 24px; }
-.hub .room[data-room="kitchen"] { left: 258px; animation-delay: .15s; }
-.hub .room[data-room="door"] { left: 492px; animation-delay: .3s; }
-.hub .room[data-room="bedroom"] { left: 726px; animation-delay: .45s; }
-.hub .room[data-room="car"] { left: 960px; animation-delay: .6s; }
+.hub .room { border-width: 10px !important; position: absolute; width: 250px; height: 250px; padding: 0; border: 14px solid #fff; border-radius: 54px; background: none; overflow: hidden; box-shadow: 0 14px 0 rgba(0, 0, 0, .15); animation: bob 1.5s ease-in-out infinite alternate; }
+.hub .room[data-room="bathroom"] { left: 145px; top: 190px; }
+.hub .room[data-room="kitchen"] { left: 475px; top: 190px; animation-delay: .15s; }
+.hub .room[data-room="door"] { left: 805px; top: 190px; animation-delay: .3s; }
+.hub .room[data-room="bedroom"] { left: 145px; top: 480px; animation-delay: .45s; }
+.hub .room[data-room="car"] { left: 475px; top: 480px; animation-delay: .6s; }
+.hub .room[data-room="school"] { left: 805px; top: 480px; animation-delay: .75s; }
 .hub .room svg { width: 100%; height: 100%; }
 .hub .room.chosen { border-color: #ffd34d; animation: pulse .25s ease-in-out 4 alternate; }
 .hub .room svg { display: block; }
@@ -597,3 +598,72 @@ html, body {
 .car .cdoor.glow { animation: pulse .6s ease-in-out infinite alternate; box-shadow: 0 0 0 10px rgba(255, 208, 0, .8); }
 .car .cdoor.nope { animation: wiggle .35s ease-in-out; }
 .car.out .rider .char { animation: jump .32s ease-out infinite alternate; }
+
+/* ---------- 學堂 ---------- */
+.school { background: #fbeed3; }
+.school .s-layer { position: absolute; inset: 0; pointer-events: none; }
+.school .s-layer svg { width: 100%; height: 100%; display: block; }
+.school .s-char { position: absolute; pointer-events: none; transition: transform .8s ease-in-out; }
+.school .s-char svg { display: block; overflow: visible; }
+.school .s-char .char { animation: bob 1.4s ease-in-out infinite alternate; }
+.school .s-char .arm { transform-box: fill-box; transform-origin: 50% 12%; transition: transform .3s; }
+.school .s-char.glow-char { pointer-events: auto; }
+.school .s-char.glow-char .char { filter: drop-shadow(0 0 14px #ffd000) drop-shadow(0 0 6px #ffd000); }
+.school .teacher { transform: translateX(420px); }
+.school .teacher.enter, .school.night-sky .teacher { transform: none; }
+.school .s-char.shout .char { animation: jump .28s ease-out infinite alternate; }
+.school .s-char.hand .arm-r { transform: rotate(-160deg); }
+.school .s-char.run { transform: translate(520px, -30px); transition: transform .9s ease-in; }
+.school .s-char.bow svg { transform: rotate(14deg); transition: transform .3s; }
+.school.clap .pupil .char { animation: jump .25s ease-out infinite alternate; }
+.school.clap .pupil .arm-r, .school.clap .pupil .arm-l { transform: rotate(-150deg); }
+.school .kidchair { transform-box: fill-box; transform-origin: 50% 100%; }
+.school.kid-wave .kidchair { animation: wiggle .4s ease-in-out 3; }
+.school .raised { position: absolute; left: 660px; top: 470px; opacity: 0; transform: translateY(60px); transition: transform .3s, opacity .3s; pointer-events: none; }
+.school.kid-hand .raised { opacity: 1; transform: none; animation: pulse .5s ease-in-out infinite alternate; }
+.school .kidbtn { position: absolute; left: 538px; top: 762px; width: 124px; height: 124px; z-index: 5; }
+.school .kidbtn.glow, .school .scard.glow, .school .hifive.glow { animation: pulse .6s ease-in-out infinite alternate; box-shadow: 0 0 0 10px rgba(255, 208, 0, .85), 0 10px 0 rgba(0, 0, 0, .15); }
+.school .tears { position: absolute; left: 922px; top: 600px; width: 80px; height: 120px; pointer-events: none; }
+.school .tears i { position: absolute; top: 0; width: 14px; height: 20px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #7cc4f5; animation: tear .8s ease-in infinite; }
+.school .tears i:first-child { left: 4px; }
+.school .tears i:last-child { left: 54px; animation-delay: .4s; }
+@keyframes tear { from { transform: translateY(0); opacity: 1; } to { transform: translateY(60px); opacity: 0; } }
+.school .blocks { opacity: 0; transition: opacity .3s; }
+.school.building .blocks { opacity: 1; }
+.school .blk { transform-box: fill-box; transform-origin: center; transition: transform .5s ease-out; }
+.school.crash .b4 { transform: translate(90px, 120px) rotate(80deg); }
+.school.crash .b3 { transform: translate(-80px, 110px) rotate(-70deg); }
+.school.crash .b2 { transform: translate(60px, 60px) rotate(40deg); }
+.school.crash .b1 { transform: rotate(-12deg); }
+.school .s-cards { position: absolute; left: 260px; top: 84px; width: 560px; height: 250px; display: flex; align-items: center; justify-content: center; gap: 16px; z-index: 6; }
+.school .scard { position: relative; width: auto; height: auto; padding: 6px; border-radius: 26px; background: #fff; }
+.school .scard svg { display: block; width: 170px; height: 136px; }
+.school .scard.nope { animation: wiggle .35s ease-in-out; }
+.school .scard.picked { animation: none; transform: scale(1.15); box-shadow: 0 0 0 10px #3be37a; }
+.school .trash { position: absolute; left: 455px; top: 120px; width: 170px; height: 170px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; z-index: 6; box-shadow: 0 0 0 8px #ffd34d; pointer-events: none; }
+.school .trash.pop { animation: popin .4s ease-out; }
+.school .trash.toss { transition: transform .45s ease-in, opacity .45s; transform: translate(var(--dx), var(--dy)) scale(.35); opacity: .2; }
+.school .s-bins { position: absolute; left: 0; right: 0; top: 350px; display: flex; justify-content: center; gap: 40px; z-index: 5; }
+.school .s-bins.n4 { gap: 22px; }
+.school .sbin { width: 150px; height: 172px; padding: 0; border: 0; background: none; }
+.school .sbin svg { width: 100%; height: 100%; display: block; }
+.school .sbin .lid { transform-box: fill-box; transform-origin: 0 100%; transition: transform .2s; }
+.school .sbin.open .lid { transform: rotate(-35deg); }
+.school .sbin.glow { animation: pulse .6s ease-in-out infinite alternate; filter: drop-shadow(0 0 14px #ffd000) drop-shadow(0 0 6px #ffd000); }
+.school .sbin.nope { animation: wiggle .35s ease-in-out; }
+.school .hifive { position: absolute; left: 640px; top: 360px; width: 150px; height: 140px; z-index: 6; }
+/* 晚上看星星 */
+.school.night-sky { background: #2a2f48; }
+.school .nstar, .school .moon { pointer-events: auto; }
+.school .nstar .halo, .school .moon .halo { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.school .moon .halo { opacity: .2; }
+.school .nstar.glow .halo { animation: halo .8s ease-in-out infinite alternate; }
+.school .nstar.lit .halo { animation: none; opacity: .8; }
+.school .nstar.lit > g { fill: #ffe14d; }
+.school .nstar > g { transform-box: fill-box; transform-origin: center; }
+.school .nstar.tpop > g { animation: starpop .5s ease-out; }
+@keyframes starpop { 0% { transform: scale(1); } 40% { transform: scale(1.7) rotate(20deg); } 100% { transform: scale(1); } }
+.school .tw { animation: twinkle 1.2s ease-in-out infinite alternate; }
+.school .dl { opacity: 0; transition: opacity .6s; }
+.school.dipper .dl { opacity: 1; }
+.school.night-sky .s-char.sill { pointer-events: auto; }
