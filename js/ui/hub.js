@@ -1,0 +1,69 @@
+// 選房間：小房子裡的兩個房間，點一個進去。
+import { CHARACTERS } from '../config.js';
+import { el, $, $$, onTap, wait, pick, burst, centerOf } from '../core/dom.js';
+import { sfx, playMusic } from '../core/audio.js';
+import { speak, hush } from '../core/voice.js';
+import { phase } from '../core/clock.js';
+import { characterSvg, avatarSvg } from '../art/characters.js';
+import { ICON } from './screens.js';
+
+const BATH = `<svg viewBox="0 0 420 420" width="420" height="420">
+  <rect width="420" height="420" rx="40" fill="#dcf3f5"/>
+  ${[60, 140, 220, 300, 380].map((x) => `<path d="M${x} 0V260" stroke="#c4e6ea" stroke-width="3"/>`).join('')}
+  <rect y="260" width="420" height="160" fill="#a9dbe6"/>
+  <rect x="120" y="60" width="180" height="140" rx="26" fill="#fff"/><rect x="132" y="72" width="156" height="116" rx="18" fill="#d6f2fb"/>
+  <rect x="80" y="250" width="260" height="130" rx="14" fill="#7cc4d8"/><rect x="66" y="228" width="288" height="30" rx="14" fill="#fff"/>
+  <path d="M200 228V200Q200 182 218 182H232V196H220Q214 196 214 204V228Z" fill="#b9c6d2"/>
+  <rect x="110" y="170" width="12" height="60" rx="6" fill="#ff7fa8"/><rect x="104" y="152" width="24" height="26" rx="6" fill="#fff" stroke="#9fd8ee" stroke-width="3"/>
+  <rect x="280" y="200" width="54" height="28" rx="12" fill="#ff9fc4"/>
+  ${[[150, 110, 16], [250, 140, 12], [300, 90, 10]].map(([x, y, r]) => `<circle class="bub" cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity=".85"/>`).join('')}
+</svg>`;
+
+const LIVING = `<svg viewBox="0 0 420 420" width="420" height="420">
+  <rect width="420" height="420" rx="40" fill="#fbe3c4"/>
+  <rect y="300" width="420" height="120" fill="#c8915a"/>
+  <rect x="210" y="60" width="160" height="270" rx="8" fill="#8a5a2b"/>
+  <rect x="222" y="72" width="136" height="258" rx="6" fill="#d96c4a"/>
+  <rect x="242" y="92" width="96" height="70" rx="8" fill="#9fdcff"/>
+  <circle cx="340" cy="210" r="9" fill="#ffd34d"/>
+  <rect x="30" y="80" width="150" height="18" rx="8" fill="#b9824f"/>
+  <g transform="translate(36 98) scale(.55)"><path d="M30 12L50 20L70 12L94 30L84 50L76 46V92H24V46L16 50L6 30Z" fill="#3f7fd6"/></g>
+  <g transform="translate(100 96) scale(.55)"><path d="M6 50Q50 -8 94 50Q83 42 72 50Q61 42 50 50Q39 42 28 50Q17 42 6 50Z" fill="#8e4ec6"/><path d="M50 50V84q0 10 -10 10" fill="none" stroke="#555" stroke-width="5"/></g>
+  <g transform="translate(40 230) scale(.6)"><path d="M10 62Q12 44 30 44L44 46Q52 58 70 58L88 62Q94 66 92 74H10Z" fill="#ff6b5c"/><rect x="10" y="72" width="82" height="9" rx="3" fill="#fff"/></g>
+  ${characterSvg('kiki', { x: 110, y: 168, s: 0.6 })}
+</svg>`;
+
+export function showHub(stage, profile) {
+  return new Promise((resolve) => {
+    const host = pick(Object.keys(CHARACTERS));
+    const night = phase() === 'night';
+    const avatars = profile.members.map((id) => `<div class="av">${avatarSvg(id, 96)}</div>`).join('');
+    const node = el(`
+      <div class="screen hub ${night ? 'night' : ''}">
+        <div class="roof"></div>
+        <div class="avs">${avatars}</div>
+        <button class="room" data-room="bathroom">${BATH}</button>
+        <button class="room" data-room="door">${LIVING}</button>
+        <button class="round-btn home">${ICON.home}</button>
+      </div>`);
+    stage.replaceChildren(node);
+    playMusic('lobby');
+    let done = false;
+    const go = async (room, btn) => {
+      if (done) return;
+      done = true;
+      hush();
+      sfx('fanfare');
+      if (btn) {
+        btn.classList.add('chosen');
+        const c = centerOf(btn);
+        burst(c.x, c.y, { n: 12, kind: 'star', spread: 180 });
+        await wait(600);
+      }
+      resolve(room);
+    };
+    $$('.room', node).forEach((b) => onTap(b, () => go(b.dataset.room, b)));
+    onTap($('.home', node), () => { sfx('tap'); go('back'); });
+    speak(host, 'hub_pick', { name: profile.name, who: profile.id });
+  });
+}

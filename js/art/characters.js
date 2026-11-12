@@ -12,7 +12,7 @@ const zzz = `
     <path class="z z2" d="M214 14 h16 l-16 20 h16"/>
   </g>`;
 
-function dudu() {
+function dudu(extra = '') {
   return `
   <g class="char dudu">
     <ellipse cx="120" cy="312" rx="96" ry="10" fill="#000" opacity=".12"/>
@@ -29,11 +29,12 @@ function dudu() {
     <path d="M98 128Q120 116 142 128Q132 146 120 148Q108 146 98 128Z" fill="#f6a23c"/>
     <path d="M120 178L88 162V196Z" fill="#5fc3e8"/><path d="M120 178L152 162V196Z" fill="#5fc3e8"/>
     <circle cx="120" cy="178" r="9" fill="#3aa6d0"/>
+    ${extra}
     ${zzz}
   </g>`;
 }
 
-function kiki() {
+function kiki(extra = '') {
   return `
   <g class="char kiki">
     <ellipse cx="120" cy="312" rx="92" ry="10" fill="#000" opacity=".12"/>
@@ -57,6 +58,7 @@ function kiki() {
     <ellipse cx="120" cy="130" rx="11" ry="8" fill="#3a2a22"/>
     <path d="M70 176Q120 204 170 176L166 196Q120 222 74 196Z" fill="#3fb58a"/>
     <path d="M150 196L176 232L154 226L146 204Z" fill="#2f9a73"/>
+    ${extra}
     ${zzz}
   </g>`;
 }
@@ -64,8 +66,8 @@ function kiki() {
 const BUILDERS = { dudu, kiki };
 
 // 回傳可放進 <svg> 的角色群組，x、y 為左上角，s 為縮放。
-export function characterSvg(id, { x = 0, y = 0, s = 1 } = {}) {
-  return `<g transform="translate(${x} ${y}) scale(${s})">${BUILDERS[id]()}</g>`;
+export function characterSvg(id, { x = 0, y = 0, s = 1, extra = '' } = {}) {
+  return `<g transform="translate(${x} ${y}) scale(${s})">${BUILDERS[id](extra)}</g>`;
 }
 
 // 角色的代表色，用在特寫畫面。

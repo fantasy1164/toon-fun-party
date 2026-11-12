@@ -54,6 +54,51 @@ Object.assign(LINES, {
   resting_sunny: { dudu: '嘟嘟去散步了。天氣很好，你也出去走走吧。', kiki: '奇奇在公園玩！你也出去玩吧！' },
 });
 
+// ---- 選房間 ----
+Object.assign(LINES, {
+  hub_pick: { dudu: '{name}，要去哪裡玩呢？', kiki: '{name}！今天要去哪個房間？' },
+});
+
+// ---- 客廳大門區（奇奇擔任） ----
+Object.assign(LINES, {
+  d_hello: { kiki: '{name}！我們要出門去公園囉！先看看外面的天氣！' },
+  d_night: { kiki: '天黑了，我們先練習明天出門要穿什麼！' },
+  d_w_normal: { kiki: '今天天氣不錯！' },
+  d_w_hot: { kiki: '今天太陽好大，好熱喔！' },
+  d_w_rain: { kiki: '外面在下雨耶！' },
+  d_w_cold: { kiki: '今天好冷喔！' },
+  d_w_windy: { kiki: '外面風好大！' },
+  d_what: { kiki: '要穿什麼、帶什麼呢？你幫我選！' },
+  d_need_normal: { kiki: '穿好鞋子就可以出發！' },
+  d_need_hot: { kiki: '要穿鞋子，還要戴帽子！' },
+  d_need_rain: { kiki: '要穿雨鞋，還要帶雨傘！' },
+  d_need_cold: { kiki: '要穿鞋子，還要穿外套！' },
+  d_need_windy: { kiki: '要穿鞋子，還要穿外套！' },
+  i_sneakers: { kiki: '運動鞋！' }, i_boots: { kiki: '雨鞋！' }, i_raincoat: { kiki: '雨衣！' }, i_umbrella: { kiki: '雨傘！' },
+  i_jacket: { kiki: '外套！' }, i_scarf: { kiki: '圍巾！' }, i_hat: { kiki: '帽子！' }, i_bottle: { kiki: '水壺！' },
+  en_sneakers: { kiki: 'Sneakers！' }, en_boots: { kiki: 'Rain boots！' }, en_raincoat: { kiki: 'Raincoat！' }, en_umbrella: { kiki: 'Umbrella！' },
+  en_jacket: { kiki: 'Jacket！' }, en_scarf: { kiki: 'Scarf！' }, en_hat: { kiki: 'Hat！' }, en_bottle: { kiki: 'Water bottle！' },
+  d_door: { kiki: '準備好了！點大門，出發！' },
+  d_ok: { kiki: '耶！準備好了！出發去公園囉！' },
+  d_f_shoes: { kiki: '哎呀！忘了穿鞋子，腳好痛！' },
+  d_f_wet: { kiki: '哇！全身都濕了！要穿雨衣或撐雨傘！' },
+  d_f_feet: { kiki: '哎呀，腳濕濕的！下雨天要穿雨鞋！' },
+  d_f_hot: { kiki: '好熱好熱！穿太多了啦，脫掉！' },
+  d_f_hotneed: { kiki: '太陽好大！要戴帽子，還要帶水壺喝水！' },
+  d_f_flip: { kiki: '哇！雨傘被風吹翻了！風大的時候不要撐傘！' },
+  d_f_norain: { kiki: '今天沒有下雨，不用雨具喔！' },
+  d_f_cold: { kiki: '好冷好冷！要穿暖暖的才可以出門！' },
+  d_storm_look: { kiki: '外面好像在打雷耶……點大門看看。' },
+  d_storm_back: { kiki: '哇！打雷了！打雷的時候，待在家裡最安全！' },
+  d_storm_inside: { kiki: '今天我們在家裡玩吧！' },
+  d_m_normal: { kiki: '換{name}去穿鞋子囉！' },
+  d_m_hot: { kiki: '換{name}戴帽子、帶水壺囉！' },
+  d_m_rain: { kiki: '換{name}穿雨衣、穿雨鞋囉！' },
+  d_m_cold: { kiki: '換{name}穿外套、圍圍巾囉！' },
+  d_m_windy: { kiki: '換{name}穿好外套囉！' },
+  d_spin: { kiki: '轉轉天氣轉盤，換一個天氣練習！' },
+});
+
 // ---- 好寶寶印章：挑選 ----
 Object.assign(LINES, {
   stamp_pick: { dudu: '{name}，選一個你最喜歡的印章吧。', kiki: '{name}！挑一個最酷的印章！' },

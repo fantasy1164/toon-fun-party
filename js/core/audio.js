@@ -168,6 +168,11 @@ const TRACKS = {
     melody: seq('G4 G4 A4 G4 E5 . D5 . G4 G4 A4 G4 D5 . C5 .  E5 E5 D5 C5 A4 . C5 . D5 D5 E5 D5 C5 . . .'),
     bass: seq('C3 . C3 G3 C3 . G3 . G2 . G2 D3 G2 . D3 .  A2 . A2 E3 F2 . F2 . G2 . G2 D3 C3 . C3 .'),
   },
+  living: {
+    bpm: 112, lead: 'triangle', leadGain: 0.18,
+    melody: seq('G4 . A4 B4 D5 . B4 . A4 . G4 . E4 . . .  G4 . A4 B4 D5 . E5 . D5 . B4 . A4 . . .'),
+    bass: seq('G2 . D3 . E2 . B2 . C3 . G2 . D3 . . .  G2 . D3 . C3 . G2 . D3 . A2 . D3 . . .'),
+  },
   lobby: {
     bpm: 100, lead: 'triangle', leadGain: 0.18,
     melody: seq('C5 . E5 . G5 . E5 . A5 . G5 . E5 . . .  D5 . F5 . A5 . G5 . E5 . D5 . C5 . . .'),

@@ -27,4 +27,5 @@ export const CHARACTERS = {
 export const REWARD_SLOTS = {
   brush: { morning: [5, 11], evening: [18, 22] },
   wash: { morning: [5, 11], noon: [11, 16], evening: [16, 22] },
+  door: { morning: [5, 11] },
 };

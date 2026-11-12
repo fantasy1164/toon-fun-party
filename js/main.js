@@ -7,6 +7,8 @@ import { loadVoiceManifest, hush, primeTts } from './core/voice.js';
 import { showSplash, showProfiles, showClosed } from './ui/screens.js';
 import { openParent } from './ui/parent.js';
 import { mountBathroom } from './scenes/bathroom.js';
+import { mountDoor } from './scenes/door.js';
+import { showHub } from './ui/hub.js';
 import { pickStamp, stampSession } from './ui/stamps.js';
 import * as weather from './core/weather.js';
 
@@ -83,9 +85,23 @@ async function route() {
     if (!p.stamp || p.repick) await pickStamp(stage, id);
   }
   profile = chosen;
-  scene = mountBathroom(stage, {
+  goHub();
+}
+
+// 選房間，再進場景；從場景按回家會回到選房間
+async function goHub() {
+  if (!profile) { route(); return; }
+  if (closedReason()) { route(); return; }
+  const room = await showHub(stage, profile);
+  if (room === 'back') { profile = null; route(); return; }
+  if (closedReason()) { route(); return; }
+  const mount = room === 'door' ? mountDoor : mountBathroom;
+  scene = mount(stage, {
     profile,
-    onExit: () => route(),
+    onExit: (why) => {
+      scene = null;
+      if (why === 'home') goHub(); else route();
+    },
   });
 }
 

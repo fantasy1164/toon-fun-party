@@ -42,9 +42,13 @@ const SKY = {
   dusk: ['#ff8f6b', '#ffd08a'],
 };
 
+export function skyColors(phase, wx) {
+  const grey = wx.kind !== 'clear' && phase !== 'night';
+  return { grey, colors: grey ? GREY_SKY[phase] : SKY[phase] };
+}
+
 function windowView(phase, wx) {
-  const grey = !['clear'].includes(wx.kind) && phase !== 'night';
-  const [a, b] = grey ? GREY_SKY[phase] : SKY[phase];
+  const { grey, colors: [a, b] } = skyColors(phase, wx);
   const stars = phase === 'night'
     ? [[830, 140], [900, 190], [1010, 130], [1050, 220], [860, 260], [960, 300]]
       .map(([x, y], i) => `<circle class="star" style="animation-delay:${i * 0.4}s" cx="${x}" cy="${y}" r="4" fill="#fff"/>`).join('')
