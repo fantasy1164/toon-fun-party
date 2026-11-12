@@ -22,6 +22,15 @@ const BATH = `<svg viewBox="0 0 420 420" width="420" height="420">
   ${[[150, 110, 16], [250, 140, 12], [300, 90, 10]].map(([x, y, r]) => `<circle class="bub" cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity=".85"/>`).join('')}
 </svg>`;
 
+const KITCHEN = `<svg viewBox="0 0 420 420" width="420" height="420">
+  <rect width="420" height="420" rx="40" fill="#fff1d6"/>
+  <rect x="120" y="40" width="180" height="110" rx="14" fill="#9fdcff" stroke="#fff" stroke-width="10"/>
+  ${characterSvg('bobo', { x: 120, y: 120, s: 0.75 })}
+  <rect x="20" y="290" width="380" height="36" rx="14" fill="#d9a066"/><rect x="40" y="326" width="24" height="80" fill="#b9824f"/><rect x="356" y="326" width="24" height="80" fill="#b9824f"/>
+  <ellipse cx="210" cy="292" rx="70" ry="16" fill="#fff" stroke="#eee" stroke-width="4"/>
+  <circle cx="186" cy="284" r="12" fill="#2e8b57"/><circle cx="214" cy="282" r="12" fill="#fff" stroke="#eee" stroke-width="2"/><circle cx="214" cy="282" r="6" fill="#ffc400"/><circle cx="240" cy="284" r="11" fill="#e5484d"/>
+</svg>`;
+
 const LIVING = `<svg viewBox="0 0 420 420" width="420" height="420">
   <rect width="420" height="420" rx="40" fill="#fbe3c4"/>
   <rect y="300" width="420" height="120" fill="#c8915a"/>
@@ -46,6 +55,7 @@ export function showHub(stage, profile) {
         <div class="roof"></div>
         <div class="avs">${avatars}</div>
         <button class="room" data-room="bathroom">${BATH}</button>
+        <button class="room" data-room="kitchen">${KITCHEN}</button>
         <button class="room" data-room="door">${LIVING}</button>
         <button class="round-btn home">${ICON.home}</button>
         ${fest.isDecember() ? `${ROOF_LIGHTS}<button class="round-btn treebtn">${TREE_ICON}</button>` : ''}

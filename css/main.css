@@ -294,9 +294,11 @@ html, body {
 .hub .roof { position: absolute; left: 90px; top: 30px; width: 1020px; height: 140px; background: #e5734f; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .hub .avs { position: absolute; left: 50%; top: 70px; transform: translateX(-50%); display: flex; gap: 10px; }
 .hub .av { width: 96px; height: 96px; border-radius: 50%; overflow: hidden; border: 6px solid #fff; }
-.hub .room { position: absolute; top: 230px; width: 420px; height: 420px; padding: 0; border: 14px solid #fff; border-radius: 54px; background: none; overflow: hidden; box-shadow: 0 14px 0 rgba(0, 0, 0, .15); animation: bob 1.5s ease-in-out infinite alternate; }
-.hub .room[data-room="bathroom"] { left: 150px; }
-.hub .room[data-room="door"] { left: 630px; animation-delay: .4s; }
+.hub .room { position: absolute; top: 250px; width: 340px; height: 340px; padding: 0; border: 14px solid #fff; border-radius: 54px; background: none; overflow: hidden; box-shadow: 0 14px 0 rgba(0, 0, 0, .15); animation: bob 1.5s ease-in-out infinite alternate; }
+.hub .room[data-room="bathroom"] { left: 60px; }
+.hub .room[data-room="kitchen"] { left: 430px; animation-delay: .25s; }
+.hub .room[data-room="door"] { left: 800px; animation-delay: .5s; }
+.hub .room svg { width: 100%; height: 100%; }
 .hub .room.chosen { border-color: #ffd34d; animation: pulse .25s ease-in-out 4 alternate; }
 .hub .room svg { display: block; }
 .hub .bub { animation: twinkle 1s ease-in-out infinite alternate; }
@@ -417,3 +419,39 @@ html, body {
 .together .tpause .pl { display: none; }
 .together.paused .tpause .pl { display: block; }
 .together.paused .tpause .pa { display: none; }
+
+/* ---------- 廚房 ---------- */
+.kitchen { background: #fff1d6; }
+.kitchen .k-layer { position: absolute; inset: 0; pointer-events: none; }
+.kitchen .k-layer svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+.kitchen .seat-char { pointer-events: auto; }
+.kitchen .seat-char.glow-char .char { filter: drop-shadow(0 0 14px #ffd000) drop-shadow(0 0 6px #ffd000); animation: jump .5s ease-out infinite alternate; }
+.kitchen .seat-char.happy .char { animation: jump .32s ease-out infinite alternate; }
+.kitchen .seat-char.eating .char .mouth { animation: talk .2s ease-in-out infinite alternate; }
+.kitchen .seat-char.ouch .char { animation: garg .1s linear infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+.kitchen .ware { opacity: 0; transition: opacity .2s; }
+.kitchen .ware.on { opacity: 1; animation: popin .35s ease-out; transform-box: fill-box; transform-origin: center; }
+.kitchen.placing .place .hit { pointer-events: auto; }
+.kitchen .place.target .mat { animation: halo .6s ease-in-out infinite alternate; }
+.kitchen .place.nope { animation: wiggle .35s ease-in-out; transform-box: fill-box; transform-origin: 50% 100%; }
+.kitchen .sink { pointer-events: auto; }
+.kitchen .sink .halo { opacity: 0; }
+.kitchen .sink.glow .halo { animation: halo .7s ease-in-out infinite alternate; }
+.kitchen .pf { animation: popin .3s ease-out; transform-box: fill-box; transform-origin: center; transition: opacity .3s; }
+.kitchen .pf.gone { opacity: 0; }
+.kitchen .dish.cut .slice { animation: wiggle .2s linear 2; }
+.kitchen .counter { position: absolute; left: 0; right: 0; bottom: 14px; height: 140px; display: flex; justify-content: center; align-items: center; gap: 14px; z-index: 5; }
+.kitchen .counter.choose { gap: 120px; }
+.kitchen .counter .pick { position: relative; width: 140px; height: 140px; }
+.kitchen .counter .glow, .kitchen .counter .pick.glow { animation: pulse .6s ease-in-out infinite alternate; box-shadow: 0 0 0 9px rgba(255, 208, 0, .75), 0 8px 0 rgba(0, 0, 0, .15); }
+.kitchen .counter .stack { position: relative; width: 150px; height: 130px; border: 0; border-radius: 26px; background: rgba(255, 255, 255, .85); padding: 0; box-shadow: 0 8px 0 rgba(0, 0, 0, .12); }
+.kitchen .counter .stack svg { position: absolute; left: 20px; top: 6px; }
+.kitchen .counter .stack svg + svg { top: 18px; left: 26px; z-index: -0; opacity: .9; }
+.kitchen .counter .ware-btn, .kitchen .counter .food-btn { width: 104px; height: 104px; border: 0; border-radius: 22px; background: rgba(255, 255, 255, .9); padding: 6px; box-shadow: 0 6px 0 rgba(0, 0, 0, .12); }
+.kitchen .counter .food-btn { width: 100px; height: 100px; }
+.kitchen .counter .ware-btn.sel { transform: translateY(-18px); box-shadow: 0 0 0 7px #ffb300, 0 10px 0 rgba(0, 0, 0, .12); }
+.kitchen .counter .nope { animation: wiggle .35s ease-in-out; }
+.kitchen .counter .eat { position: relative; width: 110px; height: 110px; background: #ffe9b8; }
+.kitchen .counter .knife { position: relative; width: 130px; height: 130px; }
+.flyer { position: absolute; z-index: 40; pointer-events: none; transform-origin: 0 0; }
+.flyer > svg { width: 100%; height: 100%; }

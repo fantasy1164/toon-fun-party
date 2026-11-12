@@ -6,13 +6,13 @@ export const LINES = {
   hello: { dudu: '{name}，你好。我是嘟嘟。', kiki: '嗨！{name}！我是奇奇，一起玩吧！' },
   hello_morning: { dudu: '早安，{name}。今天也要乾乾淨淨喔。', kiki: '早安！{name}！太陽出來囉！' },
   hello_night: { dudu: '{name}，晚上好。睡覺前要刷牙喔。', kiki: '哈啊……{name}，奇奇有點想睡了。' },
-  praise1: { dudu: '好棒。', kiki: '哇！超厲害！' },
-  praise2: { dudu: '你做得真好。', kiki: '耶！成功了！' },
-  praise3: { dudu: '非常乾淨，嘟嘟喜歡。', kiki: 'Good job！太棒了！' },
+  praise1: { dudu: '好棒。', kiki: '哇！超厲害！', bobo: '好棒好棒！' },
+  praise2: { dudu: '你做得真好。', kiki: '耶！成功了！', bobo: '你做得真好！' },
+  praise3: { dudu: '非常乾淨，嘟嘟喜歡。', kiki: 'Good job！太棒了！', bobo: '太厲害了，波波好開心！' },
   wrong: { dudu: '不是這個喔，再找找看。', kiki: '哎呀，不是這個，再試一次！' },
-  gift: { dudu: '這個送給你。', kiki: '噹噹！禮物送給你！' },
-  practice: { dudu: '練習得很好，下次再送你禮物。', kiki: '練習成功！禮物下次再給你喔！' },
-  bye: { dudu: '今天玩得很開心。我們要去休息了，明天見。', kiki: '奇奇要回家吃飯囉！{name}，明天再一起玩！掰掰！' },
+  gift: { dudu: '這個送給你。', kiki: '噹噹！禮物送給你！', bobo: '這個送給你！' },
+  practice: { dudu: '練習得很好，下次再送你禮物。', kiki: '練習成功！禮物下次再給你喔！', bobo: '練習得很好，下次再送你禮物喔。' },
+  bye: { dudu: '今天玩得很開心。我們要去休息了，明天見。', kiki: '奇奇要回家吃飯囉！{name}，明天再一起玩！掰掰！', bobo: '吃飽飽了，波波要去睡午覺囉，明天見！' },
   sleeping: { dudu: '噓……大家都睡著了。{name}也去睡覺吧，晚安。', kiki: '呼……呼……晚安……' },
   resting: { dudu: '嘟嘟在休息。{name}也讓眼睛休息一下吧。', kiki: '奇奇出去玩了！{name}也去動一動吧！' },
 
@@ -42,6 +42,44 @@ export const LINES = {
   en_towel: 'Towel！毛巾！',
 };
 
+// ---- 廚房（波波＋嘟嘟或奇奇） ----
+Object.assign(LINES, {
+  k_hello: { bobo: '{name}！一起來吃飯吧！波波肚子好餓喔！' },
+  k_pick: { bobo: '要先擺餐具，還是裝一盤好吃的飯呢？' },
+  k_set: { bobo: '我們來擺餐具。每個人都要有碗、湯匙和杯子。' },
+  k_set_hard: { bobo: '每個人的顏色不一樣喔，咖啡色是波波的。先點餐具，再點那個人的位子。' },
+  k_bowl: { bobo: '碗！' }, k_spoon: { bobo: '湯匙！' }, k_cup: { bobo: '杯子！' },
+  en_k_bowl: { bobo: 'Bowl！' }, en_k_spoon: { bobo: 'Spoon！' }, en_k_cup: { bobo: 'Cup！' },
+  n_1: { bobo: '一！' }, n_2: { bobo: '二！' }, n_3: { bobo: '三！' },
+  k_thanks: { bobo: '謝謝你！', dudu: '謝謝。', kiki: '謝謝你！' },
+  k_wrong_seat: { bobo: '這個顏色不是這個位子的喔，再看看。' },
+  k_set_done: { bobo: '餐具擺好了！好整齊喔！' },
+  k_meal: { bobo: '來裝一盤好吃又健康的飯！要有飯、青菜、肉或蛋，還有水果。' },
+  k_meal_easy: { bobo: '亮亮的食物，一個一個放進盤子裡！' },
+  f_rice: { bobo: '白飯！' }, f_broccoli: { bobo: '花椰菜！' }, f_carrot: { bobo: '紅蘿蔔！' }, f_egg: { bobo: '荷包蛋！' }, f_fish: { bobo: '魚！' },
+  f_apple: { bobo: '蘋果！' }, f_banana: { bobo: '香蕉！' }, f_candy: { bobo: '糖果……' }, f_chips: { bobo: '洋芋片……' },
+  en_rice: { bobo: 'Rice！' }, en_broccoli: { bobo: 'Broccoli！' }, en_carrot: { bobo: 'Carrot！' }, en_egg: { bobo: 'Egg！' }, en_fish: { bobo: 'Fish！' },
+  en_apple: { bobo: 'Apple！' }, en_banana: { bobo: 'Banana！' },
+  k_bobo_meat: { bobo: '哇！波波最喜歡吃這個了！' },
+  k_kiki_noveg: { kiki: '哎呀，青菜……奇奇不想吃……' },
+  k_encourage: { bobo: '奇奇，吃青菜會長高、變強壯喔！' },
+  k_kiki_try: { kiki: '好吧，我吃一口……嗯！好好吃！' },
+  k_dudu_wash: { dudu: '吃飯前，要先把手洗乾淨喔。' },
+  k_itadaki: { bobo: '我開動了！', dudu: '我開動了。', kiki: '我開動了！' },
+  k_yum: { bobo: '好好吃喔！', dudu: '很好吃。', kiki: '超好吃！' },
+  k_tummy: { bobo: '哎喲，肚子好痛……零食吃太多了。要吃飯和青菜才對。' },
+  k_need: { bobo: '還少了什麼呢？亮亮的再找找看。' },
+  k_fruit_want: { bobo: '最後一片蘋果！波波想吃！', dudu: '我也想吃。', kiki: '我也要！我也要！' },
+  k_fruit_ask: { bobo: '{name}，你覺得要給誰呢？還是用刀子切一半？' },
+  k_share: { bobo: '切成一半，大家一起吃！分享最快樂！' },
+  k_give_happy: { bobo: '謝謝你！好甜喔！', dudu: '謝謝你。', kiki: '耶！謝謝！' },
+  k_turn: { bobo: '沒關係，下次換波波。', dudu: '沒關係，下次換我。', kiki: '好吧，下次換奇奇！' },
+  k_clear: { bobo: '吃飽了！點水槽，把碗收好。' },
+  k_bye_meal: { bobo: '謝謝招待！', dudu: '謝謝招待。', kiki: '謝謝招待！' },
+  k_mission: { bobo: '{name}吃飯要坐好，吃完自己收碗喔！' },
+  hub_pick_k: { bobo: '{name}，要去哪裡玩呢？' },
+});
+
 // ---- 陪刷 ----
 Object.assign(LINES, {
   t_ready: { dudu: '{name}，拿好你的牙刷，擠一點點牙膏。準備好就點一下。', kiki: '{name}！牙刷拿好、牙膏擠好，準備好就點一下！' },
@@ -66,7 +104,7 @@ Object.assign(LINES, {
   w_fog: { dudu: '外面霧霧的，看不清楚，過馬路要特別小心。', kiki: '霧好濃喔！外面白白的，出門要牽好手！' },
   w_hot: { dudu: '今天好熱，出門要戴帽子，記得多喝水。', kiki: '好熱好熱！戴帽子、多喝水，不要曬太久喔！' },
   w_cold: { dudu: '今天好冷，出門要穿外套。', kiki: '好冷喔！外套穿好，圍巾圍好！' },
-  bye_sunny: { dudu: '外面天氣真好。{name}，我們一起去外面走走吧，明天見。', kiki: '外面有太陽耶！奇奇要去公園玩了！{name}也出去跑一跑吧！掰掰！' },
+  bye_sunny: { dudu: '外面天氣真好。{name}，我們一起去外面走走吧，明天見。', kiki: '外面有太陽耶！奇奇要去公園玩了！{name}也出去跑一跑吧！掰掰！', bobo: '外面天氣好好，{name}，吃飽了去外面散散步吧！掰掰！' },
   resting_sunny: { dudu: '嘟嘟去散步了。天氣很好，你也出去走走吧。', kiki: '奇奇在公園玩！你也出去玩吧！' },
 });
 
