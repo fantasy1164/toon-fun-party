@@ -4,7 +4,7 @@ import { CHARACTERS } from '../config.js';
 import { lineText, lineHasName } from '../data/lines.js';
 import { getCtx, getVoiceBus, duck } from './audio.js';
 
-let available = new Set();
+let available = new Map();   // 台詞代號 → 檔名（含副檔名）
 const buffers = new Map();
 let token = 0;
 let currentSource = null;
@@ -12,7 +12,9 @@ let currentSource = null;
 export async function loadVoiceManifest() {
   try {
     const r = await fetch('assets/voice/manifest.json', { cache: 'no-cache' });
-    if (r.ok) available = new Set((await r.json()).files || []);
+    if (!r.ok) return;
+    // 清單裡是檔名，例如 dudu/hello.yh.mp3；去掉副檔名就是台詞代號
+    for (const f of (await r.json()).files || []) available.set(f.replace(/\.(mp3|wav)$/, ''), f);
   } catch { /* 沒有清單就全部用佔位語音 */ }
 }
 
@@ -55,7 +57,7 @@ async function playFile(key, my) {
   if (!ctx) return false;
   let buf = buffers.get(key);
   if (!buf) {
-    const r = await fetch(`assets/voice/${key}.mp3`);
+    const r = await fetch(`assets/voice/${available.get(key)}`);
     if (!r.ok) return false;
     buf = await ctx.decodeAudioData(await r.arrayBuffer());
     buffers.set(key, buf);

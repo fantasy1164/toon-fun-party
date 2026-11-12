@@ -46,10 +46,18 @@
     assets/voice/         角色語音檔（還沒有；目前用裝置內建語音當佔位）
     docs/voice-lines.csv  語音台詞清單（node tools/export-lines.mjs 產生）
 
-## 語音檔
+## 產生角色語音
 
-把檔案放到 `docs/voice-lines.csv` 的 `file` 欄位所列的路徑，
-再把檔名（不含 `assets/voice/` 與 `.mp3`）加進 `assets/voice/manifest.json` 的 `files` 陣列，
-遊戲就會改播真正的語音。
+角色的聲音與說話風格設定在 `tools/voice-config.json`，台詞在 `js/data/lines.js`。
+
+    $env:GEMINI_API_KEY = "你的金鑰"     # PowerShell；金鑰不要寫進任何檔案
+    node tools/gen-voice.mjs --dry        # 先看會產生哪些
+    node tools/gen-voice.mjs --line hello # 先做一句試聽
+    node tools/gen-voice.mjs              # 產生全部還沒有的
+    git add -A; git commit -m "角色語音"; git push
+
+- 已存在的檔案會跳過；改了台詞或聲音要重做，加 `--force`（可搭配 `--char dudu` 或 `--line hello`）。
+- 有安裝 ffmpeg 會輸出 mp3，沒有則輸出 wav，遊戲都能播。
+- 腳本會自動更新 `assets/voice/manifest.json`；沒有語音檔的句子，遊戲會退回裝置內建語音。
 
 新增 js 檔案時，記得加進 `sw.js` 的 `CORE` 清單，並把 `CACHE` 版本號加一。
