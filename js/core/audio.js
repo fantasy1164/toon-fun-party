@@ -93,6 +93,14 @@ const SFX = {
   whoosh: (t) => noise(t, 0.4, { freq: 400, to: 3000, q: 0.7, gain: 0.2 }),
   snore: (t) => { noise(t, 0.9, { freq: 140, to: 260, q: 4, gain: 0.5 }); tone(700, t + 1.1, 0.6, { to: 500, gain: 0.05 }); },
   bye: (t) => [784, 659, 523].forEach((f, i) => tone(f, t + i * 0.25, 0.5, { type: 'sine', gain: 0.22 })),
+  // 農場動物（簡單合成，搭配棉棉的說明）
+  cluck: (t) => [0, 0.16, 0.3].forEach((d) => { tone(820, t + d, 0.09, { type: 'square', to: 520, gain: 0.08 }); noise(t + d, 0.06, { freq: 1800, q: 3, gain: 0.08 }); }),
+  moo: (t) => { tone(150, t, 1.1, { type: 'sawtooth', to: 110, gain: 0.13, attack: 0.15 }); tone(300, t, 1.1, { type: 'sine', to: 220, gain: 0.08, attack: 0.15 }); },
+  oink: (t) => [0, 0.22].forEach((d) => { tone(260, t + d, 0.16, { type: 'sawtooth', to: 180, gain: 0.1 }); noise(t + d, 0.16, { freq: 500, q: 2, gain: 0.18 }); }),
+  sniff: (t) => [0, 0.1, 0.2].forEach((d) => noise(t + d, 0.07, { freq: 3200, q: 2, gain: 0.12 })),
+  baa: (t) => { for (let i = 0; i < 6; i++) tone(440 + (i % 2) * 30, t + i * 0.07, 0.09, { type: 'sawtooth', gain: 0.07 }); },
+  munch: (t) => [0, 0.14, 0.28, 0.42].forEach((d) => noise(t + d, 0.08, { freq: 1200, q: 1.5, gain: 0.2 })),
+  boing: (t) => tone(300, t, 0.35, { type: 'sine', to: 900, gain: 0.2 }),
 };
 
 export function sfx(name) {
@@ -172,6 +180,11 @@ const TRACKS = {
     bpm: 112, lead: 'triangle', leadGain: 0.18,
     melody: seq('G4 . A4 B4 D5 . B4 . A4 . G4 . E4 . . .  G4 . A4 B4 D5 . E5 . D5 . B4 . A4 . . .'),
     bass: seq('G2 . D3 . E2 . B2 . C3 . G2 . D3 . . .  G2 . D3 . C3 . G2 . D3 . A2 . D3 . . .'),
+  },
+  farm: {
+    bpm: 116, lead: 'triangle', leadGain: 0.18,
+    melody: seq('G4 . G4 B4 D5 . B4 . C5 . A4 . G4 . . .  G4 . G4 B4 D5 . E5 . D5 B4 A4 . G4 . . .'),
+    bass: seq('G2 . D3 . G2 . D3 . C3 . G2 . G2 . D3 .  G2 . D3 . C3 . E3 . D3 . D3 . G2 . . .'),
   },
   school: {
     bpm: 112, lead: 'triangle', leadGain: 0.18,

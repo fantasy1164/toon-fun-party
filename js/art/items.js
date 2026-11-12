@@ -21,6 +21,17 @@ export const ITEMS = {
   gugu_apple: `<path d="M50 30C30 18 12 34 16 58C20 82 38 92 50 84C62 92 80 82 84 58C88 34 70 18 50 30Z" fill="#e5484d"/><path d="M50 30Q50 18 56 10" stroke="#7a4a1e" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M54 20Q68 8 76 18Q64 28 54 20Z" fill="#4caf50"/><ellipse cx="32" cy="46" rx="6" ry="10" fill="#fff" opacity=".5"/>`,
   gugu_bell: `<path d="M50 16Q76 18 78 52L84 72H16L22 52Q24 18 50 16Z" fill="#ffd34d" stroke="#e0a800" stroke-width="4"/><circle cx="50" cy="80" r="9" fill="#e0a800"/><rect x="44" y="6" width="12" height="12" rx="4" fill="#8a5a2b"/>`,
   gugu_crayon: `${['#e5484d', '#ffd34d', '#4caf50', '#5fa8e8'].map((c, i) => `<g transform="translate(${16 + i * 18} 0)"><rect x="0" y="26" width="14" height="64" rx="3" fill="${c}"/><path d="M0 26L7 10L14 26Z" fill="${c}"/><rect x="0" y="44" width="14" height="8" fill="#fff" opacity=".6"/></g>`).join('')}`,
+  // 棉棉的農場系列
+  mian_yarn: `<circle cx="50" cy="52" r="34" fill="#ff9fb0"/><path d="M22 40Q50 30 78 44M18 56Q50 46 82 60M26 72Q50 62 74 76M40 20Q30 50 44 84M62 20Q72 50 58 86" stroke="#e5738f" stroke-width="4" fill="none"/><path d="M80 70Q96 80 90 94" stroke="#ff9fb0" stroke-width="5" fill="none"/>`,
+  mian_egg: `<ellipse cx="50" cy="54" rx="30" ry="38" fill="#fff6e6" stroke="#e8d8b8" stroke-width="4"/><path d="M24 56L34 46L44 58L54 46L64 58L76 48" stroke="#ff9fb0" stroke-width="5" fill="none" stroke-linejoin="round"/><circle cx="40" cy="74" r="5" fill="#9fd8ee"/><circle cx="60" cy="74" r="5" fill="#ffd34d"/>`,
+  mian_flower: `<path d="M50 56V94" stroke="#4caf50" stroke-width="6"/><ellipse cx="38" cy="80" rx="12" ry="6" fill="#4caf50" transform="rotate(-30 38 80)"/>${[0, 72, 144, 216, 288].map((r) => `<ellipse cx="50" cy="22" rx="12" ry="18" fill="#ffb3c7" transform="rotate(${r} 50 40)"/>`).join('')}<circle cx="50" cy="40" r="11" fill="#ffd34d"/>`,
+  mian_bell: `<path d="M30 20H70" stroke="#e5484d" stroke-width="8" stroke-linecap="round"/><path d="M32 30H68L76 82H24Z" fill="#ffd34d" stroke="#e0a800" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="86" r="8" fill="#e0a800"/>`,
+  mian_cloud: `<g fill="#fff" stroke="#c8d8ea" stroke-width="4"><circle cx="34" cy="56" r="20"/><circle cx="54" cy="44" r="24"/><circle cx="72" cy="58" r="18"/></g><rect x="30" y="56" width="46" height="20" fill="#fff"/><circle cx="46" cy="58" r="3" fill="#555"/><circle cx="62" cy="58" r="3" fill="#555"/>`,
+  mian_pillow: `<path d="M14 34Q10 22 24 22H76Q90 22 86 34V66Q90 78 76 78H24Q10 78 14 66Z" fill="#cbb8ff"/><path d="M14 34L6 26M86 34L94 26M14 66L6 74M86 66L94 74" stroke="#cbb8ff" stroke-width="6" stroke-linecap="round"/><path d="M50 40l4 8l9 1l-7 6l2 9l-8-5l-8 5l2-9l-7-6l9-1z" fill="#fff6c8"/>`,
+  // 小菜園採收（特別收藏）
+  harvest_carrot: `<path d="M50 30Q68 34 64 46L52 94Q50 98 48 94L36 46Q32 34 50 30Z" fill="#f08a3c"/><path d="M42 50h8M44 64h8M46 78h6" stroke="#c9562f" stroke-width="3"/><path d="M50 32Q40 10 30 8M50 32Q50 8 54 4M50 32Q62 12 72 10" stroke="#4caf50" stroke-width="6" fill="none" stroke-linecap="round"/>`,
+  harvest_tomato: `<circle cx="50" cy="56" r="34" fill="#e5484d"/><path d="M30 28L50 38L70 28L60 44H40Z" fill="#3f9a3f"/><path d="M50 36V20" stroke="#3f9a3f" stroke-width="5"/><ellipse cx="36" cy="54" rx="6" ry="10" fill="#fff" opacity=".4"/>`,
+  harvest_corn: `<g transform="rotate(-20 50 50)"><ellipse cx="50" cy="46" rx="18" ry="38" fill="#ffd34d"/>${[[44, 22], [56, 22], [42, 36], [54, 36], [44, 50], [56, 50], [46, 64], [56, 64]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4.5" fill="#f0b400"/>`).join('')}<path d="M34 50Q20 80 46 94Q40 70 44 56Z M66 50Q80 80 54 94Q60 70 56 56Z" fill="#6cc04f"/></g>`,
   // 特別收藏：聖誕節禮物
   xmas_globe: `<ellipse cx="50" cy="88" rx="30" ry="8" fill="#8a5a2b"/><rect x="24" y="74" width="52" height="16" rx="6" fill="#b9824f"/>
     <circle cx="50" cy="44" r="34" fill="#d6f4ff" stroke="#9fd8ee" stroke-width="4"/>
@@ -31,7 +42,8 @@ export const ITEMS = {
 
 export const SERIES = {
   dudu: ['dudu_bubble', 'dudu_brush', 'dudu_fish', 'dudu_snow', 'dudu_ice', 'dudu_bow'],
-  special: ['xmas_globe'],
+  special: ['xmas_globe', 'harvest_carrot', 'harvest_tomato', 'harvest_corn'],
+  mian: ['mian_yarn', 'mian_egg', 'mian_flower', 'mian_bell', 'mian_cloud', 'mian_pillow'],
   gugu: ['gugu_pencil', 'gugu_book', 'gugu_globe', 'gugu_apple', 'gugu_bell', 'gugu_crayon'],
   kiki: ['kiki_leaf', 'kiki_ball', 'kiki_kite', 'kiki_car', 'kiki_star', 'kiki_mush'],
 };

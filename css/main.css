@@ -300,13 +300,14 @@ html, body {
 .hub .roof { position: absolute; left: 90px; top: 30px; width: 1020px; height: 140px; background: #e5734f; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .hub .avs { position: absolute; left: 50%; top: 70px; transform: translateX(-50%); display: flex; gap: 10px; }
 .hub .av { width: 96px; height: 96px; border-radius: 50%; overflow: hidden; border: 6px solid #fff; }
-.hub .room { border-width: 10px !important; position: absolute; width: 250px; height: 250px; padding: 0; border: 14px solid #fff; border-radius: 54px; background: none; overflow: hidden; box-shadow: 0 14px 0 rgba(0, 0, 0, .15); animation: bob 1.5s ease-in-out infinite alternate; }
-.hub .room[data-room="bathroom"] { left: 145px; top: 190px; }
-.hub .room[data-room="kitchen"] { left: 475px; top: 190px; animation-delay: .15s; }
-.hub .room[data-room="door"] { left: 805px; top: 190px; animation-delay: .3s; }
-.hub .room[data-room="bedroom"] { left: 145px; top: 480px; animation-delay: .45s; }
-.hub .room[data-room="car"] { left: 475px; top: 480px; animation-delay: .6s; }
-.hub .room[data-room="school"] { left: 805px; top: 480px; animation-delay: .75s; }
+.hub .room { border-width: 10px !important; position: absolute; width: 235px; height: 235px; padding: 0; border: 14px solid #fff; border-radius: 54px; background: none; overflow: hidden; box-shadow: 0 14px 0 rgba(0, 0, 0, .15); animation: bob 1.5s ease-in-out infinite alternate; }
+.hub .room[data-room="bathroom"] { left: 70px; top: 185px; }
+.hub .room[data-room="kitchen"] { left: 345px; top: 185px; animation-delay: .1s; }
+.hub .room[data-room="door"] { left: 620px; top: 185px; animation-delay: .2s; }
+.hub .room[data-room="bedroom"] { left: 895px; top: 185px; animation-delay: .3s; }
+.hub .room[data-room="car"] { left: 207px; top: 470px; animation-delay: .4s; }
+.hub .room[data-room="school"] { left: 482px; top: 470px; animation-delay: .5s; }
+.hub .room[data-room="farm"] { left: 757px; top: 470px; animation-delay: .6s; }
 .hub .room svg { width: 100%; height: 100%; }
 .hub .room.chosen { border-color: #ffd34d; animation: pulse .25s ease-in-out 4 alternate; }
 .hub .room svg { display: block; }
@@ -667,3 +668,70 @@ html, body {
 .school .dl { opacity: 0; transition: opacity .6s; }
 .school.dipper .dl { opacity: 1; }
 .school.night-sky .s-char.sill { pointer-events: auto; }
+
+/* ---------- 農場 ---------- */
+.farm { background: #9fdc7c; }
+.farm .f-layer { position: absolute; inset: 0; pointer-events: none; }
+.farm .f-layer svg { width: 100%; height: 100%; display: block; }
+.farm .view { pointer-events: none; }
+.farm .f-host { position: absolute; pointer-events: none; z-index: 4; }
+.farm .f-host svg { display: block; overflow: visible; }
+.farm .f-host .char { animation: bob 1.6s ease-in-out infinite alternate; }
+.farm .animal { position: absolute; pointer-events: none; transform-origin: 50% 100%; }
+.farm .animal svg { display: block; }
+.farm .animal .body { animation: bob 1.8s ease-in-out infinite alternate; }
+.farm .animal.ask .body { animation: jump .35s ease-out infinite alternate; }
+.farm .animal.ask svg { filter: drop-shadow(0 0 12px #ffd000) drop-shadow(0 0 5px #ffd000); }
+.farm .animal.eat .body { animation: munch .18s ease-in-out infinite alternate; }
+@keyframes munch { from { transform: translateY(0) scaleY(1); } to { transform: translateY(4px) scaleY(.97); } }
+.farm .animal.nope { animation: shakehead .45s ease-in-out; }
+@keyframes shakehead { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-14px); } 75% { transform: translateX(14px); } }
+.farm .animal .heart { position: absolute; left: 50%; top: -20px; width: 46px; height: 42px; margin-left: -23px; background: no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 42'%3E%3Cpath d='M23 40C10 30 0 22 0 12C0 4 6 0 12 0C17 0 21 3 23 7C25 3 29 0 34 0C40 0 46 4 46 12C46 22 36 30 23 40Z' fill='%23ff6b8a'/%3E%3C/svg%3E"); animation: pulse .6s ease-in-out infinite alternate; }
+.farm .tray { position: absolute; left: 230px; right: 20px; top: 690px; display: flex; justify-content: center; gap: 26px; pointer-events: auto; }
+.farm .tray .food { position: relative; width: 136px; height: 136px; }
+.farm .tray.active .food { box-shadow: 0 10px 0 rgba(0, 0, 0, .15); }
+.farm .food.glow, .farm .seed:hover { animation: pulse .6s ease-in-out infinite alternate; box-shadow: 0 0 0 10px rgba(255, 208, 0, .85), 0 10px 0 rgba(0, 0, 0, .15); }
+.farm .food.nope { animation: wiggle .35s ease-in-out; }
+.farm .nest { position: absolute; left: 240px; top: 556px; pointer-events: none; }
+.farm .eggs .egg { position: absolute; top: 540px; width: 60px; height: 70px; padding: 0; border: 0; background: none; pointer-events: auto; }
+.farm .eggs .egg.glow { animation: pulse .5s ease-in-out infinite alternate; filter: drop-shadow(0 0 10px #ffd000); }
+.farm .eggs .egg.taken { visibility: hidden; }
+.farm .hen { z-index: 2; transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+.farm .hen.glow-a { pointer-events: auto; }
+.farm .hen.glow-a svg { filter: drop-shadow(0 0 12px #ffd000) drop-shadow(0 0 5px #ffd000); animation: pulse .6s ease-in-out infinite alternate; }
+.farm .hen.hop { transform: translate(-170px, -40px); }
+.farm .bucket { position: absolute; left: 850px; top: 650px; pointer-events: none; z-index: 2; }
+.farm .bucket .milk { transition: y .2s; }
+.farm .udder-hit { position: absolute; left: 860px; top: 548px; width: 140px; height: 110px; border-radius: 50%; border: 0; background: transparent; pointer-events: auto; z-index: 3; }
+.farm .udder-hit.glow { box-shadow: 0 0 0 8px rgba(255, 208, 0, .85), inset 0 0 30px rgba(255, 208, 0, .5); animation: pulse .6s ease-in-out infinite alternate; }
+.farm .cowb.milking .body { animation: munch .2s ease-in-out infinite alternate; }
+.farm .basket { position: absolute; left: 520px; top: 690px; pointer-events: none; z-index: 2; }
+.farm .breakfast { position: absolute; left: 380px; top: 220px; width: 440px; height: 320px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 16px #ffd34d, 0 0 80px #fff7c2; z-index: 25; animation: popin .5s ease-out; }
+.farm .breakfast svg { width: 340px; height: 250px; }
+.farm .breakfast.away { transition: transform .5s ease-in, opacity .5s; transform: scale(.2); opacity: 0; }
+.farm .plot { position: absolute; width: 320px; height: 350px; pointer-events: none; }
+.farm .plot-art svg { display: block; overflow: visible; }
+.farm .plot .plant { transform-box: fill-box; transform-origin: 50% 100%; }
+.farm .plot.glow-p { pointer-events: auto; }
+.farm .plot.glow-p .plot-art { filter: drop-shadow(0 0 14px #ffd000) drop-shadow(0 0 6px #ffd000); animation: pulse .6s ease-in-out infinite alternate; }
+.farm .plot.sprout .plant { animation: popin .5s ease-out; }
+.farm .plot.happy .plant { animation: wiggle .4s ease-in-out 3; }
+.farm .plot.pull .plant { transition: transform .4s ease-in; transform: translateY(-120px); }
+.farm .plot .tag { position: absolute; left: -10px; top: 220px; width: 70px; height: 70px; border-radius: 50%; overflow: hidden; border: 5px solid #fff; }
+.farm .canbtn { pointer-events: auto; position: absolute; left: 1040px; top: 700px; width: 140px; height: 140px; z-index: 5; }
+.farm .canbtn.glow { animation: pulse .6s ease-in-out infinite alternate; box-shadow: 0 0 0 10px rgba(255, 208, 0, .85), 0 10px 0 rgba(0, 0, 0, .15); }
+.farm.watering .canbtn { transform: rotate(-30deg); }
+.farm.watering .plot::after { content: ''; position: absolute; left: 80px; right: 80px; top: 40px; height: 180px; background: repeating-linear-gradient(105deg, transparent 0 14px, rgba(120, 190, 255, .8) 14px 18px); animation: drops .4s linear infinite; }
+@keyframes drops { from { background-position: 0 0; } to { background-position: 0 40px; } }
+.farm .seeds { pointer-events: auto; position: absolute; left: 0; right: 0; top: 200px; display: flex; justify-content: center; gap: 40px; z-index: 8; }
+.farm .seed { position: relative; width: 150px; height: 180px; border-radius: 24px; animation: pulse .7s ease-in-out infinite alternate; }
+/* 晚上數羊 */
+.farm.night-farm { background: #14203a; }
+.farm .sheep-btn { position: absolute; left: 260px; top: 560px; width: 180px; height: 140px; padding: 0; border: 0; background: none; z-index: 5; }
+.farm .sheep-btn svg { width: 100%; height: 100%; overflow: visible; }
+.farm .sheep-btn.glow svg { filter: drop-shadow(0 0 12px #ffd000) drop-shadow(0 0 5px #ffd000); animation: pulse .6s ease-in-out infinite alternate; }
+.farm .sheep-btn.jump { animation: sheepjump .9s ease-in-out forwards; }
+@keyframes sheepjump { 0% { transform: translate(0, 0); } 50% { transform: translate(240px, -230px) rotate(-8deg); } 100% { transform: translate(480px, -40px) scale(.5); opacity: 0; } }
+.farm .flock { position: absolute; inset: 0; pointer-events: none; }
+.farm .fsheep { position: absolute; width: 90px; height: 68px; animation: popin .4s ease-out; }
+.farm .fsheep svg { width: 100%; height: 100%; overflow: visible; }

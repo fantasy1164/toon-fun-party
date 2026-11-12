@@ -299,7 +299,7 @@ export function mountBedroom(stage, { profile, onExit }) {
     const winners = slot ? profile.members.filter((id) => !hasClaimed(id, `bedroom_${slot}`)) : [];
     if (winners.length) {
       const gifts = winners.map((id) => {
-        const item = nextItem(state.profiles[id].collection, pick(['dudu', 'kiki']));
+        const item = nextItem(state.profiles[id].collection, 'mian');
         addItem(id, item);
         claim(id, `bedroom_${slot}`);
         return { id, item };

@@ -40,4 +40,5 @@ export const REWARD_SLOTS = {
   bedroom: { evening: [18, 21] },
   car: { day: [0, 24] },
   school: { day: [8, 17] },
+  farm: { day: [8, 17] },
 };
