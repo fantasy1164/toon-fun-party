@@ -121,11 +121,18 @@ function playTts(text, charId, my) {
 }
 
 // 說一句台詞。回傳的 Promise 在說完（或被下一句打斷）時結束。
+// 給手指提示、時間提醒判斷「角色現在有沒有在說話」
+let speakingToken = -1;
+let lastSpokeAt = 0;
+export function isSpeaking() { return speakingToken === token; }
+export function quietFor() { return isSpeaking() ? 0 : Date.now() - lastSpokeAt; }
+
 export async function speak(charId, lineId, { name = '', who = '', node = null } = {}) {
   stopCurrent();
   const my = token;
   const text = lineText(lineId, charId, name);
   if (!text) return;
+  speakingToken = my;
   node?.classList.add('talking');
   duck(true);
   try {
@@ -137,7 +144,8 @@ export async function speak(charId, lineId, { name = '', who = '', node = null }
     if (!played && my === token) await playTts(text, charId, my);
   } finally {
     node?.classList.remove('talking');
-    if (my === token) duck(false);
+    if (my === token) { duck(false); speakingToken = -1; }
+    lastSpokeAt = Date.now();
   }
 }
 

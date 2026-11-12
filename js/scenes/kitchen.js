@@ -541,6 +541,7 @@ export function mountKitchen(stage, { profile, onExit }) {
 
   return {
     destroy,
+    hostChar: 'bobo',
     requestEnd() {
       if (timeUp || !alive) return;
       timeUp = true;

@@ -377,6 +377,7 @@ export function mountBedroom(stage, { profile, onExit }) {
 
   return {
     destroy,
+    hostChar: CHAR,
     requestEnd() {
       if (timeUp || !alive) return;
       timeUp = true;

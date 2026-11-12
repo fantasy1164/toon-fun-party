@@ -611,6 +611,7 @@ export function mountBathroom(stage, { profile, onExit }) {
 
   return {
     destroy,
+    hostChar: charId,
     // 時間到：正在活動就等做完，閒著就直接道別
     requestEnd() {
       if (timeUp || !alive) return;

@@ -113,6 +113,11 @@ Object.assign(LINES, {
   m_sleeping: { mian: '呼……呼……' },
 });
 
+// ---- 快到休息時間 ----
+Object.assign(LINES, {
+  time_soon: { dudu: '再玩一下下，就要休息囉。', kiki: '再玩一下下就要休息了喔！', bobo: '再玩一下下，波波就要去休息囉。', mian: '再一下下……就要休息了喔。' },
+});
+
 // ---- 陪刷 ----
 Object.assign(LINES, {
   t_ready: { dudu: '{name}，拿好你的牙刷，擠一點點牙膏。準備好就點一下。', kiki: '{name}！牙刷拿好、牙膏擠好，準備好就點一下！' },

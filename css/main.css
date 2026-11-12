@@ -186,13 +186,19 @@ html, body {
 
 /* ---------- 陳列櫃 ---------- */
 .cabinet { position: absolute; inset: 0; z-index: 40; background: rgba(40, 30, 20, .55); display: flex; align-items: center; justify-content: center; gap: 30px; animation: fadein .25s; }
-.cabinet.two { --cell: 104px; }
-.cabinet .shelf .slot svg { width: 80%; height: 80%; }
+.cabinet.two { --cell: 84px; }
 .cabinet .unit { background: #b9824f; border: 14px solid #8a5a2b; border-radius: 28px; padding: 70px 22px 22px; position: relative; }
 .cabinet .unit .owner { position: absolute; left: 50%; top: -60px; width: 120px; height: 120px; margin-left: -60px; border-radius: 50%; border: 8px solid #fff; overflow: hidden; background: #fff; }
-.cabinet .shelf { display: grid; grid-template-columns: repeat(4, var(--cell, 120px)); gap: 12px; }
-.cabinet .shelf .slot { width: var(--cell, 120px); height: var(--cell, 120px); background: #e9c89c; border-radius: 16px; border-bottom: 10px solid #8a5a2b; display: flex; align-items: center; justify-content: center; position: relative; }
-.cabinet .shelf .slot.none svg { filter: grayscale(1); opacity: .16; }
+.cabinet .shelf { display: grid; grid-template-columns: repeat(var(--cols, 5), var(--cell, 110px)); gap: 10px; }
+.cabinet .shelf .slot { width: var(--cell, 110px); height: var(--cell, 110px); background: #e9c89c; border-radius: 16px; border-bottom: 10px solid #8a5a2b; display: flex; align-items: center; justify-content: center; position: relative; }
+.cabinet .shelf .slot.empty { background: #d9b588; }
+.cabinet .shelf .slot .thing { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.cabinet .shelf .slot .thing svg { width: 80%; height: 80%; }
+.cabinet .unit.draggable .slot.have { cursor: grab; }
+.cabinet .shelf .slot.lifted .thing { opacity: .25; }
+.cabinet .shelf .slot.over { box-shadow: 0 0 0 6px #ffd34d; }
+.drag-ghost { position: absolute; left: 0; top: 0; width: 110px; height: 110px; z-index: 60; pointer-events: none; filter: drop-shadow(0 10px 8px rgba(0, 0, 0, .3)); }
+.drag-ghost svg { width: 100%; height: 100%; }
 .cabinet .shelf .slot .dots { position: absolute; right: 6px; top: 6px; display: flex; gap: 3px; }
 .cabinet .shelf .slot .dots i { width: 10px; height: 10px; border-radius: 50%; background: #ff7fa8; }
 .cabinet .close { right: 30px; top: 30px; width: 92px; height: 92px; }
@@ -520,3 +526,11 @@ html, body {
 .bedroom .storybook .next { right: 30px; bottom: 30px; width: 110px; height: 110px; background: #2ea05a; animation: pulse .6s ease-in-out infinite alternate; }
 .twinkle { animation: twinkle 1s ease-in-out infinite alternate; }
 .particle.heart { background: #ff7fa8; border-radius: 0; clip-path: path('M10 18C4 13 0 9 0 5C0 2 2 0 5 0C7 0 9 1 10 3C11 1 13 0 15 0C18 0 20 2 20 5C20 9 16 13 10 18Z'); }
+
+/* ---------- 剩餘時間、手指提示 ---------- */
+.playclock { position: absolute; right: 22px; top: 126px; width: 82px; height: 82px; z-index: 12; pointer-events: none; filter: drop-shadow(0 4px 0 rgba(0, 0, 0, .15)); }
+.playclock svg { width: 100%; height: 100%; }
+.playclock .pie { transition: stroke-dasharray 1s linear; }
+.playclock.soon { animation: pulse .7s ease-in-out infinite alternate; }
+.hint-hand { position: absolute; z-index: 45; pointer-events: none; animation: handtap 1s ease-in-out infinite; transform-origin: 40% 10%; }
+@keyframes handtap { 0%, 100% { transform: translate(18px, 30px) scale(1); } 45% { transform: translate(0, 0) scale(.92); } 55% { transform: translate(0, 0) scale(.92); } }

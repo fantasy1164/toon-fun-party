@@ -3,7 +3,7 @@ import { STAGE_W, STAGE_H } from './config.js';
 import { state, save, addPlayTime } from './core/store.js';
 import { isAsleep, testing, dateKey, hour, testSettings } from './core/clock.js';
 import { unlock, sfx } from './core/audio.js';
-import { loadVoiceManifest, hush, primeTts } from './core/voice.js';
+import { loadVoiceManifest, hush, primeTts, speak, isSpeaking, quietFor } from './core/voice.js';
 import { showSplash, showProfiles, showClosed } from './ui/screens.js';
 import { openParent } from './ui/parent.js';
 import { mountBathroom } from './scenes/bathroom.js';
@@ -105,13 +105,77 @@ async function goHub() {
   if (room === 'tree') { await treeScreen(stage, profile); goHub(); return; }
   if (closedReason()) { route(); return; }
   const mount = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom }[room] || mountBathroom;
+  if (state.session.usedMs === 0) warned = false;
   scene = mount(stage, {
     profile,
     onExit: (why) => {
       scene = null;
+      stage.querySelector('.playclock')?.remove();
       if (why === 'home') goHub(); else route();
     },
   });
+  updateClock();
+}
+
+// ---------- 剩餘遊玩時間：場景右上角的小時鐘餅 ----------
+const C_SMALL = 2 * Math.PI * 25;
+function playClock() {
+  let n = stage.querySelector('.playclock');
+  if (!n) {
+    n = document.createElement('div');
+    n.className = 'playclock';
+    n.innerHTML = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#fff" opacity=".9"/>
+      <circle class="pie" cx="50" cy="50" r="25" fill="none" stroke="#ffb300" stroke-width="50" transform="rotate(-90 50 50)"/>
+      <circle cx="50" cy="50" r="38" fill="none" stroke="#e0a800" stroke-width="4"/><circle cx="50" cy="50" r="5" fill="#7a5230"/></svg>`;
+    stage.appendChild(n);
+  }
+  return n;
+}
+let warned = false;
+function updateClock() {
+  if (!scene) return;
+  const total = sessionMs();
+  const n = playClock();
+  if (!Number.isFinite(total)) { n.classList.add('hidden'); return; }
+  const left = Math.max(0, 1 - state.session.usedMs / total);
+  n.classList.remove('hidden');
+  n.querySelector('.pie').setAttribute('stroke-dasharray', `${(C_SMALL * left).toFixed(1)} ${C_SMALL.toFixed(1)}`);
+  const leftMs = total - state.session.usedMs;
+  n.classList.toggle('soon', leftMs <= 120000);
+  // 剩 2 分鐘：等角色說完話，再提醒一次
+  if (!warned && leftMs <= 120000 && leftMs > 0 && !isSpeaking() && quietFor() > 800 && scene.hostChar) {
+    warned = true;
+    speak(scene.hostChar, 'time_soon');
+  }
+}
+
+// ---------- 手指提示：停下來 8 秒沒動作，就指出現在發亮的東西 ----------
+let lastTouch = Date.now();
+document.addEventListener('pointerdown', () => {
+  lastTouch = Date.now();
+  stage.querySelector('.hint-hand')?.remove();
+}, true);
+const HAND = `<svg viewBox="0 0 100 120" width="110" height="132"><path d="M38 60V18a9 9 0 0 1 18 0V52l4-2a9 9 0 0 1 9 2l2-1a9 9 0 0 1 11 4a9 9 0 0 1 10 8V86Q92 112 64 114H52Q36 112 28 96L14 70a9 9 0 0 1 14-10Z" fill="#fff" stroke="#7a5230" stroke-width="5" stroke-linejoin="round"/></svg>`;
+function hintTick() {
+  if (!scene || stage.querySelector('.hint-hand, .cabinet, .parent, .gift, .storybook')) return;
+  if (Date.now() - lastTouch < 8000 || quietFor() < 2500) return;
+  const target = ['.glow-char', '.prop.glow', '.spot.glow', '.toy.glow', '.glow']
+    .map((q) => [...stage.querySelectorAll(q)].find((e) => e.getBoundingClientRect().width > 0))
+    .find(Boolean);
+  if (!target) return;
+  const sr = stage.getBoundingClientRect();
+  const k = sr.width / 1200;
+  const r = target.getBoundingClientRect();
+  const x = (r.left - sr.left + r.width / 2) / k;
+  const y = (r.top - sr.top + r.height / 2) / k;
+  const h = document.createElement('div');
+  h.className = 'hint-hand';
+  h.style.left = `${x - 40}px`;
+  h.style.top = `${y - 10}px`;
+  h.innerHTML = HAND;
+  stage.appendChild(h);
+  lastTouch = Date.now();  // 出現一次後，再等 8 秒才會再出現
+  setTimeout(() => h.remove(), 4000);
 }
 
 // 每秒累計遊玩時間；時間到或睡覺時間到，請角色道別
@@ -119,6 +183,8 @@ setInterval(() => {
   if (!scene || !profile || document.hidden) return;
   addPlayTime(profile.members, 1000);
   if (state.session.usedMs % 10000 === 0) save();
+  updateClock();
+  hintTick();
   if (state.session.usedMs >= sessionMs() || isAsleep(state.settings)) scene.requestEnd();
 }, 1000);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });

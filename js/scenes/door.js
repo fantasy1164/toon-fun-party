@@ -390,6 +390,7 @@ export function mountDoor(stage, { profile, onExit }) {
 
   return {
     destroy,
+    hostChar: CHAR,
     requestEnd() {
       if (timeUp || !alive) return;
       timeUp = true;

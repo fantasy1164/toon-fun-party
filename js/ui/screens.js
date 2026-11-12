@@ -1,6 +1,6 @@
 // 開場、選人、休息／睡覺畫面、陳列櫃。
 import { PROFILES, CHARACTERS } from '../config.js';
-import { el, $, onTap, wait, pick, burst, centerOf } from '../core/dom.js';
+import { el, $, $$, onTap, wait, pick, burst, centerOf } from '../core/dom.js';
 import { sfx, playMusic, stopMusic } from '../core/audio.js';
 import { speak } from '../core/voice.js';
 import { phase } from '../core/clock.js';
@@ -8,7 +8,7 @@ import * as weather from '../core/weather.js';
 import * as fest from '../core/festival.js';
 import { NIGHTCAP } from '../art/characters.js';
 import { TREE_ICON } from '../art/xmas.js';
-import { state } from '../core/store.js';
+import { state, save, shelfLayout, swapShelf, SHELF_COLS } from '../core/store.js';
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import { SERIES, itemSvg } from '../art/items.js';
 import { cardHtml } from './stamps.js';
@@ -196,20 +196,76 @@ function showRest(stage, { onParent, ph }) {
 // ---------- 陳列櫃 ----------
 export function openCabinet(root, memberIds) {
   ensureInkFilter();
-  const units = memberIds.map((id) => {
+  const unitHtml = (id) => {
     const col = state.profiles[id].collection;
-    const special = SERIES.special.filter((i) => col[i]);
-    const slots = [...SERIES.dudu, ...SERIES.kiki, ...special].map((item) => {
-      const n = col[item] || 0;
+    const shelf = shelfLayout(id);
+    const drag = PROFILES[id].level === 'hard';
+    const slots = shelf.map((item, i) => {
+      const n = item ? col[item] || 0 : 0;
       const dots = n > 1 ? `<span class="dots">${'<i></i>'.repeat(Math.min(n, 5))}</span>` : '';
-      return `<div class="slot ${n ? 'have' : 'none'}">${itemSvg(item, 96)}${dots}</div>`;
+      return `<div class="slot ${item ? 'have' : 'empty'}" data-i="${i}">${item ? `<div class="thing">${itemSvg(item, 96)}</div>${dots}` : ''}</div>`;
     }).join('');
     const card = state.profiles[id].stamp ? `<div class="card-row">${cardHtml(id, memberIds.length > 1 ? 46 : 64)}</div>` : '';
-    return `<div class="unit"><div class="owner">${avatarSvg(id, 104)}</div>${card}<div class="shelf">${slots}</div></div>`;
-  }).join('');
-  const node = el(`<div class="cabinet ${memberIds.length > 1 ? 'two' : ''}">${units}<button class="round-btn close">${ICON.close}</button></div>`);
+    return `<div class="unit ${drag ? 'draggable' : ''}" data-id="${id}"><div class="owner">${avatarSvg(id, 104)}</div>${card}
+      <div class="shelf" style="--cols:${SHELF_COLS}">${slots}</div></div>`;
+  };
+  save();
+  const node = el(`<div class="cabinet ${memberIds.length > 1 ? 'two' : ''}">${memberIds.map(unitHtml).join('')}<button class="round-btn close">${ICON.close}</button></div>`);
   root.appendChild(node);
   sfx('whoosh');
-  onTap(node, () => { sfx('tap'); node.remove(); });
+  const close = () => { sfx('tap'); node.remove(); };
+  onTap($('.close', node), close);
+  // 點櫃子以外的地方也可以關
+  node.addEventListener('pointerdown', (e) => { if (e.target === node) close(); });
+
+  // 6 歲版：拖曳收藏品換位置
+  $$('.unit.draggable', node).forEach((unit) => {
+    const id = unit.dataset.id;
+    let drag = null;
+    const stageEl = document.getElementById('stage');
+    const toStage = (e) => {
+      const r = stageEl.getBoundingClientRect();
+      const k = r.width / 1200;
+      return { x: (e.clientX - r.left) / k, y: (e.clientY - r.top) / k };
+    };
+    unit.addEventListener('pointerdown', (e) => {
+      const slot = e.target.closest('.slot.have');
+      if (!slot) return;
+      e.preventDefault();
+      const p = toStage(e);
+      const ghost = el(`<div class="drag-ghost">${slot.querySelector('.thing').innerHTML}</div>`);
+      stageEl.appendChild(ghost);
+      ghost.style.transform = `translate(${p.x - 55}px, ${p.y - 55}px)`;
+      slot.classList.add('lifted');
+      drag = { slot, ghost, pid: e.pointerId };
+      unit.setPointerCapture?.(e.pointerId);
+      sfx('pop');
+    });
+    unit.addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.pid) return;
+      const p = toStage(e);
+      drag.ghost.style.transform = `translate(${p.x - 55}px, ${p.y - 55}px)`;
+      $$('.slot', unit).forEach((s) => s.classList.remove('over'));
+      document.elementFromPoint(e.clientX, e.clientY)?.closest?.('.slot')?.classList.add('over');
+    });
+    const end = (e) => {
+      if (!drag || e.pointerId !== drag.pid) return;
+      const target = document.elementFromPoint(e.clientX, e.clientY)?.closest?.('.slot');
+      const { slot, ghost } = drag;
+      drag = null;
+      ghost.remove();
+      slot.classList.remove('lifted');
+      $$('.slot', unit).forEach((s) => s.classList.remove('over'));
+      if (!target || !unit.contains(target) || target === slot) return;
+      swapShelf(id, +slot.dataset.i, +target.dataset.i);
+      unit.outerHTML = unitHtml(id);
+      sfx('sparkle');
+      // 重新綁定事件：直接重開一次櫃子
+      node.remove();
+      openCabinet(root, memberIds);
+    };
+    unit.addEventListener('pointerup', end);
+    unit.addEventListener('pointercancel', end);
+  });
   return node;
 }

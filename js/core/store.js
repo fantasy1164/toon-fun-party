@@ -7,7 +7,7 @@ const KEY = 'toon-fun-party';
 function blankProfile() {
   // stamp：選好的印章 { shape, color }；card：目前這張卡上的章；log：所有蓋章紀錄
   // owed：集滿但家長還沒發的獎品數；repick：下次進來可以換印章圖案
-  return { collection: {}, claims: {}, playMs: {}, stamp: null, card: [], log: [], owed: 0, cardsDone: 0, repick: false };
+  return { collection: {}, claims: {}, playMs: {}, stamp: null, card: [], log: [], owed: 0, cardsDone: 0, repick: false, shelf: [] };
 }
 
 function blank() {
@@ -177,6 +177,30 @@ export function addStamp(id, reasons) {
 export function redeem(id) {
   const p = state.profiles[id];
   p.owed = Math.max(0, p.owed - 1);
+  save();
+}
+
+// 陳列櫃：每格放一種收藏品（null 是空格）。新拿到的放進第一個空格。
+export const SHELF_COLS = 5;
+export function shelfLayout(id) {
+  const p = state.profiles[id];
+  const owned = Object.keys(p.collection).filter((k) => p.collection[k] > 0);
+  let shelf = (p.shelf || []).map((k) => (k && owned.includes(k) ? k : null));
+  for (const k of owned) {
+    if (shelf.includes(k)) continue;
+    const i = shelf.indexOf(null);
+    if (i >= 0) shelf[i] = k; else shelf.push(k);
+  }
+  // 至少 3 層，東西多了再加一層，永遠留一點空位
+  const need = Math.max(3, Math.ceil((owned.length + 1) / SHELF_COLS)) * SHELF_COLS;
+  while (shelf.length > need && shelf[shelf.length - 1] === null) shelf.pop();
+  while (shelf.length < need || shelf.length % SHELF_COLS) shelf.push(null);
+  p.shelf = shelf;
+  return shelf;
+}
+export function swapShelf(id, a, b) {
+  const s = state.profiles[id].shelf;
+  [s[a], s[b]] = [s[b], s[a]];
   save();
 }
 
