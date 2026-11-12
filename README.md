@@ -63,7 +63,9 @@
     $env:GEMINI_API_KEY = "你的金鑰"     # PowerShell；金鑰不要寫進任何檔案
     node tools/gen-voice.mjs --dry        # 先看會產生哪些
     node tools/gen-voice.mjs --line hello # 先做一句試聽
-    node tools/gen-voice.mjs              # 產生全部還沒有的
+    node tools/gen-voice.mjs              # 產生全部還沒有的（同一角色每 25 句串成一次請求，再依停頓切開）
+    node tools/gen-voice.mjs --batch 5    # 切不開時，改小批一點
+    node tools/gen-voice.mjs --single     # 一句一次請求（最穩、最耗額度）
     git add -A; git commit -m "角色語音"; git push
 
 - 已存在的檔案會跳過；改了台詞或聲音要重做，加 `--force`（可搭配 `--char dudu` 或 `--line hello`）。
