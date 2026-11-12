@@ -37,4 +37,5 @@ export const REWARD_SLOTS = {
   door: { morning: [5, 11] },
   kitchen: { breakfast: [5, 10], lunch: [10, 14], dinner: [16, 21] },
   bedroom: { evening: [18, 21] },
+  car: { day: [0, 24] },
 };

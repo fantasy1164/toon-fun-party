@@ -40,6 +40,16 @@ const BED = `<svg viewBox="0 0 420 420" width="420" height="420">
   <circle cx="380" cy="200" r="40" fill="#ffe08a" opacity=".35"/>
 </svg>`;
 
+const CAR = `<svg viewBox="0 0 420 420" width="420" height="420">
+  <rect width="420" height="420" rx="40" fill="#9fdcff"/>
+  <rect y="260" width="420" height="160" fill="#6b6f7a"/><rect x="0" y="330" width="420" height="10" fill="#fff" opacity=".7"/>
+  <path d="M60 270V200Q70 150 120 140H290Q340 150 360 200V270Z" fill="#ff6b5c"/>
+  <path d="M110 200Q120 160 150 160H270Q300 160 310 200Z" fill="#d6f4ff"/>
+  ${characterSvg('kiki', { x: 150, y: 150, s: 0.32 })}
+  <circle cx="120" cy="280" r="34" fill="#333"/><circle cx="300" cy="280" r="34" fill="#333"/><circle cx="120" cy="280" r="14" fill="#ddd"/><circle cx="300" cy="280" r="14" fill="#ddd"/>
+  <g transform="translate(360 60)"><rect x="-4" y="40" width="8" height="140" fill="#555"/><rect x="-22" y="-30" width="44" height="100" rx="10" fill="#333"/><circle cy="-10" r="12" fill="#e5484d"/><circle cy="20" r="12" fill="#5a4a20"/><circle cy="50" r="12" fill="#204a2a"/></g>
+</svg>`;
+
 const LIVING = `<svg viewBox="0 0 420 420" width="420" height="420">
   <rect width="420" height="420" rx="40" fill="#fbe3c4"/>
   <rect y="300" width="420" height="120" fill="#c8915a"/>
@@ -67,6 +77,7 @@ export function showHub(stage, profile) {
         <button class="room" data-room="kitchen">${KITCHEN}</button>
         <button class="room" data-room="door">${LIVING}</button>
         <button class="room" data-room="bedroom">${BED}</button>
+        <button class="room" data-room="car">${CAR}</button>
         <button class="round-btn home">${ICON.home}</button>
         ${fest.isDecember() ? `${ROOF_LIGHTS}<button class="round-btn treebtn">${TREE_ICON}</button>` : ''}
       </div>`);

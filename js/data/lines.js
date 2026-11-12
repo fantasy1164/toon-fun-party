@@ -113,6 +113,35 @@ Object.assign(LINES, {
   m_sleeping: { mian: '呼……呼……' },
 });
 
+// ---- 汽車（奇奇、嘟嘟） ----
+Object.assign(LINES, {
+  c_hello: { kiki: '{name}！我們坐車去公園玩！' },
+  c_belt: { dudu: '出發以前，大家都要繫好安全帶。' },
+  c_belt_easy: { dudu: '亮亮的地方點一下，喀！就扣好了。' },
+  c_click: { kiki: '喀！扣好了！', dudu: '扣好了。' },
+  c_kid_ok: { dudu: '{name}也坐好安全座椅，扣好了。' },
+  c_not_yet: { dudu: '還有人沒繫安全帶，車子不能出發。' },
+  c_ready: { kiki: '大家都扣好了！點綠色的按鈕出發！' },
+  c_go: { kiki: '出發囉！' },
+  c_naughty: { kiki: '哇！外面好漂亮！我要站起來看！' },
+  c_sitdown: { dudu: '奇奇，坐車要坐好，手不能伸出窗外，很危險。' },
+  c_ok_sit: { kiki: '好啦好啦，我坐好了，安全帶也扣好了。' },
+  c_what: { kiki: '前面有狀況！要怎麼辦？' },
+  c_red: { dudu: '紅燈了，要停下來。' },
+  c_green: { dudu: '綠燈了，可以走了。' },
+  c_yellow: { dudu: '黃燈了，要慢慢停下來。' },
+  c_walker: { dudu: '有人在過馬路，要停下來讓他們先走。' },
+  c_cross: { dudu: '過馬路要牽大人的手，看左邊、看右邊。' },
+  c_siren: { kiki: '喔咿喔咿！救護車來了！要靠邊讓路！' },
+  c_arrive: { kiki: '到公園囉！' },
+  c_unbuckle: { dudu: '車子停好了，才可以解開安全帶。點一下扣環。' },
+  c_door: { dudu: '要從哪一邊下車呢？' },
+  c_door_easy: { dudu: '從亮亮的那一邊下車，那邊是人行道。' },
+  c_door_wrong: { dudu: '叭叭！那邊有車子經過！下車要從人行道那一邊。' },
+  c_out: { kiki: '耶！去玩溜滑梯囉！' },
+  c_mission: { dudu: '{name}坐車要坐安全座椅、繫好安全帶喔！' },
+});
+
 // ---- 快到休息時間 ----
 Object.assign(LINES, {
   time_soon: { dudu: '再玩一下下，就要休息囉。', kiki: '再玩一下下就要休息了喔！', bobo: '再玩一下下，波波就要去休息囉。', mian: '再一下下……就要休息了喔。' },

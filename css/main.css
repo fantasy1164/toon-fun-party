@@ -300,11 +300,12 @@ html, body {
 .hub .roof { position: absolute; left: 90px; top: 30px; width: 1020px; height: 140px; background: #e5734f; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .hub .avs { position: absolute; left: 50%; top: 70px; transform: translateX(-50%); display: flex; gap: 10px; }
 .hub .av { width: 96px; height: 96px; border-radius: 50%; overflow: hidden; border: 6px solid #fff; }
-.hub .room { border-width: 10px !important; position: absolute; top: 270px; width: 270px; height: 270px; padding: 0; border: 14px solid #fff; border-radius: 54px; background: none; overflow: hidden; box-shadow: 0 14px 0 rgba(0, 0, 0, .15); animation: bob 1.5s ease-in-out infinite alternate; }
-.hub .room[data-room="bathroom"] { left: 30px; }
-.hub .room[data-room="kitchen"] { left: 320px; animation-delay: .2s; }
-.hub .room[data-room="door"] { left: 610px; animation-delay: .4s; }
-.hub .room[data-room="bedroom"] { left: 900px; animation-delay: .6s; }
+.hub .room { border-width: 9px !important; position: absolute; top: 280px; width: 216px; height: 216px; padding: 0; border: 14px solid #fff; border-radius: 54px; background: none; overflow: hidden; box-shadow: 0 14px 0 rgba(0, 0, 0, .15); animation: bob 1.5s ease-in-out infinite alternate; }
+.hub .room[data-room="bathroom"] { left: 24px; }
+.hub .room[data-room="kitchen"] { left: 258px; animation-delay: .15s; }
+.hub .room[data-room="door"] { left: 492px; animation-delay: .3s; }
+.hub .room[data-room="bedroom"] { left: 726px; animation-delay: .45s; }
+.hub .room[data-room="car"] { left: 960px; animation-delay: .6s; }
 .hub .room svg { width: 100%; height: 100%; }
 .hub .room.chosen { border-color: #ffd34d; animation: pulse .25s ease-in-out 4 alternate; }
 .hub .room svg { display: block; }
@@ -534,3 +535,65 @@ html, body {
 .playclock.soon { animation: pulse .7s ease-in-out infinite alternate; }
 .hint-hand { position: absolute; z-index: 45; pointer-events: none; animation: handtap 1s ease-in-out infinite; transform-origin: 40% 10%; }
 @keyframes handtap { 0%, 100% { transform: translate(18px, 30px) scale(1); } 45% { transform: translate(0, 0) scale(.92); } 55% { transform: translate(0, 0) scale(.92); } }
+
+/* ---------- 汽車 ---------- */
+.car { background: #3a3f55; }
+.car .c-art { position: absolute; inset: 0; width: 1200px; height: 900px; }
+.car .c-belts { position: absolute; inset: 0; pointer-events: none; }
+.car .c-belts svg { width: 100%; height: 100%; pointer-events: none; }
+.car .buckle { pointer-events: auto; }
+.car .buckle .halo { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.car .buckle.glow .halo { animation: halo .7s ease-in-out infinite alternate; }
+.car .buckle.done rect:not(.hit) { opacity: .35; }
+.car .buckle.nope { animation: wiggle .35s ease-in-out; transform-box: fill-box; transform-origin: center; }
+.car .belt { opacity: 0; transition: opacity .2s; }
+.car .belt.on { opacity: 1; }
+.car .rider { pointer-events: auto; }
+.car .rider-in { transition: transform .4s; }
+.car .rider.naughty .rider-in { transform: translateY(-90px); }
+.car .rider .arm { transform-box: fill-box; transform-origin: 50% 12%; transition: transform .3s; }
+.car .rider.naughty .arm-l { animation: armwave .45s ease-in-out infinite alternate; }
+@keyframes armwave { from { transform: rotate(75deg); } to { transform: rotate(115deg); } }
+.car .rider.glow-char .char { filter: drop-shadow(0 0 14px #ffd000) drop-shadow(0 0 6px #ffd000); animation: jump .5s ease-out infinite alternate; }
+.car .rider .char { animation: bob 1.4s ease-in-out infinite alternate; }
+.car.driving .rider .char { animation: carbump .3s ease-in-out infinite alternate; }
+@keyframes carbump { from { transform: translateY(0); } to { transform: translateY(-4px); } }
+/* 道路捲動 */
+.car .dash { transform-box: fill-box; transform-origin: 50% 0; opacity: 0; }
+.car.driving .dash { animation: dashmove 1s linear infinite; }
+@keyframes dashmove { 0% { transform: translateY(0) scale(.3); opacity: 1; } 100% { transform: translateY(210px) scale(2.2); opacity: 1; } }
+.car.slowing .dash { animation-duration: 2.5s; }
+.car .rtree { opacity: 0; }
+.car.driving .rtree.l { animation: treeL 2s linear infinite; }
+.car.driving .rtree.r { animation: treeR 2s linear infinite; }
+@keyframes treeL { 0% { transform: translate(-60px, 0) scale(.2); opacity: 1; } 100% { transform: translate(-560px, 230px) scale(1.8); opacity: 1; } }
+@keyframes treeR { 0% { transform: translate(60px, 0) scale(.2); opacity: 1; } 100% { transform: translate(560px, 230px) scale(1.8); opacity: 1; } }
+.car:not(.driving) .rtree { animation-play-state: paused !important; }
+.car .tlight, .car .crosswalk, .car .walkers, .car .ambulance, .car .park, .car .mirror-amb { display: none; }
+.car.show-light .tlight, .car.show-cross .crosswalk, .car.show-walkers .walkers, .car.amb-pass .ambulance, .car.arrived .park, .car.amb-mirror .mirror-amb { display: block; }
+.car .tlight.red .l-red { fill: #ff3b3b; filter: drop-shadow(0 0 10px #ff3b3b); }
+.car .tlight.yellow .l-yellow { fill: #ffd34d; filter: drop-shadow(0 0 10px #ffd34d); }
+.car .tlight.green .l-green { fill: #3be37a; filter: drop-shadow(0 0 10px #3be37a); }
+.car .walkers { transform: translate(380px, 330px); }
+.car.walking .walkers { animation: ducks 3s linear forwards; }
+@keyframes ducks { from { transform: translate(380px, 330px); } to { transform: translate(860px, 330px); } }
+.car.amb-mirror .mirror-glass { animation: siren .3s steps(2) infinite; }
+@keyframes siren { 0% { fill: #ff9f9f; } 100% { fill: #9fb3ff; } }
+.car.amb-pass .ambulance { animation: ambgo 2.2s ease-in forwards; }
+@keyframes ambgo { from { transform: translate(400px, 360px) scale(1.4); } to { transform: translate(600px, 175px) scale(.3); } }
+.car .ambulance .siren { animation: twinkle .2s steps(2) infinite; }
+.car .road-in { transition: transform .8s; }
+.car.pulled .road-in { transform: translateX(-70px); }
+.car .road-in { transform-box: fill-box; transform-origin: center; }
+.car.honk .road-in { animation: carshake .15s linear 6; }
+@keyframes carshake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-12px); } 75% { transform: translateX(12px); } }
+.car .drive { position: absolute; left: 0; right: 0; top: 394px; display: flex; justify-content: center; gap: 22px; z-index: 6; opacity: .45; transition: opacity .3s; }
+.car .drive.active { opacity: 1; }
+.car .dbtn { position: relative; width: 100px; height: 100px; background: transparent; box-shadow: none; }
+.car .dbtn.glow { animation: pulse .6s ease-in-out infinite alternate; filter: drop-shadow(0 0 12px #ffd000); }
+.car .dbtn.nope { animation: wiggle .35s ease-in-out; }
+.car .c-doors { position: absolute; left: 0; right: 0; top: 230px; display: flex; justify-content: space-between; padding: 0 30px; z-index: 7; }
+.car .cdoor { position: relative; width: 170px; height: 170px; background: rgba(255, 255, 255, .9); }
+.car .cdoor.glow { animation: pulse .6s ease-in-out infinite alternate; box-shadow: 0 0 0 10px rgba(255, 208, 0, .8); }
+.car .cdoor.nope { animation: wiggle .35s ease-in-out; }
+.car.out .rider .char { animation: jump .32s ease-out infinite alternate; }
