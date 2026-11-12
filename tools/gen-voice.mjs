@@ -72,9 +72,17 @@ async function synth({ charId, text }) {
     });
     if (res.ok) return findAudio(await res.json());
     const msg = (await res.text()).slice(0, 600);
-    // 太頻繁或伺服器忙：等一下再試
+    // 每日額度用完：重試沒有用，直接停下整批
+    if (res.status === 429 && /per day|daily/i.test(msg)) {
+      const e = new Error(`今日額度已用完：${msg}`);
+      e.quota = true;
+      throw e;
+    }
+    // 每分鐘太頻繁或伺服器忙：照伺服器建議的時間等，再試
     if ((res.status === 429 || res.status >= 500) && attempt < 5) {
-      const waitS = attempt * (process.env.GEMINI_API_BASE ? 1 : 15);
+      const m = /retry in (?:(\d+)m)?\s*(?:(\d+(?:\.\d+)?)s)?/i.exec(msg);
+      const hinted = m ? (parseInt(m[1] || '0', 10) * 60 + parseFloat(m[2] || '0')) : 0;
+      const waitS = Math.ceil(hinted > 0 && hinted <= 120 ? hinted + 2 : attempt * (process.env.GEMINI_API_BASE ? 1 : 15));
       console.log(`    HTTP ${res.status}，${waitS} 秒後重試（第 ${attempt} 次）`);
       await sleep(waitS * 1000);
       continue;
@@ -156,6 +164,7 @@ if (flag('dry')) {
     } catch (e) {
       failed.push(j.key);
       console.log(`    失敗：${e.message}`);
+      if (e.quota) { console.log('免費額度一天只有很少次。請到 AI Studio 開啟付費（Billing）後再執行一次，已完成的會自動跳過。'); break; }
       // 連續失敗多半是金鑰或格式問題，不要整批硬跑
       if (failed.length >= 3 && ok === 0) { console.log('連續失敗，先停下來。請把上面的錯誤訊息給 Claude 看。'); break; }
     }
