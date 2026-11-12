@@ -6,7 +6,7 @@ import * as weather from '../core/weather.js';
 import { speak, hush } from '../core/voice.js';
 import { phase, hour, currentSlot } from '../core/clock.js';
 import { state, save, hasClaimed, claim, addItem } from '../core/store.js';
-import { mainView, mouthView, handsView, BRUSH_CURSOR, TOOTH_COUNT } from '../art/bathroom.js';
+import { mainView, mouthView, handsView, togetherView, ZONES, BRUSH_CURSOR, TOOTH_COUNT } from '../art/bathroom.js';
 import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
@@ -36,6 +36,11 @@ export function mountBathroom(stage, { profile, onExit }) {
       <div class="view main">${mainView(charId, ph, wx)}</div>
       <div class="view mouth off">${mouthView(charId)}</div>
       <div class="view hands off">${handsView(charId)}<div class="foam"></div></div>
+      <div class="view together off">${togetherView(charId)}
+        <div class="tbar"><i></i></div>
+        <button class="round-btn tgo hidden">${ICON.play || ''}</button>
+        <button class="round-btn tpause hidden"><svg viewBox="0 0 100 100" width="50" height="50"><rect class="pa" x="24" y="20" width="18" height="60" rx="6" fill="#2f7fe0"/><rect class="pa" x="58" y="20" width="18" height="60" rx="6" fill="#2f7fe0"/><path class="pl" d="M30 18L80 50L30 82Z" fill="#2ea05a"/></svg></button>
+      </div>
       <div class="hud">
         <button class="round-btn home">${ICON.home}</button>
         <button class="round-btn cab">${ICON.cab}</button>
@@ -44,7 +49,7 @@ export function mountBathroom(stage, { profile, onExit }) {
     </div>`);
   stage.replaceChildren(root);
 
-  const views = { main: $('.view.main', root), mouth: $('.view.mouth', root), hands: $('.view.hands', root) };
+  const views = { main: $('.view.main', root), mouth: $('.view.mouth', root), hands: $('.view.hands', root), together: $('.view.together', root) };
   const charBox = $('.layer.front', root);
   const cursor = document.getElementById('cursor');
   cursor.innerHTML = BRUSH_CURSOR;
@@ -113,7 +118,8 @@ export function mountBathroom(stage, { profile, onExit }) {
   function onProp(name, node) {
     if (!alive) return;
     if (mode === 'idle') {
-      if (BRUSH_PROPS.includes(name)) run(runBrush);
+      if (name === 'together') run(runTogether);
+      else if (BRUSH_PROPS.includes(name)) run(runBrush);
       else if (WASH_PROPS.includes(name)) run(runWash);
       return;
     }
@@ -287,6 +293,94 @@ export function mountBathroom(stage, { profile, onExit }) {
     await celebrate('brush', 'b_mission');
   }
 
+  // ---------- 陪刷：小孩刷自己的牙，全程不用碰螢幕 ----------
+  async function runTogether() {
+    const v = views.together;
+    const bar = $('.tbar i', v);
+    const go = $('.tgo', v);
+    const pauseBtn = $('.tpause', v);
+    const segMs = hard ? 15000 : 7500;   // 6 歲 2 分鐘、3 歲 1 分鐘
+    const total = segMs * ZONES.length;
+    bar.style.width = '0%';
+    $$('.zone', v).forEach((z) => z.classList.remove('on', 'done'));
+    v.classList.remove('brushing', 'paused');
+    await showView('together');
+
+    // 等小孩準備好
+    say('t_ready');
+    go.classList.remove('hidden');
+    await new Promise((res) => {
+      const h = () => { go.removeEventListener('pointerdown', h); res(); };
+      go.addEventListener('pointerdown', h);
+      cleanups.push(() => go.removeEventListener('pointerdown', h));
+    });
+    guard();
+    go.classList.add('hidden');
+    sfx('fanfare');
+
+    // 盡量不要讓螢幕自動變暗
+    let lock = null;
+    try { lock = await navigator.wakeLock?.request('screen'); } catch { lock = null; }
+    cleanups.push(() => { try { lock?.release(); } catch { /* 忽略 */ } });
+
+    playMusic('brush_song');
+    v.classList.add('brushing');
+    pauseBtn.classList.remove('hidden');
+    await say('t_start');
+    guard();
+
+    let elapsed = 0;
+    let paused = false;
+    let seg = -1;
+    const togglePause = () => {
+      paused = !paused;
+      v.classList.toggle('paused', paused);
+      sfx('tap');
+      if (paused) { hush(); playMusic(track); } else playMusic('brush_song');
+    };
+    pauseBtn.addEventListener('pointerdown', togglePause);
+    cleanups.push(() => pauseBtn.removeEventListener('pointerdown', togglePause));
+
+    await new Promise((res) => {
+      let last = performance.now();
+      const timer = setInterval(() => {
+        const t = performance.now();
+        const dt = t - last;
+        last = t;
+        if (!alive) { clearInterval(timer); res(); return; }
+        if (paused) return;
+        elapsed += dt;
+        bar.style.width = `${Math.min(100, (elapsed / total) * 100)}%`;
+        const n = Math.min(ZONES.length - 1, Math.floor(elapsed / segMs));
+        if (n !== seg) {
+          if (seg >= 0) $(`.zone[data-z="${ZONES[seg]}"]`, v).classList.replace('on', 'done');
+          seg = n;
+          const z = $(`.zone[data-z="${ZONES[seg]}"]`, v);
+          z.classList.add('on');
+          const r = z.getBBox();
+          $('.zbrush', v).setAttribute('transform', `translate(${r.x + r.width / 2} ${r.y + r.height / 2})`);
+          sfx('sparkle');
+          say(`z_${ZONES[seg]}`);
+        }
+        if (elapsed >= total) { clearInterval(timer); res(); }
+      }, 100);
+      cleanups.push(() => clearInterval(timer));
+    });
+    guard();
+    try { lock?.release(); } catch { /* 忽略 */ }
+    pauseBtn.classList.add('hidden');
+    v.classList.remove('brushing');
+    $$('.zone', v).forEach((z) => z.classList.replace('on', 'done'));
+    playMusic(track);
+    await say('t_spit');
+    sfx('gargle');
+    await pause(2500);
+    sfx('sparkle');
+    await say('b_done');
+    await showView('main');
+    await celebrate('brush', 't_mission');
+  }
+
   // ---------- 洗手 ----------
   function rubHands() {
     return new Promise((resolve) => {
@@ -444,7 +538,7 @@ export function mountBathroom(stage, { profile, onExit }) {
   function idle() {
     mode = 'idle';
     expect = null;
-    glow(['brush', 'soap']);
+    glow(['brush', 'soap', 'together']);
     say('bath_pick');
   }
 

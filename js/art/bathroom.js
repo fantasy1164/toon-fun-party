@@ -107,6 +107,17 @@ function midLayer() {
     <rect x="228" y="498" width="524" height="44" rx="20" fill="#fff"/>
     <ellipse cx="490" cy="506" rx="120" ry="20" fill="#e3f4f8"/>
 
+    <g class="prop" data-prop="together">
+      ${halo(490, 240, 92)}
+      <circle cx="490" cy="240" r="74" fill="#fff" stroke="#ffd34d" stroke-width="8"/>
+      <circle cx="462" cy="250" r="26" fill="#ffd9b8"/><circle cx="526" cy="250" r="26" fill="#f08a3c"/>
+      <circle cx="454" cy="246" r="3.5" fill="#333"/><circle cx="470" cy="246" r="3.5" fill="#333"/>
+      <circle cx="518" cy="246" r="3.5" fill="#333"/><circle cx="534" cy="246" r="3.5" fill="#333"/>
+      <rect x="440" y="258" width="44" height="7" rx="3.5" fill="#ff7fa8"/><rect x="504" y="258" width="44" height="7" rx="3.5" fill="#5fc3e8"/>
+      <path d="M478 196l6 14l14 2l-10 10l3 14l-13-7l-13 7l3-14l-10-10l14-2Z" fill="#ffd34d"/>
+      ${hit(410, 160, 160, 160)}
+    </g>
+
     <g class="prop" data-prop="cup">
       ${halo(300, 452, 70)}
       <path d="M266 414H334L324 498H276Z" fill="#ffd34d"/>
@@ -218,6 +229,44 @@ export function mouthView(charId) {
     <path d="M600 420V520" stroke="#e0667c" stroke-width="8" stroke-linecap="round"/>
     ${teeth}
   `, 'mouth-art');
+}
+
+// ---------- 陪刷：左邊角色一起刷，右邊嘴巴圖標出正在刷的區域 ----------
+export const ZONES = ['ul_out', 'ur_out', 'll_out', 'lr_out', 'up_in', 'lo_in', 'chew', 'front'];
+// 區域在嘴巴圖（原始座標）上的位置
+const ZONE_RECTS = {
+  ul_out: [[248, 226, 352, 170]],
+  ur_out: [[600, 226, 352, 170]],
+  ll_out: [[248, 556, 352, 170]],
+  lr_out: [[600, 556, 352, 170]],
+  up_in: [[248, 396, 704, 34]],
+  lo_in: [[248, 522, 704, 34]],
+  chew: [[248, 360, 704, 40], [248, 556, 704, 40]],
+  front: [[480, 226, 240, 170], [480, 556, 240, 170]],
+};
+const BRUSH_AT_MOUTH = `<g class="tb">
+  <rect x="140" y="138" width="96" height="13" rx="6.5" fill="#ff7fa8"/>
+  <rect x="112" y="132" width="34" height="24" rx="6" fill="#fff" stroke="#9fd8ee" stroke-width="3"/>
+  <circle class="foam" cx="104" cy="160" r="8" fill="#fff"/><circle class="foam" cx="92" cy="148" r="6" fill="#fff"/><circle class="foam" cx="146" cy="166" r="7" fill="#fff"/></g>`;
+
+export function togetherView(charId) {
+  let teeth = '';
+  for (let i = 0; i < TOOTH_COUNT; i++) teeth += tooth(i);
+  const zones = ZONES.map((z) => `<g class="zone" data-z="${z}">${ZONE_RECTS[z].map(([x, y, w, h]) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="26" fill="#ffd34d"/>`).join('')}</g>`).join('');
+  return svg(`
+    <rect width="1200" height="900" fill="#dcf3f5"/>
+    <rect y="700" width="1200" height="200" fill="#a9dbe6"/>
+    <g class="buddy">${characterSvg(charId, { x: 40, y: 250, s: 1.45, extra: BRUSH_AT_MOUTH })}</g>
+    <g transform="translate(470 170) scale(.6)">
+      <rect x="150" y="160" width="900" height="640" rx="190" fill="#f2738a"/>
+      <rect x="192" y="200" width="816" height="560" rx="150" fill="#7a1f2e"/>
+      <ellipse cx="600" cy="478" rx="250" ry="70" fill="#f58ea0"/>
+      ${teeth}
+      ${zones}
+      <g class="zbrush"><rect x="-20" y="-8" width="150" height="20" rx="10" fill="#ff7fa8"/><rect x="-60" y="-18" width="50" height="40" rx="8" fill="#fff" stroke="#9fd8ee" stroke-width="5"/></g>
+    </g>
+  `, 'together-art');
 }
 
 // ---------- 洗手特寫 ----------

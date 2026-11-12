@@ -42,6 +42,22 @@ export const LINES = {
   en_towel: 'Towel！毛巾！',
 };
 
+// ---- 陪刷 ----
+Object.assign(LINES, {
+  t_ready: { dudu: '{name}，拿好你的牙刷，擠一點點牙膏。準備好就點一下。', kiki: '{name}！牙刷拿好、牙膏擠好，準備好就點一下！' },
+  t_start: { dudu: '開始囉，跟著我一起刷。', kiki: '開始！跟奇奇一起刷刷刷！' },
+  z_ul_out: { dudu: '刷上面左邊的外面。', kiki: '上面左邊！刷刷刷！' },
+  z_ur_out: { dudu: '刷上面右邊的外面。', kiki: '上面右邊！刷刷刷！' },
+  z_ll_out: { dudu: '刷下面左邊的外面。', kiki: '下面左邊！刷刷刷！' },
+  z_lr_out: { dudu: '刷下面右邊的外面。', kiki: '下面右邊！刷刷刷！' },
+  z_up_in: { dudu: '刷上面牙齒的裡面。', kiki: '上面的裡面也要刷！' },
+  z_lo_in: { dudu: '刷下面牙齒的裡面。', kiki: '下面的裡面也要刷！' },
+  z_chew: { dudu: '刷咬東西的地方，前後刷一刷。', kiki: '咬東西的地方！前前後後刷！' },
+  z_front: { dudu: '最後刷門牙，上下刷一刷。', kiki: '最後是門牙！上上下下！' },
+  t_spit: { dudu: '刷好了。吐掉，漱漱口。', kiki: '刷完了！吐掉，咕嚕咕嚕漱口！' },
+  t_mission: { dudu: '請爸爸媽媽看看{name}的牙齒，再幫你蓋章。', kiki: '{name}快去給爸爸媽媽看牙齒，請他們蓋章！' },
+});
+
 // ---- 天氣 ----
 Object.assign(LINES, {
   w_rain: { dudu: '外面在下雨。出門要穿雨衣、帶雨傘，公園濕濕的，溜滑梯今天不能玩喔。', kiki: '下雨了！馬路濕濕滑滑的，過馬路不能跑，要牽好大人的手！' },

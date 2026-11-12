@@ -392,3 +392,28 @@ html, body {
 .parent select, .parent input[type=date] { font-size: 24px; padding: 6px 10px; border: 2px solid #d9c8a8; border-radius: 10px; }
 .parent button.armed { outline: 5px solid #c9462c; }
 #testbadge { position: fixed; left: 50%; top: 4px; transform: translateX(-50%); z-index: 90; padding: 2px 12px; border-radius: 10px; background: rgba(201, 70, 44, .75); color: #fff; font: 14px sans-serif; pointer-events: none; }
+
+/* ---------- 陪刷 ---------- */
+.together .t-dirt, .together .germ, .together .t-shine { display: none; }
+.together .zone rect { opacity: 0; }
+.together .zone.on rect { animation: zoneglow .6s ease-in-out infinite alternate; }
+.together .zone.done rect { opacity: .18; fill: #7be0a0; }
+@keyframes zoneglow { from { opacity: .3; } to { opacity: .75; } }
+.together .zbrush { opacity: 0; }
+.together.brushing .zbrush { opacity: 1; }
+.together.brushing .zbrush > * { animation: zscrub .18s linear infinite alternate; }
+@keyframes zscrub { from { transform: translateX(-30px); } to { transform: translateX(30px); } }
+.together .tb { opacity: 0; }
+.together.brushing .tb { opacity: 1; animation: tbmove .2s linear infinite alternate; }
+.together.brushing .tb .foam { animation: twinkle .4s ease-in-out infinite alternate; }
+@keyframes tbmove { from { transform: translateX(-8px); } to { transform: translateX(8px); } }
+.together.brushing .buddy .mouth { transform: scaleY(1) !important; animation: none !important; }
+.together.paused .tb, .together.paused .zbrush > *, .together.paused .zone.on rect { animation-play-state: paused; }
+.together .tbar { position: absolute; left: 140px; right: 250px; top: 40px; height: 44px; border-radius: 22px; background: rgba(255, 255, 255, .8); box-shadow: inset 0 0 0 5px #fff; overflow: hidden; }
+.together .tbar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ff6b5c, #ffb300, #ffd34d, #7be0a0, #5fc3e8, #8e4ec6); transition: width .1s linear; }
+.together .tgo { left: 680px; top: 360px; width: 220px; height: 220px; background: #2ea05a; animation: pulse .7s ease-in-out infinite alternate; }
+.together .tgo svg path { fill: #fff; stroke: #fff; }
+.together .tpause { right: 130px; top: 22px; width: 92px; height: 92px; }
+.together .tpause .pl { display: none; }
+.together.paused .tpause .pl { display: block; }
+.together.paused .tpause .pa { display: none; }
