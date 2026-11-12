@@ -271,3 +271,19 @@ html, body {
 .parent .chip:disabled { opacity: .4; }
 .parent button:disabled { opacity: .45; }
 .parent button.small { font-size: 20px; padding: 8px 16px; }
+
+/* ---------- 天氣 ---------- */
+.rain line { animation: rainfall .7s linear infinite; }
+@keyframes rainfall { from { transform: translate(0, 0); } to { transform: translate(-30px, 300px); } }
+.wcloud { animation: drift 20s linear infinite alternate; }
+.flash { opacity: 0; }
+.flash.on { animation: flash .9s ease-out; }
+@keyframes flash { 0%, 30% { opacity: 0; } 35% { opacity: .9; } 45% { opacity: .1; } 52% { opacity: .8; } 100% { opacity: 0; } }
+.fog { opacity: .55; animation: fogmove 8s ease-in-out infinite alternate; }
+@keyframes fogmove { from { opacity: .45; } to { opacity: .7; } }
+.leaf { animation: leaffly 3.4s linear infinite; }
+@keyframes leaffly { from { transform: translate(-40px, 0) rotate(0); } to { transform: translate(340px, -60px) rotate(540deg); } }
+.leaf path { transform-box: fill-box; transform-origin: center; }
+.drips circle { animation: drip 3s ease-in infinite; }
+.drips circle:nth-child(2) { animation-delay: .8s; } .drips circle:nth-child(3) { animation-delay: 1.6s; } .drips circle:nth-child(4) { animation-delay: 2.2s; }
+@keyframes drip { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .9; } 100% { transform: translateY(90px); opacity: 0; } }

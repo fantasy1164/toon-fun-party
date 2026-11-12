@@ -89,6 +89,7 @@ const SFX = {
     [1047, 1319, 1568].forEach((f) => tone(f, t + 0.55, 0.8, { type: 'triangle', gain: 0.16 }));
   },
   stamp: (t) => { tone(140, t, 0.22, { type: 'sine', to: 60, gain: 0.6 }); noise(t, 0.12, { freq: 500, q: 0.8, gain: 0.35 }); },
+  thunder: (t) => { noise(t, 2.2, { freq: 160, to: 60, q: 0.7, gain: 0.55, type: 'lowpass' }); noise(t, 0.3, { freq: 900, q: 0.5, gain: 0.25 }); },
   whoosh: (t) => noise(t, 0.4, { freq: 400, to: 3000, q: 0.7, gain: 0.2 }),
   snore: (t) => { noise(t, 0.9, { freq: 140, to: 260, q: 4, gain: 0.5 }); tone(700, t + 1.1, 0.6, { to: 500, gain: 0.05 }); },
   bye: (t) => [784, 659, 523].forEach((f, i) => tone(f, t + i * 0.25, 0.5, { type: 'sine', gain: 0.22 })),
@@ -118,6 +119,27 @@ export function waterOff() {
   water = null;
   g.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.1);
   s.stop(ctx.currentTime + 0.6);
+}
+
+// 持續的雨聲
+let rain = null;
+export function rainOn(heavy = false) {
+  if (!ctx || rain) return;
+  const s = ctx.createBufferSource();
+  s.buffer = noiseBuf; s.loop = true;
+  const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 2400; f.Q.value = 0.4;
+  const g = ctx.createGain(); g.gain.value = 0.0001;
+  g.gain.linearRampToValueAtTime(heavy ? 0.12 : 0.07, ctx.currentTime + 1.5);
+  s.connect(f).connect(g).connect(sfxBus);
+  s.start();
+  rain = { s, g };
+}
+export function rainOff() {
+  if (!rain) return;
+  const { s, g } = rain;
+  rain = null;
+  g.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.3);
+  s.stop(ctx.currentTime + 1.5);
 }
 
 // ---------- 音樂 ----------

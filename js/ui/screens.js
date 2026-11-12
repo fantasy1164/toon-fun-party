@@ -4,6 +4,7 @@ import { el, onTap, wait, pick, burst, centerOf } from '../core/dom.js';
 import { sfx, playMusic, stopMusic } from '../core/audio.js';
 import { speak } from '../core/voice.js';
 import { phase } from '../core/clock.js';
+import * as weather from '../core/weather.js';
 import { state } from '../core/store.js';
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import { SERIES, itemSvg } from '../art/items.js';
@@ -110,7 +111,7 @@ export function showClosed(stage, { reason, onParent }) {
     if (t - last < 5000) return;
     last = t;
     sfx('snore');
-    speak(pick(['dudu', 'kiki']), reason === 'bedtime' ? 'sleeping' : 'resting', { name: '', who: '' });
+    speak(pick(['dudu', 'kiki']), reason === 'bedtime' ? 'sleeping' : weather.niceOutside(phase()) ? 'resting_sunny' : 'resting', { name: '', who: '' });
   });
   return node;
 }

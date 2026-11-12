@@ -3,6 +3,7 @@ import { el } from '../core/dom.js';
 import { state, save, exportData, importData, stampedToday, cardInfo, redeem } from '../core/store.js';
 import { dateKey } from '../core/clock.js';
 import { REASONS, reasonIcon, shapeSvg, ensureInkFilter } from '../art/stamps.js';
+import * as weather from '../core/weather.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
@@ -34,6 +35,22 @@ function stampSection(id) {
     </div>`;
 }
 
+const KIND_NAMES = { clear: '晴天', cloudy: '多雲', rain: '下雨', storm: '雷雨', fog: '起霧' };
+function weatherSection() {
+  const w = weather.current();
+  const p = weather.place();
+  const at = weather.lastUpdated();
+  const flags = [w.hot && '很熱', w.cold && '很冷', w.windy && '強風'].filter(Boolean).join('、');
+  const now = w.none ? '還沒取得天氣資料（需要網路）' :
+    `${KIND_NAMES[w.kind] || w.kind}${w.temp !== null ? `，${w.temp}°C` : ''}${flags ? `，${flags}` : ''}${w.fake ? '（測試用）' : ''}`;
+  return `
+    <p>地點：<b>${p.name}</b>（${(+p.lat).toFixed(2)}, ${(+p.lon).toFixed(2)}）　目前：${now}</p>
+    <p class="note">${at ? `更新於 ${new Date(at).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}，每 30 分鐘更新。` : ''}遊戲窗外的天氣和角色的提醒都依這裡的天氣。</p>
+    <button class="quiet" data-act="geo">用目前位置</button>
+    <button class="quiet" data-act="taichung">改回台中</button>
+    <span class="note geo-msg"></span>`;
+}
+
 export function openParent(onClose, { onStamp } = {}) {
   ensureInkFilter();
   const k = dateKey();
@@ -55,6 +72,9 @@ export function openParent(onClose, { onStamp } = {}) {
       <h2>今天</h2>
       <table><tr><th></th><th>遊玩時間</th><th>已領獎的活動</th><th>收藏品總數</th></tr>${rows}</table>
 
+      <h2>天氣</h2>
+      <div class="wx">${weatherSection()}</div>
+
       <h2>時間設定</h2>
       <label>每次可玩 <input type="number" data-k="sessionMin" min="1" max="60" value="${s.sessionMin}"> 分鐘</label>
       <label>下班後休息 <input type="number" data-k="restMin" min="0" max="600" value="${s.restMin}"> 分鐘</label><br>
@@ -72,7 +92,7 @@ export function openParent(onClose, { onStamp } = {}) {
 
       <h2>&nbsp;</h2>
       <button data-act="close">完成</button>
-      <p class="note">天氣資料（之後加入）：Open-Meteo.com</p>
+      <p class="note">天氣資料來源：Open-Meteo.com（CC BY 4.0）</p>
     </div>`);
   document.getElementById('stage').appendChild(node);
   const ta = node.querySelector('textarea');
@@ -112,6 +132,24 @@ export function openParent(onClose, { onStamp } = {}) {
       state.profiles[id].repick = true; save();
       e.target.textContent = '下次進遊戲時會讓他換印章';
       e.target.disabled = true;
+      return;
+    }
+    if (act === 'geo' || act === 'taichung') {
+      const wx = node.querySelector('.wx');
+      const done = async (p) => {
+        weather.setPlace(p);
+        await weather.refresh(true);
+        wx.innerHTML = weatherSection();
+      };
+      if (act === 'taichung') { done(weather.DEFAULT_PLACE); return; }
+      const msg = node.querySelector('.geo-msg');
+      if (!navigator.geolocation) { msg.textContent = '這台裝置不支援定位。'; return; }
+      msg.textContent = '定位中…';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => done({ name: '目前位置', lat: +pos.coords.latitude.toFixed(3), lon: +pos.coords.longitude.toFixed(3) }),
+        () => { msg.textContent = '無法取得位置（可能沒有允許定位）。'; },
+        { timeout: 10000, maximumAge: 600000 },
+      );
       return;
     }
     if (act === 'wake') {

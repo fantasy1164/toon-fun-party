@@ -6,6 +6,35 @@ const svg = (inner, cls = '') => `<svg class="${cls}" viewBox="0 0 1200 900" pre
 const halo = (cx, cy, r) => `<circle class="halo" cx="${cx}" cy="${cy}" r="${r}" fill="#ffd000"/>`;
 const hit = (x, y, w, h) => `<rect class="hit" x="${x}" y="${y}" width="${w}" height="${h}" fill="transparent"/>`;
 
+const GREY_SKY = { day: ['#8fa3b5', '#c9d4dc'], dawn: ['#b9a7a3', '#d9cfc7'], dusk: ['#a08c94', '#cbbcb6'] };
+
+// 天氣圖層：雲、雨、閃電、霧、風吹葉子。x0,y0,w,h 是窗戶範圍。
+export function weatherLayer(wx, ph, x0, y0, w, h) {
+  let out = '';
+  const dark = ph === 'night';
+  const wet = wx.kind === 'rain' || wx.kind === 'storm';
+  if (wx.kind !== 'clear' && wx.kind !== 'fog') {
+    const c = wet ? (dark ? '#3b4a6b' : '#7d8a99') : (dark ? '#4a5a80' : '#eef2f6');
+    for (const [dx, dy, k] of [[0.15, 0.18, 1], [0.6, 0.12, 1.2], [0.4, 0.38, 0.9], [0.85, 0.32, 0.8]]) {
+      const cx = x0 + w * dx, cy = y0 + h * dy, r = 30 * k;
+      out += `<g class="wcloud" fill="${c}"><ellipse cx="${cx}" cy="${cy}" rx="${r * 1.7}" ry="${r * 0.8}"/><ellipse cx="${cx + r * 0.5}" cy="${cy - r * 0.5}" rx="${r}" ry="${r * 0.8}"/></g>`;
+    }
+  }
+  if (wet) {
+    let drops = '';
+    const n = wx.kind === 'storm' ? 34 : 24;
+    for (let i = 0; i < n; i++) {
+      const x = x0 + ((i * 37) % w), y = y0 + ((i * 53) % h) - h;
+      drops += `<line x1="${x}" y1="${y}" x2="${x - 6}" y2="${y + 22}" style="animation-delay:-${((i * 0.13) % 0.7).toFixed(2)}s"/>`;
+    }
+    out += `<g class="rain" stroke="${dark ? '#9fb3ff' : '#ffffff'}" stroke-width="3" stroke-linecap="round" opacity=".8">${drops}</g>`;
+  }
+  if (wx.kind === 'storm') out += `<rect class="flash" x="${x0}" y="${y0}" width="${w}" height="${h}" fill="#fff"/>`;
+  if (wx.kind === 'fog') out += `<rect class="fog" x="${x0}" y="${y0}" width="${w}" height="${h}" fill="#e6ebef"/>`;
+  if (wx.windy) out += `<g class="leaf"><path d="M${x0} ${y0 + h * 0.5}c10-14 30-14 34 0c-10 12-26 12-34 0Z" fill="#7cc46a"/></g>`;
+  return out;
+}
+
 const SKY = {
   night: ['#0d1b4a', '#25357a'],
   dawn: ['#ffb38a', '#ffe6b0'],
@@ -13,18 +42,20 @@ const SKY = {
   dusk: ['#ff8f6b', '#ffd08a'],
 };
 
-function windowView(phase) {
-  const [a, b] = SKY[phase];
+function windowView(phase, wx) {
+  const grey = !['clear'].includes(wx.kind) && phase !== 'night';
+  const [a, b] = grey ? GREY_SKY[phase] : SKY[phase];
   const stars = phase === 'night'
     ? [[830, 140], [900, 190], [1010, 130], [1050, 220], [860, 260], [960, 300]]
       .map(([x, y], i) => `<circle class="star" style="animation-delay:${i * 0.4}s" cx="${x}" cy="${y}" r="4" fill="#fff"/>`).join('')
     : '';
-  const body = phase === 'night'
+  const showSun = wx.kind === 'clear' || wx.kind === 'cloudy';
+  const body = !showSun ? '' : phase === 'night'
     ? `<circle cx="1000" cy="190" r="42" fill="#fff6c8"/><circle cx="1020" cy="176" r="38" fill="${a}"/>`
     : phase === 'day'
       ? `<circle class="sun" cx="1000" cy="180" r="44" fill="#ffd34d"/><circle cx="1000" cy="180" r="58" fill="#ffd34d" opacity=".3"/>`
       : `<circle cx="940" cy="350" r="60" fill="#fff0a8"/>`;
-  const clouds = phase === 'night' ? '' : `
+  const clouds = phase === 'night' || wx.kind !== 'clear' ? '' : `
     <g class="cloud" fill="#fff" opacity=".9"><ellipse cx="850" cy="250" rx="44" ry="20"/><ellipse cx="880" cy="238" rx="30" ry="20"/></g>`;
   return `
     <defs>
@@ -33,15 +64,16 @@ function windowView(phase) {
     </defs>
     <g clip-path="url(#winclip)">
       <rect x="790" y="100" width="300" height="280" fill="url(#sky)"/>
-      ${stars}${body}${clouds}
-      <path d="M790 380V340Q860 300 940 336T1090 320V380Z" fill="${phase === 'night' ? '#16305a' : '#8fd67a'}"/>
+      ${wx.kind === 'clear' || wx.kind === 'cloudy' ? stars : ''}${body}${clouds}
+      <path d="M790 380V340Q860 300 940 336T1090 320V380Z" fill="${phase === 'night' ? '#16305a' : grey ? '#7fae74' : '#8fd67a'}"/>
+      ${weatherLayer(wx, phase, 790, 100, 300, 280)}
     </g>
     <rect x="790" y="100" width="300" height="280" rx="24" fill="none" stroke="#fff" stroke-width="16"/>
     <path d="M940 100V380M790 240H1090" stroke="#fff" stroke-width="10"/>
     <rect x="770" y="376" width="340" height="20" rx="10" fill="#fff"/>`;
 }
 
-function backLayer(phase) {
+function backLayer(phase, wx) {
   let tiles = '';
   for (let x = 0; x <= 1200; x += 100) tiles += `<path d="M${x} 0V560" stroke="#c4e6ea" stroke-width="3"/>`;
   for (let y = 80; y < 560; y += 100) tiles += `<path d="M0 ${y}H1200" stroke="#c4e6ea" stroke-width="3"/>`;
@@ -53,7 +85,8 @@ function backLayer(phase) {
     <rect y="730" width="1200" height="170" fill="#f3e2c6"/>
     <path d="M0 730H1200" stroke="#e2cba6" stroke-width="6"/>
     <path d="M150 730L60 900M450 730L410 900M750 730L790 900M1050 730L1140 900" stroke="#e8d3b0" stroke-width="4"/>
-    ${windowView(phase)}
+    ${windowView(phase, wx)}
+    ${wx.kind === 'rain' || wx.kind === 'storm' ? '<g class="drips" fill="#cfe8f5"><circle cx="840" cy="170" r="5"/><circle cx="1000" cy="300" r="4"/><circle cx="900" cy="260" r="6"/><circle cx="1050" cy="150" r="4"/></g>' : ''}
     <rect x="322" y="82" width="336" height="316" rx="40" fill="#fff"/>
     <rect x="338" y="98" width="304" height="284" rx="28" fill="#d6f2fb"/>
     <path d="M370 350L470 120M410 360L490 180" stroke="#fff" stroke-width="14" stroke-linecap="round" opacity=".7"/>
@@ -130,9 +163,9 @@ function charLayer(charId) {
   return svg(characterSvg(charId, { x: 34, y: 436, s: 1.14 }), 'char-layer');
 }
 
-export function mainView(charId, phase) {
+export function mainView(charId, phase, wx) {
   return `
-    <div class="layer back" style="--d:0.4">${backLayer(phase)}</div>
+    <div class="layer back" style="--d:0.4">${backLayer(phase, wx)}</div>
     <div class="layer mid" style="--d:1">${midLayer()}</div>
     <div class="layer front" style="--d:1.8">${charLayer(charId)}</div>
     <div class="light ${phase}"></div>`;

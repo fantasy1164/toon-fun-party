@@ -1,7 +1,8 @@
 // 廁所場景：刷牙（純遊戲版）與洗手。
 import { CHARACTERS, REWARD_SLOTS } from '../config.js';
 import { el, $, $$, wait, pick, rand, burst, centerOf, onTap } from '../core/dom.js';
-import { sfx, playMusic, waterOn, waterOff } from '../core/audio.js';
+import { sfx, playMusic, waterOn, waterOff, rainOn, rainOff } from '../core/audio.js';
+import * as weather from '../core/weather.js';
 import { speak, hush } from '../core/voice.js';
 import { phase, hour, currentSlot } from '../core/clock.js';
 import { state, save, hasClaimed, claim, addItem } from '../core/store.js';
@@ -28,10 +29,11 @@ export function mountBathroom(stage, { profile, onExit }) {
   const hard = profile.level === 'hard';
   const ph = phase();
   const track = ph === 'night' ? 'bath_night' : 'bath_day';
+  const wx = weather.current();
 
   const root = el(`
     <div class="screen scene bathroom ${ph === 'night' ? 'sleepy' : ''}">
-      <div class="view main">${mainView(charId, ph)}</div>
+      <div class="view main">${mainView(charId, ph, wx)}</div>
       <div class="view mouth off">${mouthView(charId)}</div>
       <div class="view hands off">${handsView(charId)}<div class="foam"></div></div>
       <div class="hud">
@@ -449,7 +451,8 @@ export function mountBathroom(stage, { profile, onExit }) {
   async function goodbye() {
     mode = 'end';
     clearGlow();
-    await say('bye');
+    // 天氣好的白天：角色邀小孩出去玩
+    await say(weather.niceOutside(ph) ? 'bye_sunny' : 'bye');
     sfx('bye');
     root.classList.add('lights-out');
     await wait(1600);
@@ -465,6 +468,8 @@ export function mountBathroom(stage, { profile, onExit }) {
     if (!alive) return;
     alive = false;
     cancelAnimationFrame(raf);
+    clearInterval(thunderTimer);
+    rainOff();
     clearGlow();
     cleanups.forEach((fn) => fn());
     waterOff();
@@ -485,12 +490,28 @@ export function mountBathroom(stage, { profile, onExit }) {
     openCabinet(root, profile.members);
   });
 
+  // 雨聲與打雷
+  let thunderTimer = 0;
+  if (wx.kind === 'rain' || wx.kind === 'storm') rainOn(wx.kind === 'storm');
+  if (wx.kind === 'storm') {
+    const flash = () => {
+      $$('.flash', root).forEach((f) => { f.classList.remove('on'); void f.getBoundingClientRect(); f.classList.add('on'); });
+      setTimeout(() => sfx('thunder'), 500);
+    };
+    thunderTimer = setInterval(() => { if (Math.random() < 0.35) flash(); }, 6000);
+  }
+
   (async () => {
     playMusic(track);
     await wait(300);
     if (!alive) return;
     await say(ph === 'night' ? 'hello_night' : hour() < 11 ? 'hello_morning' : 'hello');
     if (!alive) return;
+    const advice = weather.adviceLine(ph);
+    if (advice) {
+      await say(advice);
+      if (!alive) return;
+    }
     if (timeUp) goodbye(); else idle();
   })();
 

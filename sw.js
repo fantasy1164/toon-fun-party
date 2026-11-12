@@ -1,9 +1,9 @@
 // 離線快取：有網路時一律抓最新版並更新快取，沒網路時用快取。
-const CACHE = 'tfp-v5';
+const CACHE = 'tfp-v6';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest', 'css/main.css',
   'js/main.js', 'js/config.js', 'js/core/store.js', 'js/core/clock.js',
-  'js/core/audio.js', 'js/core/voice.js', 'js/core/dom.js',
+  'js/core/audio.js', 'js/core/voice.js', 'js/core/weather.js', 'js/core/dom.js',
   'js/data/lines.js', 'js/art/characters.js', 'js/art/items.js',
   'js/art/bathroom.js', 'js/scenes/bathroom.js', 'js/ui/screens.js',
   'js/ui/parent.js', 'js/ui/stamps.js', 'js/art/stamps.js', 'assets/voice/manifest.json',

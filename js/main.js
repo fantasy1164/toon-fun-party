@@ -8,6 +8,7 @@ import { showSplash, showProfiles, showClosed } from './ui/screens.js';
 import { openParent } from './ui/parent.js';
 import { mountBathroom } from './scenes/bathroom.js';
 import { pickStamp, stampSession } from './ui/stamps.js';
+import * as weather from './core/weather.js';
 
 const stage = document.getElementById('stage');
 const params = new URLSearchParams(location.search);
@@ -103,6 +104,9 @@ async function boot() {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
   loadVoiceManifest();
+  weather.refresh();
+  setInterval(() => weather.refresh(), 10 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) weather.refresh(); });
   await showSplash(stage);
   unlock();
   primeTts();
