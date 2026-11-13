@@ -16,7 +16,7 @@ const nameOf = (id) => PROFILES[id].name;
 // 回傳卡片 HTML。slot 是每格大小（px）。
 export function cardHtml(id, slot = 120) {
   const { size, stamps } = cardInfo(id);
-  const cols = 5;
+  const cols = size > 10 ? 10 : 5;
   const cells = Array.from({ length: size }, (_, i) => {
     const e = stamps[i];
     const ink = e ? impressionSvg(e.s, e.c, slot * 0.82, e.rot, '#fffdf6') : '';
@@ -118,7 +118,7 @@ export function stampSession(stage, id, reasons) {
     const p = state.profiles[id];
     const { size, stamps, full } = cardInfo(id);
     const nextIndex = full ? 0 : stamps.length;   // 上一張集滿了，這次會換新卡
-    const slot = size > 5 ? 128 : 150;
+    const slot = size > 10 ? 84 : size > 5 ? 128 : 150;
 
     const node = el(`
       <div class="screen stamping">
@@ -199,5 +199,5 @@ export function stampSession(stage, id, reasons) {
 function cardHtmlEmpty(id, size, slot) {
   const cells = Array.from({ length: size }, (_, i) =>
     `<div class="slot" data-i="${i}" style="width:${slot}px;height:${slot}px"></div>`).join('');
-  return `<div class="stamp-card"><div class="card-head">${avatarSvg(id, slot * 0.8)}</div><div class="card-grid">${cells}</div></div>`;
+  return `<div class="stamp-card" style="--cols:${size > 10 ? 10 : 5}"><div class="card-head">${avatarSvg(id, slot * 0.8)}</div><div class="card-grid">${cells}</div></div>`;
 }

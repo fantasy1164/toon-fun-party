@@ -44,6 +44,15 @@ function load() {
 
 export const state = load();
 
+// 印章卡從 10／5 格改成 20 格：舊卡如果已經集滿（獎品已記在 owed），就從新卡開始，避免同一批章算兩次
+for (const id of ['yh', 'xz']) {
+  const p = state.profiles[id];
+  if (p.cardV !== 2) {
+    if (p.card.length >= { yh: 10, xz: 5 }[id]) p.card = [];
+    p.cardV = 2;
+  }
+}
+
 // ---------- 每日快照：每天第一次存檔前，先把「今天開始時」的進度存一份，保留 35 天 ----------
 const SNAP_KEY = 'tfp-snaps';
 let frozen = false;               // 清除或回復後、重新載入前，不再存檔

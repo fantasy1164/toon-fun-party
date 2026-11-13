@@ -16,7 +16,8 @@ export const PROFILES = {
 };
 
 // 好寶寶印章卡一張幾格
-export const CARD_SIZE = { yh: 10, xz: 5 };
+// 遊戲難度已分開，印章卡兩人一樣多（公平）
+export const CARD_SIZE = { yh: 20, xz: 20 };
 
 export const CHARACTERS = {
   dudu: { id: 'dudu', name: '嘟嘟', tts: { pitch: 1.25, rate: 0.95 } },

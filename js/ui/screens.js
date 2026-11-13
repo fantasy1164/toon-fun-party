@@ -205,7 +205,7 @@ export function openCabinet(root, memberIds) {
       const dots = n > 1 ? `<span class="dots">${'<i></i>'.repeat(Math.min(n, 5))}</span>` : '';
       return `<div class="slot ${item ? 'have' : 'empty'}" data-i="${i}">${item ? `<div class="thing">${itemSvg(item, 96)}</div>${dots}` : ''}</div>`;
     }).join('');
-    const card = state.profiles[id].stamp ? `<div class="card-row">${cardHtml(id, memberIds.length > 1 ? 46 : 64)}</div>` : '';
+    const card = state.profiles[id].stamp ? `<div class="card-row">${cardHtml(id, memberIds.length > 1 ? 38 : 54)}</div>` : '';
     return `<div class="unit ${drag ? 'draggable' : ''}" data-id="${id}"><div class="owner">${avatarSvg(id, 104)}</div>${card}
       <div class="shelf" style="--cols:${SHELF_COLS}">${slots}</div></div>`;
   };
