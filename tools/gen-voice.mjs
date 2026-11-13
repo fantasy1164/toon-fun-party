@@ -213,7 +213,8 @@ export function splitBySilence(samples, rate, texts) {
     const r = bounds.map(([s0, e0], i) => ({ r: (voiced[e0] - voiced[s0]) / charsOf(texts[i]), c: charsOf(texts[i]) })).filter((x) => x.c >= 4);
     if (r.length < 3) return true;
     const med = r.map((x) => x.r).sort((a, b) => a - b)[Math.floor(r.length / 2)];
-    return r.every((x) => x.r > med * 0.6 && x.r < med * 1.6);
+    // 短句（感嘆、單字）常唸得比較慢，只檢查不能太快；長句兩邊都檢查
+    return r.every((x) => x.r > med * 0.6 && (x.c <= 6 ? x.r < med * 2.6 : x.r < med * 1.6));
   };
   // 方法 A
   const byLen = gaps.slice().sort((x, y) => y.len - x.len);
