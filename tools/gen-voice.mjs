@@ -3,7 +3,7 @@
 // 用法（PowerShell）：
 //   $env:GEMINI_API_KEY = "你的金鑰"
 //   node tools/gen-voice.mjs              # 產生所有還沒有的語音（預設：同一角色多句串成一次請求再切開）
-//   node tools/gen-voice.mjs --batch 20   # 每次請求串幾句（預設 25）
+//   node tools/gen-voice.mjs --batch 20   # 每次請求串幾句（預設 10）
 //   node tools/gen-voice.mjs --single     # 一句一次請求（舊方式，最穩但最耗額度）
 //   node tools/gen-voice.mjs --char dudu  # 只做某個角色
 //   node tools/gen-voice.mjs --line hello # 只做某一句
@@ -34,7 +34,7 @@ const onlyChar = opt('char');
 const onlyLine = opt('line');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const hasFfmpeg = spawnSync('ffmpeg', ['-version'], { stdio: 'ignore' }).status === 0;
-const BATCH = flag('single') ? 1 : Math.max(1, parseInt(opt('batch') || '25', 10));
+const BATCH = flag('single') ? 1 : Math.max(1, parseInt(opt('batch') || '10', 10));
 
 // 展開成一筆一筆要產生的工作
 function jobs() {
@@ -64,7 +64,7 @@ async function synth({ charId, text }) {  // text 可以是很多句用停頓串
     model: cfg.model,
     input: [{
       type: 'user_input',
-      content: [{ type: 'text', text, annotations: [{ type: 'speech_metadata', style: c.style }] }],
+      content: [{ type: 'text', text, annotations: [{ type: 'speech_metadata', style: text.includes('<long pause>') ? `${c.style}每一行台詞之間要停頓大約兩秒，同一行裡的句子正常說。` : c.style }] }],
     }],
     response_format: { type: 'audio' },
     generation_config: { speech_config: [{ voice: c.voice }] },
@@ -151,9 +151,14 @@ function wavOf(samples, rate) {
 }
 
 // 找出最長的 n-1 段靜音當切點，切成 n 段。切不出合理結果就回傳 null。
+// 把一段串起來的語音切回每一句。
+// 方法 A：挑最長的 n-1 個停頓；方法 B：依每句字數估計句子交界的位置，挑「離估計位置近、又夠長」的停頓（同一句裡有句號、驚嘆號時比較準）。
+// 兩種都要通過「每段長度跟字數相符」的檢查。回傳 { parts, how } 或 { parts: null, info }。
+const charsOf = (t) => t.replace(/[\s，。！？、…,.!?～~「」]/g, '').length || 1;
 export function splitBySilence(samples, rate, texts) {
   const n = texts.length;
-  const frame = Math.round(rate * 0.02);          // 20 毫秒一格
+  const FR = 0.02;
+  const frame = Math.round(rate * FR);              // 20 毫秒一格
   const frames = Math.floor(samples.length / frame);
   let peak = 1;
   const rms = new Float32Array(frames);
@@ -165,36 +170,90 @@ export function splitBySilence(samples, rate, texts) {
   }
   const quiet = Math.max(120, peak * 0.03);
   const silent = Array.from(rms, (v) => v < quiet);
-  // 句子實際開始與結束的位置（去掉頭尾靜音）
-  let first = silent.indexOf(false), last = silent.lastIndexOf(false);
-  if (first < 0) return null;
-  // 中間的靜音段
+  const first = silent.indexOf(false);
+  const last = silent.lastIndexOf(false);
+  if (first < 0) return { parts: null, info: '整段都是靜音' };
+  const cut = (bounds) => bounds.map(([s0, e0]) => samples.slice(Math.max(0, s0 - 4) * frame, Math.min(frames, e0 + 4) * frame));
+  if (n === 1) return { parts: cut([[first, last + 1]]), how: 'single' };
   const gaps = [];
   for (let f = first; f <= last; f++) {
     if (!silent[f]) continue;
     let g = f;
     while (g <= last && silent[g]) g++;
-    gaps.push({ start: f, end: g, len: g - f });
+    if (g - f >= 6) gaps.push({ start: f, end: g, len: g - f, mid: (f + g) / 2 });   // 0.12 秒以上才算停頓
     f = g;
   }
-  if (n === 1) return [[first, last + 1]].map(([a, b]) => samples.slice(Math.max(0, a - 4) * frame, Math.min(frames, b + 4) * frame));
-  if (gaps.length < n - 1) return null;
-  const chosen = gaps.slice().sort((a, b) => b.len - a.len).slice(0, n - 1).sort((a, b) => a.start - b.start);
-  // 選到的停頓至少 0.3 秒，而且要明顯比沒選到的最長停頓長，才表示真的是句子之間
-  const minChosen = Math.min(...chosen.map((g) => g.len));
-  const nextBest = gaps.length > n - 1 ? gaps.slice().sort((a, b) => b.len - a.len)[n - 1].len : 0;
-  if (minChosen * 20 < 300 || minChosen < nextBest * 1.3) return null;
-  const bounds = [];
-  let a = first;
-  for (const g of chosen) { bounds.push([a, g.start]); a = g.end; }
-  bounds.push([a, last + 1]);
+  // 「有聲音的時間」累計：用來估計位置、檢查語速（不受句子裡停頓長短影響）
+  const voiced = new Int32Array(frames + 1);
+  for (let f = 0; f < frames; f++) voiced[f + 1] = voiced[f] + (silent[f] ? 0 : 1);
+  const info = `${gaps.length} 個停頓，長度 ${gaps.map((g) => (g.len * FR).toFixed(2)).join(' ')}`;
+  if (gaps.length < n - 1) return { parts: null, info };
+  const boundsOf = (chosen) => {
+    const out = [];
+    let a = first;
+    for (const g of chosen) { out.push([a, g.start]); a = g.end; }
+    out.push([a, last + 1]);
+    return out;
+  };
   // 每段長度要跟字數大致相符（每個字 0.08 到 0.7 秒）
-  for (let i = 0; i < n; i++) {
-    const sec = (bounds[i][1] - bounds[i][0]) * 0.02;
-    const chars = texts[i].replace(/[\s，。！？、…,.!?]/g, '').length || 1;
-    if (sec < Math.min(0.25, chars * 0.08) || sec > chars * 0.7 + 2.5) return null;
+  // 同一次請求裡說話速度差不多：每段「秒數／字數」不能跟中位數差太多（太短或太長多半是切錯）
+  const okLen = (bounds) => {
+    const ok = bounds.every(([s0, e0], i) => {
+      const sec = (e0 - s0) * FR;
+      const c = charsOf(texts[i]);
+      return sec >= Math.min(0.25, c * 0.08) && sec <= c * 0.7 + 2.5;
+    });
+    if (!ok) return false;
+    const r = bounds.map(([s0, e0], i) => ({ r: (voiced[e0] - voiced[s0]) / charsOf(texts[i]), c: charsOf(texts[i]) })).filter((x) => x.c >= 4);
+    if (r.length < 3) return true;
+    const med = r.map((x) => x.r).sort((a, b) => a - b)[Math.floor(r.length / 2)];
+    return r.every((x) => x.r > med * 0.6 && x.r < med * 1.6);
+  };
+  // 方法 A
+  const byLen = gaps.slice().sort((x, y) => y.len - x.len);
+  const A = byLen.slice(0, n - 1).sort((x, y) => x.start - y.start);
+  const minA = Math.min(...A.map((g) => g.len));
+  const nextA = byLen[n - 1]?.len || 0;
+  if (minA * FR >= 0.3 && minA >= nextA * 1.15 && okLen(boundsOf(A))) return { parts: cut(boundsOf(A)), how: 'A' };
+  // 方法 B：動態規劃，依序替每個交界挑一個停頓
+  const w = texts.map(charsOf);
+  const W = w.reduce((x, y) => x + y, 0);
+  const V = voiced[last + 1] - voiced[first];
+  const expect = [];
+  let acc = 0;
+  for (let k = 0; k < n - 1; k++) { acc += w[k]; expect.push((V * acc) / W); }
+  const G = gaps.length;
+  const score = (g, k) => g.len * FR - (Math.abs(voiced[g.start] - voiced[first] - expect[k]) * FR) / 2;
+  const best = Array.from({ length: n - 1 }, () => new Float64Array(G).fill(-Infinity));
+  const from = Array.from({ length: n - 1 }, () => new Int32Array(G).fill(-1));
+  for (let j = 0; j < G; j++) best[0][j] = score(gaps[j], 0);
+  for (let k = 1; k < n - 1; k++) {
+    let runMax = -Infinity;
+    let runArg = -1;
+    for (let j = 0; j < G; j++) {
+      if (j - 1 >= 0 && best[k - 1][j - 1] > runMax) { runMax = best[k - 1][j - 1]; runArg = j - 1; }
+      if (runArg >= 0) { best[k][j] = runMax + score(gaps[j], k); from[k][j] = runArg; }
+    }
   }
-  return bounds.map(([s0, e0]) => samples.slice(Math.max(0, s0 - 4) * frame, Math.min(frames, e0 + 4) * frame));
+  let j = -1;
+  let bv = -Infinity;
+  for (let x = 0; x < G; x++) if (best[n - 2][x] > bv) { bv = best[n - 2][x]; j = x; }
+  if (j < 0) return { parts: null, info };
+  const B = [];
+  for (let k = n - 2; k >= 0; k--) { B.unshift(gaps[j]); j = from[k][j]; }
+  const minB = Math.min(...B.map((g) => g.len));
+  if (minB * FR >= 0.2 && okLen(boundsOf(B))) return { parts: cut(boundsOf(B)), how: 'B' };
+  return { parts: null, info };
+}
+
+// 切不開的那段原始語音存起來，方便檢查（tools/voice-debug/，可以 push 上來給 Claude 看）
+function saveDebug(batch, samples, rate, info) {
+  const dir = join(ROOT, 'tools', 'voice-debug');
+  mkdirSync(dir, { recursive: true });
+  const name = `${batch[0].key.replace(/[\/.]/g, '_')}-${batch.length}`;
+  writeFileSync(join(dir, `${name}.wav`), wavOf(samples, rate));
+  writeFileSync(join(dir, `${name}.txt`), `${info}\n\n${batch.map((j) => `${j.key}\t${j.text}`).join('\n')}\n`);
+  return name;
 }
 
 function saveSamples(key, samples, rate) {
@@ -214,14 +273,18 @@ async function runBatch(batch, depth = 0) {
   const text = batch.map((j) => j.text).join('\n<long pause>\n');
   const audio = await synth({ charId: batch[0].charId, text });
   const { samples, rate } = pcmOf(audio);
-  const parts = splitBySilence(samples, rate, batch.map((j) => j.text));
+  const { parts, how, info } = splitBySilence(samples, rate, batch.map((j) => j.text));
   if (parts) {
+    if (how === 'B') console.log('    （用字數估計位置切開）');
     batch.forEach((j, i) => {
       if (flag('force')) { const ext = existing(j.key); if (ext) unlinkSync(join(VOICE_DIR, `${j.key}.${ext}`)); }
       saveSamples(j.key, parts[i], rate);
     });
     return batch.length;
   }
+  const dbg = saveDebug(batch, samples, rate, info);
+  console.log(`    切不開：${info}`);
+  console.log(`    原始語音存在 tools/voice-debug/${dbg}.wav`);
   if (batch.length === 1 || depth >= 1) {
     const e = new Error(`切不開（${batch.length} 句）`);
     e.split = true;
