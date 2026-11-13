@@ -13,6 +13,7 @@ import { santaPop } from './xmas.js';
 import { SCHOOL_ICON } from '../art/school.js';
 import { FARM_ICON } from '../art/farm.js';
 import { HUB_BALLOONS, PARTY_ICON } from '../art/party.js';
+import { HUB_NY, NY_ICON } from '../art/newyear.js';
 
 const BATH = `<svg viewBox="0 0 420 420" width="420" height="420">
   <rect width="420" height="420" rx="40" fill="#dcf3f5"/>
@@ -74,9 +75,10 @@ export function showHub(stage, profile) {
     const night = phase() === 'night';
     const avatars = profile.members.map((id) => `<div class="av">${avatarSvg(id, 96)}</div>`).join('');
     const bids = fest.birthdayKids();
+    const ny = fest.newYear();
     const node = el(`
-      <div class="screen hub ${night ? 'night' : ''} ${bids.length ? 'bday' : ''}">
-        ${bids.length ? HUB_BALLOONS : ''}
+      <div class="screen hub ${night ? 'night' : ''} ${bids.length ? 'bday' : ''} ${ny ? 'ny' : ''}">
+        ${bids.length ? HUB_BALLOONS : ''}${ny ? HUB_NY : ''}
         <div class="roof"></div>
         <div class="avs">${avatars}</div>
         <button class="room" data-room="bathroom">${BATH}</button>
@@ -87,10 +89,12 @@ export function showHub(stage, profile) {
         <button class="room" data-room="school">${SCHOOL_ICON}</button>
         <button class="room" data-room="farm">${FARM_ICON}</button>
         ${bids.length ? `<button class="room party-room" data-room="party">${PARTY_ICON}</button>` : ''}
+        ${ny ? `<button class="room ny-room" data-room="newyear">${NY_ICON}</button>` : ''}
         <button class="round-btn home">${ICON.home}</button>
         ${fest.isDecember() ? `${ROOF_LIGHTS}<button class="round-btn treebtn">${TREE_ICON}</button>` : ''}
       </div>`);
     stage.replaceChildren(node);
+    layoutRooms(node);
     playMusic('lobby');
     let done = false;
     const go = async (room, btn) => {
@@ -119,6 +123,13 @@ export function showHub(stage, profile) {
       state.bdGreet = g;
       save();
       bdGreet(node, profile, bids).then(() => { if (!done) $('.party-room', node)?.classList.add('glow'); });
+    } else if (ny && !(state.nyGreet?.date === dateKey() && state.nyGreet.seen.includes(profile.id))) {
+      const ng = state.nyGreet?.date === dateKey() ? state.nyGreet : { date: dateKey(), seen: [] };
+      ng.seen.push(profile.id);
+      state.nyGreet = ng;
+      save();
+      $('.ny-room', node)?.classList.add('glow');
+      speak('kiki', `ny_hub_${ny.stage}`, { name: profile.name, who: profile.id });
     } else if (x && fest.day() <= 24 && profile.members.some((id) => !x.greeted[id])) {
       santaPop(node, profile).then(() => { if (!done) speak(host, 'hub_pick', { name: profile.name, who: profile.id }); });
     } else {
@@ -151,4 +162,21 @@ async function bdGreet(hub, profile, bids) {
   ov.classList.add('away');
   await wait(500);
   ov.remove();
+}
+
+// 房間排版：平常 7 間（上 4 下 3）；節慶多出來的房間排到下排，太多時縮小
+function layoutRooms(hub) {
+  const rooms = [...hub.querySelectorAll('.room')];
+  const size = rooms.length > 8 ? 205 : 235;
+  const gap = rooms.length > 8 ? 26 : 40;
+  const rows = [rooms.slice(0, 4), rooms.slice(4)];
+  rows.forEach((row, r) => {
+    const w = row.length * size + (row.length - 1) * gap;
+    row.forEach((b, i) => {
+      b.style.left = `${(1200 - w) / 2 + i * (size + gap)}px`;
+      b.style.top = `${r === 0 ? 185 : 470}px`;
+      b.style.width = `${size}px`;
+      b.style.height = `${size}px`;
+    });
+  });
 }

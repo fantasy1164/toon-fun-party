@@ -100,6 +100,9 @@ const SFX = {
   sniff: (t) => [0, 0.1, 0.2].forEach((d) => noise(t + d, 0.07, { freq: 3200, q: 2, gain: 0.12 })),
   baa: (t) => { for (let i = 0; i < 6; i++) tone(440 + (i % 2) * 30, t + i * 0.07, 0.09, { type: 'sawtooth', gain: 0.07 }); },
   munch: (t) => [0, 0.14, 0.28, 0.42].forEach((d) => noise(t + d, 0.08, { freq: 1200, q: 1.5, gain: 0.2 })),
+  roar: (t) => { tone(90, t, 0.9, { type: 'sawtooth', to: 70, gain: 0.16, attack: 0.08 }); noise(t, 0.9, { freq: 300, q: 1.2, gain: 0.25 }); },
+  drum: (t) => [0, 0.22, 0.44].forEach((d) => { tone(110, t + d, 0.25, { type: 'sine', to: 50, gain: 0.5 }); noise(t + d, 0.08, { freq: 900, q: 1, gain: 0.2 }); }),
+  boom: (t) => { noise(t, 0.6, { freq: 200, q: 0.8, gain: 0.5 }); [0, 0.1, 0.2, 0.35].forEach((d) => noise(t + 0.3 + d, 0.05, { freq: 4000, q: 2, gain: 0.12 })); },
   boing: (t) => tone(300, t, 0.35, { type: 'sine', to: 900, gain: 0.2 }),
 };
 
@@ -180,6 +183,11 @@ const TRACKS = {
     bpm: 112, lead: 'triangle', leadGain: 0.18,
     melody: seq('G4 . A4 B4 D5 . B4 . A4 . G4 . E4 . . .  G4 . A4 B4 D5 . E5 . D5 . B4 . A4 . . .'),
     bass: seq('G2 . D3 . E2 . B2 . C3 . G2 . D3 . . .  G2 . D3 . C3 . G2 . D3 . A2 . D3 . . .'),
+  },
+  newyear: {
+    bpm: 120, lead: 'triangle', leadGain: 0.2,
+    melody: seq('E5 G5 A5 . G5 E5 D5 .  E5 D5 C5 D5 E5 . . .  A4 C5 D5 . E5 G5 E5 D5  C5 D5 E5 . C5 . . .'),
+    bass: seq('C3 . G2 . C3 . G2 .  A2 . E2 . A2 . E2 .  F2 . C3 . G2 . D3 .  C3 . G2 . C3 . . .'),
   },
   party: {
     bpm: 132, lead: 'square', leadGain: 0.07,

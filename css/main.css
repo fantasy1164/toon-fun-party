@@ -799,3 +799,74 @@ html, body {
 .party .bigcard.send { transition: transform .9s ease-in, opacity .9s; transform: translate(520px, -520px) scale(.1) rotate(30deg); opacity: 0; }
 .parent .mic-meter { display: inline-block; width: 160px; height: 14px; background: #eee; border-radius: 7px; vertical-align: middle; overflow: hidden; }
 .parent .mic-meter i { display: block; height: 100%; width: 0; background: #3be37a; transition: width .08s; }
+
+/* ---------- 過年 ---------- */
+.hub .ny-deco { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; }
+.hub .ny-deco .swing { animation: lswing 2.4s ease-in-out infinite alternate; }
+@keyframes lswing { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+.hub .ny-room.glow { box-shadow: 0 0 0 12px rgba(255, 208, 0, .85), 0 14px 0 rgba(0, 0, 0, .15); }
+.newyear { background: #fff1dd; }
+.newyear .p-char.glow-c { pointer-events: auto; }
+.newyear .p-char.glow-c svg { filter: drop-shadow(0 0 12px #ffd000) drop-shadow(0 0 5px #ffd000); animation: pulse .7s ease-in-out infinite alternate; }
+.newyear .door-done { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; }
+.newyear .dustwin { position: absolute; left: 70px; top: 110px; width: 300px; height: 260px; z-index: 2; touch-action: none; }
+.newyear .dustwin.glow { box-shadow: 0 0 0 10px rgba(255, 208, 0, .8); border-radius: 14px; animation: pulse .8s ease-in-out infinite alternate; }
+.newyear .toy, .newyear .pile { position: absolute; padding: 0; border: 0; background: none; z-index: 3; pointer-events: none; }
+.newyear .toy.glow, .newyear .toy.live, .newyear .pile.glow, .newyear .pile.live { pointer-events: auto; }
+.newyear .toy.glow svg, .newyear .pile.glow svg { filter: drop-shadow(0 0 10px #ffd000); animation: pulse .6s ease-in-out infinite alternate; }
+.newyear .toy.gone, .newyear .pile.gone { transition: opacity .3s, transform .3s; opacity: 0; transform: scale(.4); }
+.newyear .dpiece { position: absolute; z-index: 3; animation: popin .4s ease-out; }
+.newyear .dpiece svg { width: 100%; height: 100%; display: block; }
+.newyear .dpiece.fu { pointer-events: auto; transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+.newyear .dpiece.fu.glow { filter: drop-shadow(0 0 14px #ffd000); animation: pulse .6s ease-in-out infinite alternate; }
+.newyear .dpiece.fu.flip { animation: none; transform: rotate(180deg); }
+.newyear .ny-red { position: absolute; left: 0; top: 24px; width: 1200px; height: 200px; z-index: 2; pointer-events: none; animation: popin .4s ease-out; }
+.newyear.bright .p-layer { filter: brightness(1.15) saturate(1.2); }
+.newyear.shake .nian { animation: carshake .15s linear 4; }
+.newyear .nian { position: absolute; left: 1240px; top: 200px; width: 360px; height: 320px; z-index: 3; pointer-events: none; transition: left .8s cubic-bezier(.3, 1.2, .5, 1), transform .5s; }
+.newyear .nian svg { display: block; overflow: visible; }
+.newyear .nian.in { left: 780px; }
+.newyear .nian.scared.s1 { transform: translateX(80px) scale(.95); }
+.newyear .nian.scared.s2 { transform: translateX(160px) scale(.9); }
+.newyear .nian.scared.s3 { transform: translateX(220px) scale(.85) rotate(-6deg); }
+.newyear .nian.friend { left: 760px; top: 280px; transform: scale(.8); }
+.newyear .nian.friend .nbrow { display: none; }
+.newyear .nian.friend svg { animation: jump .5s ease-out infinite alternate; }
+.newyear .nytable { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; z-index: 2; }
+.newyear .dish { position: absolute; z-index: 4; animation: popin .4s ease-out; pointer-events: none; }
+.newyear .tbtn.dishbtn svg { width: 120px; height: 82px; }
+.newyear .ny-kid { position: absolute; left: 30px; top: 690px; width: 130px; height: 130px; border-radius: 50%; overflow: hidden; background: #fff; box-shadow: 0 0 0 8px #ffcf40; z-index: 4; transition: transform .3s; }
+.newyear.bow .ny-kid { transform: translateY(14px) scale(.95); }
+.newyear .envs .env { position: absolute; z-index: 5; pointer-events: none; }
+.newyear .envs .env svg { width: 60px; height: 84px; }
+.newyear .envs .env.glow { pointer-events: auto; filter: drop-shadow(0 0 12px #ffd000); animation: pulse .6s ease-in-out infinite alternate; }
+.newyear .hands { position: absolute; left: 0; right: 0; top: 600px; display: flex; justify-content: center; gap: 220px; z-index: 7; }
+.newyear .hand { position: relative; width: 150px; height: 150px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, .9); padding: 0; }
+.newyear .hand.glow { animation: pulse .6s ease-in-out infinite alternate; box-shadow: 0 0 0 10px rgba(255, 208, 0, .8); }
+.newyear .hand.down { background: #ffe680; }
+.newyear .piggy { position: absolute; left: 490px; top: 600px; width: 220px; height: 180px; padding: 0; border: 0; background: none; z-index: 6; }
+.newyear .piggy.glow svg { filter: drop-shadow(0 0 14px #ffd000); animation: pulse .6s ease-in-out infinite alternate; }
+.newyear .piggy.happy svg { animation: jump .3s ease-out 4 alternate; }
+.newyear .ncards { position: absolute; left: 0; right: 0; top: 230px; display: flex; justify-content: center; gap: 30px; z-index: 8; }
+.newyear .ncard { width: auto; height: auto; padding: 8px; }
+.newyear .ncard svg { width: 220px; height: 176px; display: block; }
+.newyear .fw { position: absolute; inset: 0; z-index: 9; }
+.newyear .fw svg { width: 100%; height: 100%; display: block; }
+.newyear.ears .p-char .arm { transform-box: fill-box; transform-origin: 50% 12%; transform: rotate(160deg); }
+.newyear.lantern-night { background: #16204a; }
+.newyear .street { transition: transform .8s ease-out; }
+.newyear .mylantern { position: absolute; left: 520px; top: 380px; width: 160px; height: 200px; z-index: 5; display: flex; justify-content: center; transform-origin: 50% 0; }
+.newyear .mylantern svg { width: 150px; height: 190px; overflow: visible; }
+.newyear .mylantern.glow { animation: pulse .6s ease-in-out infinite alternate; filter: drop-shadow(0 0 12px #ffd000); }
+.newyear .mylantern.lit .glowball { animation: twinkle 1.2s ease-in-out infinite alternate; }
+.newyear .mylantern.swing { animation: lswing .5s ease-in-out 2 alternate; }
+.newyear.lantern-night .ny-kid { left: 340px; top: 600px; }
+.newyear .bowl { position: absolute; left: 440px; top: 560px; width: 320px; height: 220px; z-index: 6; animation: popin .4s ease-out; }
+.newyear .bowl svg { overflow: visible; }
+.newyear .tball { pointer-events: auto; transform-box: fill-box; transform-origin: center; transition: transform .25s, opacity .25s; }
+.newyear .tball.glow { animation: pulse .6s ease-in-out infinite alternate; }
+.newyear .tball.eaten { animation: none; transform: scale(0); opacity: 0; }
+.newyear.hold .p-char.glow-c svg { filter: none; animation: none; }
+.newyear .fwb { position: absolute; width: 280px; height: 280px; pointer-events: none; animation: fwpop 1.3s ease-out forwards; }
+.newyear .fwb svg { width: 100%; height: 100%; }
+@keyframes fwpop { 0% { transform: scale(.15); opacity: 1; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1.25) translateY(20px); opacity: 0; } }

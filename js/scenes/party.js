@@ -18,7 +18,7 @@ import { itemSvg, CARD_COLORS, STICKERS, CARD_SPOTS } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
 
 const shuffle = (a) => a.map((x) => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map((p) => p[1]);
-const charDiv = (id, x, y, s = 0.62) => `<div class="p-char" data-who="${id}" style="left:${x}px;top:${y}px;width:${240 * s}px;height:${320 * s}px">
+export const charDiv = (id, x, y, s = 0.62) => `<div class="p-char" data-who="${id}" style="left:${x}px;top:${y}px;width:${240 * s}px;height:${320 * s}px">
   <svg viewBox="0 0 240 320" width="100%" height="100%">${characterSvg(id)}</svg></div>`;
 
 export function mountParty(stage, opts) {
@@ -29,11 +29,11 @@ export function mountParty(stage, opts) {
 }
 
 // 共用：場景外框、等待、拖曳
-function makeScene(stage, profile, onExit, inner, hostId) {
+export function makeScene(stage, profile, onExit, inner, hostId, { cls = '', back = null } = {}) {
   const ph = phase();
   const root = el(`
-    <div class="screen scene party ${ph}">
-      <div class="p-layer">${partyRoom(ph)}</div>
+    <div class="screen scene party ${cls} ${ph}">
+      <div class="p-layer">${back ?? partyRoom(ph)}</div>
       ${inner}
       <div class="dim"></div>
       <div class="hud">

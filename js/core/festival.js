@@ -58,3 +58,27 @@ export function ageOf(id) {
   if (!b) return 0;
   return now().getFullYear() - +b.slice(0, 4);
 }
+
+// ---------- 過年（農曆春節） ----------
+// 初一的國曆日期（查表；之後的年份要再補）
+const CNY = {
+  2026: '2026-02-17', 2027: '2027-02-06', 2028: '2028-01-26', 2029: '2029-02-13', 2030: '2030-02-03',
+  2031: '2031-01-23', 2032: '2032-02-11', 2033: '2033-01-31', 2034: '2034-02-19', 2035: '2035-02-08',
+};
+const ZODIAC = ['rat', 'ox', 'tiger', 'rabbit', 'dragon', 'snake', 'horse', 'goat', 'monkey', 'rooster', 'dog', 'pig'];
+// 回傳 null 或 { stage, offset, year, zodiac }：offset＝今天距離初一幾天
+//   prep：除夕前 7 天到前 2 天（大掃除、貼春聯）；eve：除夕；days：初一到十四（拜年、紅包、煙火）；lantern：元宵節（十五）
+export function newYear() {
+  const d = now();
+  const today = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  for (const y of [d.getFullYear(), d.getFullYear() + 1]) {
+    const k = CNY[y];
+    if (!k) continue;
+    const c = Date.UTC(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8, 10));
+    const off = Math.round((today - c) / 86400000);
+    if (off < -7 || off > 14) continue;
+    const stage = off <= -2 ? 'prep' : off === -1 ? 'eve' : off <= 13 ? 'days' : 'lantern';
+    return { stage, offset: off, year: y, zodiac: ZODIAC[(y - 4) % 12] };
+  }
+  return null;
+}
