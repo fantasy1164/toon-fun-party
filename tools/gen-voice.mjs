@@ -154,7 +154,13 @@ function wavOf(samples, rate) {
 // 把一段串起來的語音切回每一句。
 // 方法 A：挑最長的 n-1 個停頓；方法 B：依每句字數估計句子交界的位置，挑「離估計位置近、又夠長」的停頓（同一句裡有句號、驚嘆號時比較準）。
 // 兩種都要通過「每段長度跟字數相符」的檢查。回傳 { parts, how } 或 { parts: null, info }。
-const charsOf = (t) => t.replace(/[\s，。！？、…,.!?～~「」]/g, '').length || 1;
+// 估計「念起來有多長」：中文一字算 1；英文大約 3 個字母算 1（Raincoat ≈ 3）
+const charsOf = (t) => {
+  const cjk = (t.match(/[\u3400-\u9fff]/g) || []).length;
+  const latin = (t.match(/[A-Za-z]/g) || []).length;
+  const digits = (t.match(/[0-9]/g) || []).length;
+  return Math.max(1, cjk + Math.ceil(latin / 3) + digits);
+};
 export function splitBySilence(samples, rate, texts) {
   const n = texts.length;
   const FR = 0.02;
@@ -285,17 +291,15 @@ async function runBatch(batch, depth = 0) {
   const dbg = saveDebug(batch, samples, rate, info);
   console.log(`    切不開：${info}`);
   console.log(`    原始語音存在 tools/voice-debug/${dbg}.wav`);
-  if (batch.length === 1 || depth >= 1) {
-    const e = new Error(`切不開（${batch.length} 句）`);
-    e.split = true;
-    throw e;
-  }
-  console.log(`    切不開，對半各試一次`);
-  const mid = Math.ceil(batch.length / 2);
+  // 第一次切不開：對半各試一次；對半還是切不開：那幾句改成一句一次（一定切得開，但比較花額度）
+  const parts2 = depth === 0 && batch.length > 3
+    ? [batch.slice(0, Math.ceil(batch.length / 2)), batch.slice(Math.ceil(batch.length / 2))]
+    : batch.map((j) => [j]);
+  console.log(depth === 0 && batch.length > 3 ? '    切不開，對半各試一次' : `    改成一句一次（${batch.length} 次請求）`);
   let ok = 0;
-  for (const half of [batch.slice(0, mid), batch.slice(mid)]) {
+  for (const part of parts2) {
     await sleep(1200);
-    ok += await runBatch(half, depth + 1);
+    ok += await runBatch(part, depth + 1);
   }
   return ok;
 }
