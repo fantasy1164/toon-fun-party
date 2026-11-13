@@ -1,0 +1,12 @@
+19 個停頓，長度 0.18 1.36 0.14 1.02 0.32 0.28 0.18 1.30 0.26 0.30 0.22 1.38 0.94 0.20 0.92 0.88 1.32 0.18 1.38
+
+kiki/bd_hello.xz	向澤，生日快樂！
+kiki/bd_hello.both	妍卉、向澤，生日快樂！
+kiki/bd_sib_hub_xz	向澤，今天是姊姊的生日喔！點派對房間，我們偷偷準備驚喜！
+kiki/bd_sib_hub_yh	妍卉，今天是弟弟的生日喔！點派對房間，我們偷偷準備驚喜！
+kiki/bd_p_hello.yh	妍卉的生日派對，開始囉！
+kiki/bd_p_hello.xz	向澤的生日派對，開始囉！
+kiki/bd_p_hello.both	妍卉、向澤的生日派對，開始囉！
+kiki/bd_decor	先把派對布置得漂漂亮亮！
+kiki/bd_light	點蠟燭囉！關燈！
+kiki/bd_song_end	祝你生日快樂！

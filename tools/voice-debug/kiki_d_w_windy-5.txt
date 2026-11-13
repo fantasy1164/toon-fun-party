@@ -1,0 +1,7 @@
+10 個停頓，長度 0.20 0.16 0.20 0.24 0.88 0.20 0.94 0.24 0.60 0.28
+
+kiki/d_w_windy	外面風好大！
+kiki/d_what	要穿什麼、帶什麼呢？你幫我選！
+kiki/d_need_normal	穿好鞋子就可以出發！
+kiki/d_need_hot	要穿鞋子，還要戴帽子！
+kiki/d_need_rain	要穿雨鞋，還要帶雨傘！

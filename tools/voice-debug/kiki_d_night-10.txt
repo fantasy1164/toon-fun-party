@@ -1,0 +1,12 @@
+17 個停頓，長度 0.14 1.48 1.32 0.18 1.40 1.16 0.12 1.42 0.20 1.56 0.14 1.38 0.16 1.24 0.20 1.34 0.18
+
+kiki/d_night	天黑了，我們先練習明天出門要穿什麼！
+kiki/d_w_normal	今天天氣不錯！
+kiki/d_w_hot	今天太陽好大，好熱喔！
+kiki/d_w_rain	外面在下雨耶！
+kiki/d_w_cold	今天好冷喔！
+kiki/d_w_windy	外面風好大！
+kiki/d_what	要穿什麼、帶什麼呢？你幫我選！
+kiki/d_need_normal	穿好鞋子就可以出發！
+kiki/d_need_hot	要穿鞋子，還要戴帽子！
+kiki/d_need_rain	要穿雨鞋，還要帶雨傘！

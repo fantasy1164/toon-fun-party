@@ -1,0 +1,12 @@
+22 個停頓，長度 0.14 0.12 1.82 0.24 1.48 0.24 0.98 1.40 1.08 0.18 1.22 0.12 0.32 0.18 1.56 1.68 0.14 0.22 0.18 0.24 1.54 0.24
+
+kiki/ny_say_thanks	收到紅包，要說：謝謝！
+kiki/ny_fw	晚上要放煙火！要怎麼看煙火呢？
+kiki/ny_fw_tap	點一下天空，放煙火！
+kiki/ny_fw_wow	哇！好漂亮！
+kiki/ny_pick_lantern	選一個燈籠！
+kiki/ny_light	點一下，把燈籠點亮！
+kiki/ny_walk	我們提著燈籠去散步！點一下，往前走。
+kiki/time_soon	再玩一下下就要休息了喔！
+kiki/t_ready.both	妍卉、向澤！牙刷拿好、牙膏擠好，準備好就點一下！
+kiki/t_start	開始！跟奇奇一起刷刷刷！

@@ -1,0 +1,12 @@
+20 個停頓，長度 0.16 0.58 1.54 1.20 0.46 1.30 0.22 0.32 1.04 0.20 0.16 1.14 0.92 1.18 1.14 0.98 0.14 0.14 0.26 1.26
+
+kiki/resting	奇奇在休息！等餅乾吃完再來玩！你也去動一動吧！
+kiki/k_thanks	謝謝你！
+kiki/k_kiki_noveg	哎呀，青菜……奇奇不想吃……
+kiki/k_kiki_try	好吧，我吃一口……嗯！好好吃！
+kiki/k_itadaki	我開動了！
+kiki/k_yum	超好吃！
+kiki/k_fruit_want	我也要！我也要！
+kiki/k_give_happy	耶！謝謝！
+kiki/k_turn	好吧，下次換奇奇！
+kiki/k_bye_meal	謝謝招待！

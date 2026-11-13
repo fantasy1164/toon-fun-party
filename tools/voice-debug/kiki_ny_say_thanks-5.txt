@@ -1,0 +1,7 @@
+8 個停頓，長度 0.18 1.52 0.14 0.78 0.26 1.42 0.20 1.36
+
+kiki/ny_say_thanks	收到紅包，要說：謝謝！
+kiki/ny_fw	晚上要放煙火！要怎麼看煙火呢？
+kiki/ny_fw_tap	點一下天空，放煙火！
+kiki/ny_fw_wow	哇！好漂亮！
+kiki/ny_pick_lantern	選一個燈籠！

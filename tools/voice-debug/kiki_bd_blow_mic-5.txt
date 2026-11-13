@@ -1,0 +1,7 @@
+6 個停頓，長度 0.14 1.98 2.06 1.70 0.12 1.32
+
+kiki/bd_blow_mic	對著 iPad，用力吹氣，把蠟燭吹熄！
+kiki/bd_blow_tap	點一下火，把蠟燭吹熄！
+kiki/bd_blown	哇！蠟燭全部吹熄了！
+kiki/bd_card_from_xz	這是向澤偷偷幫你做的卡片！
+kiki/bd_card_from_yh	這是妍卉偷偷幫你做的卡片！
