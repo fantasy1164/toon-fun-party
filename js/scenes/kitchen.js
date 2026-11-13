@@ -483,7 +483,7 @@ export function mountKitchen(stage, { profile, onExit }) {
     const winners = slot ? profile.members.filter((id) => !hasClaimed(id, `kitchen_${slot}`)) : [];
     if (winners.length) {
       const gifts = winners.map((id) => {
-        const item = nextItem(state.profiles[id].collection, pick(['dudu', 'kiki']));
+        const item = nextItem(state.profiles[id].collection, 'bobo');
         addItem(id, item);
         claim(id, `kitchen_${slot}`);
         return { id, item };

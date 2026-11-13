@@ -1,4 +1,4 @@
-// 節慶：目前只有聖誕節。日期一律用遊戲時鐘（可用 ?date= 測試）。
+// 節慶：聖誕節、生日。日期一律用遊戲時鐘（可用 ?date= 測試）。
 import { now, hour } from './clock.js';
 import { state, save } from './store.js';
 
@@ -38,4 +38,23 @@ export function resetXmas() {
 export function decemberStamps(id) {
   const ym = `${now().getFullYear()}-12`;
   return state.profiles[id].log.filter((e) => e.d.startsWith(ym));
+}
+
+// ---------- 生日 ----------
+// 生日存在 state.settings.birthdays = { yh: 'YYYY-MM-DD', xz: 'YYYY-MM-DD' }（只存在這台 iPad）
+export function birthday(id) { return state.settings.birthdays?.[id] || ''; }
+export function setBirthday(id, v) {
+  state.settings.birthdays = { ...(state.settings.birthdays || {}), [id]: v };
+  save();
+}
+// 今天生日的小孩
+export function birthdayKids() {
+  const d = now();
+  const md = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return ['yh', 'xz'].filter((id) => birthday(id).slice(5) === md);
+}
+export function ageOf(id) {
+  const b = birthday(id);
+  if (!b) return 0;
+  return now().getFullYear() - +b.slice(0, 4);
 }

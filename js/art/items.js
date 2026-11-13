@@ -28,6 +28,19 @@ export const ITEMS = {
   mian_bell: `<path d="M30 20H70" stroke="#e5484d" stroke-width="8" stroke-linecap="round"/><path d="M32 30H68L76 82H24Z" fill="#ffd34d" stroke="#e0a800" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="86" r="8" fill="#e0a800"/>`,
   mian_cloud: `<g fill="#fff" stroke="#c8d8ea" stroke-width="4"><circle cx="34" cy="56" r="20"/><circle cx="54" cy="44" r="24"/><circle cx="72" cy="58" r="18"/></g><rect x="30" y="56" width="46" height="20" fill="#fff"/><circle cx="46" cy="58" r="3" fill="#555"/><circle cx="62" cy="58" r="3" fill="#555"/>`,
   mian_pillow: `<path d="M14 34Q10 22 24 22H76Q90 22 86 34V66Q90 78 76 78H24Q10 78 14 66Z" fill="#cbb8ff"/><path d="M14 34L6 26M86 34L94 26M14 66L6 74M86 66L94 74" stroke="#cbb8ff" stroke-width="6" stroke-linecap="round"/><path d="M50 40l4 8l9 1l-7 6l2 9l-8-5l-8 5l2-9l-7-6l9-1z" fill="#fff6c8"/>`,
+  // 波波的廚房系列
+  bobo_honey: `<path d="M26 34H74V84Q74 92 66 92H34Q26 92 26 84Z" fill="#ffb300"/><rect x="22" y="22" width="56" height="16" rx="6" fill="#c98f4f"/><path d="M26 50Q50 58 74 50V60Q50 68 26 60Z" fill="#fff" opacity=".35"/><path d="M40 70l10 -6l10 6v12l-10 6l-10 -6z" fill="#e08a00"/><path d="M64 30Q80 20 84 34" stroke="#c98f4f" stroke-width="5" fill="none"/>`,
+  bobo_pot: `<path d="M14 44H86V74Q86 90 70 90H30Q14 90 14 74Z" fill="#e5734f"/><rect x="8" y="40" width="84" height="10" rx="5" fill="#c9562f"/><path d="M4 56H14M86 56H96" stroke="#555" stroke-width="7" stroke-linecap="round"/><path d="M36 30Q30 20 38 12M52 30Q46 18 54 8M68 30Q62 20 70 12" stroke="#c8d0da" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  bobo_donut: `<circle cx="50" cy="52" r="36" fill="#d9a066"/><path d="M18 46Q20 20 50 18Q80 20 84 46Q78 60 66 52Q58 64 48 54Q38 64 30 52Q22 60 18 46Z" fill="#ff9fc4"/><circle cx="50" cy="52" r="12" fill="#fff"/>${[[34, 32, '#5fa8e8'], [62, 30, '#ffd34d'], [72, 44, '#4caf50'], [28, 44, '#fff'], [46, 26, '#e5484d']].map(([x, y, c]) => `<rect x="${x}" y="${y}" width="8" height="3" rx="1.5" fill="${c}" transform="rotate(30 ${x} ${y})"/>`).join('')}`,
+  bobo_bread: `<path d="M14 52Q14 24 50 24Q86 24 86 52V82Q86 88 80 88H20Q14 88 14 82Z" fill="#e8b46a"/><path d="M20 54Q20 32 50 32Q80 32 80 54V80H20Z" fill="#fff3d6"/><circle cx="40" cy="58" r="4" fill="#3a2a22"/><circle cx="60" cy="58" r="4" fill="#3a2a22"/><path d="M42 68Q50 74 58 68" stroke="#3a2a22" stroke-width="3" fill="none"/>`,
+  bobo_spoon: `<g transform="rotate(-35 50 50)"><ellipse cx="50" cy="26" rx="16" ry="22" fill="#c0c6d0"/><ellipse cx="50" cy="24" rx="10" ry="15" fill="#e6eaf0"/><rect x="45" y="44" width="10" height="50" rx="5" fill="#c98f4f"/></g>`,
+  bobo_apron: `<path d="M30 20H70V34Q86 40 84 56L80 90H20L16 56Q14 40 30 34Z" fill="#ff9f43"/><path d="M30 20Q50 6 70 20" stroke="#fff" stroke-width="5" fill="none"/><rect x="34" y="56" width="32" height="20" rx="4" fill="#fff" opacity=".5"/><circle cx="50" cy="44" r="7" fill="#e5484d"/>`,
+  // 生日禮物（每位角色一件）
+  bd_rocket: `<path d="M50 8Q70 26 68 60H32Q30 26 50 8Z" fill="#e5484d"/><circle cx="50" cy="36" r="9" fill="#9fd8ee" stroke="#fff" stroke-width="3"/><path d="M32 52L18 72L32 68ZM68 52L82 72L68 68Z" fill="#ffd34d"/><path d="M38 60H62L58 70H42Z" fill="#888"/><path d="M42 72Q50 96 58 72Z" fill="#ff9f43"/>`,
+  bd_bubble: `<rect x="46" y="50" width="8" height="44" rx="4" fill="#5fa8e8"/><circle cx="50" cy="40" r="14" fill="none" stroke="#5fa8e8" stroke-width="6"/>${[[24, 22, 10], [76, 26, 12], [70, 60, 8], [22, 58, 7], [52, 12, 6]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#d6f4ff" stroke="#9fd8ee" stroke-width="2" opacity=".9"/>`).join('')}`,
+  bd_cupcake: `<path d="M26 54H74L68 90H32Z" fill="#ff9fc4"/>${[34, 44, 54, 64].map((x) => `<path d="M${x} 54L${x + 2} 90" stroke="#e5738f" stroke-width="3"/>`).join('')}<path d="M22 56Q20 34 40 32Q44 18 58 22Q78 22 78 40Q84 50 76 58Z" fill="#fff3d6"/><circle cx="52" cy="18" r="8" fill="#e5484d"/><rect x="38" y="36" width="8" height="3" fill="#5fa8e8" transform="rotate(30 38 36)"/><rect x="60" y="40" width="8" height="3" fill="#ffd34d"/>`,
+  bd_starlamp: `<path d="M50 10l11 23l25 3l-18 17l5 25l-23 -12l-23 12l5 -25l-18 -17l25 -3z" fill="#ffe680" stroke="#ffd34d" stroke-width="4" stroke-linejoin="round"/><circle cx="42" cy="44" r="3" fill="#555"/><circle cx="58" cy="44" r="3" fill="#555"/><path d="M44 54Q50 58 56 54" stroke="#555" stroke-width="3" fill="none"/><rect x="40" y="82" width="20" height="10" rx="3" fill="#cbb8ff"/>`,
+  bd_musicbox: `<rect x="16" y="46" width="68" height="44" rx="6" fill="#8e6cd8"/><path d="M16 46L26 28H74L84 46Z" fill="#b39ef0"/><rect x="16" y="60" width="68" height="6" fill="#ffd34d"/><path d="M60 14V30M60 14L72 18" stroke="#3a2a22" stroke-width="4" stroke-linecap="round"/><circle cx="56" cy="30" r="5" fill="#3a2a22"/><path d="M30 18V30" stroke="#3a2a22" stroke-width="4"/><circle cx="26" cy="30" r="5" fill="#3a2a22"/>`,
   // 小菜園採收（特別收藏）
   harvest_carrot: `<path d="M50 30Q68 34 64 46L52 94Q50 98 48 94L36 46Q32 34 50 30Z" fill="#f08a3c"/><path d="M42 50h8M44 64h8M46 78h6" stroke="#c9562f" stroke-width="3"/><path d="M50 32Q40 10 30 8M50 32Q50 8 54 4M50 32Q62 12 72 10" stroke="#4caf50" stroke-width="6" fill="none" stroke-linecap="round"/>`,
   harvest_tomato: `<circle cx="50" cy="56" r="34" fill="#e5484d"/><path d="M30 28L50 38L70 28L60 44H40Z" fill="#3f9a3f"/><path d="M50 36V20" stroke="#3f9a3f" stroke-width="5"/><ellipse cx="36" cy="54" rx="6" ry="10" fill="#fff" opacity=".4"/>`,
@@ -43,13 +56,33 @@ export const ITEMS = {
 export const SERIES = {
   dudu: ['dudu_bubble', 'dudu_brush', 'dudu_fish', 'dudu_snow', 'dudu_ice', 'dudu_bow'],
   special: ['xmas_globe', 'harvest_carrot', 'harvest_tomato', 'harvest_corn'],
+  bobo: ['bobo_honey', 'bobo_pot', 'bobo_donut', 'bobo_bread', 'bobo_spoon', 'bobo_apron'],
   mian: ['mian_yarn', 'mian_egg', 'mian_flower', 'mian_bell', 'mian_cloud', 'mian_pillow'],
   gugu: ['gugu_pencil', 'gugu_book', 'gugu_globe', 'gugu_apple', 'gugu_bell', 'gugu_crayon'],
   kiki: ['kiki_leaf', 'kiki_ball', 'kiki_kite', 'kiki_car', 'kiki_star', 'kiki_mush'],
 };
 
 export function itemSvg(id, size = 100) {
-  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}">${ITEMS[id] || ''}</svg>`;
+  const body = id.startsWith('bdcard~') ? cardItem(id) : (ITEMS[id] || '');
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}">${body}</svg>`;
+}
+
+// 兄弟姊妹做的生日卡：bdcard~<誰做的>~<顏色>~<貼紙.貼紙>~<日期>
+export const CARD_COLORS = { pink: '#ffb3c7', blue: '#9fd0ff', yellow: '#ffe07a' };
+export const STICKERS = {
+  heart: `<path d="M0 10C-10 2 -16 -4 -16 -10C-16 -16 -10 -18 -6 -16C-3 -15 -1 -13 0 -10C1 -13 3 -15 6 -16C10 -18 16 -16 16 -10C16 -4 10 2 0 10Z" fill="#ff5c8a"/>`,
+  star: `<path d="M0 -16l5 10l11 1.5l-8 7.5l2 11l-10 -5.5l-10 5.5l2 -11l-8 -7.5l11 -1.5z" fill="#ffc400"/>`,
+  flower: `${[0, 72, 144, 216, 288].map((r) => `<ellipse cy="-9" rx="6" ry="9" fill="#c77dff" transform="rotate(${r})"/>`).join('')}<circle r="5" fill="#ffd34d"/>`,
+  balloon: `<ellipse cy="-4" rx="11" ry="14" fill="#3fbf7f"/><path d="M0 10Q-4 16 2 22" stroke="#888" stroke-width="2" fill="none"/>`,
+  cake: `<rect x="-14" y="-4" width="28" height="16" rx="3" fill="#ff9fc4"/><rect x="-14" y="-4" width="28" height="5" fill="#fff"/><rect x="-2" y="-14" width="4" height="10" fill="#5fa8e8"/><ellipse cy="-16" rx="3" ry="4" fill="#ffb300"/>`,
+  rainbow: `${['#e5484d', '#ffc400', '#3fbf7f', '#5fa8e8'].map((c, i) => `<path d="M${-16 + i * 4} 8A${16 - i * 4} ${16 - i * 4} 0 0 1 ${16 - i * 4} 8" stroke="${c}" stroke-width="4" fill="none"/>`).join('')}`,
+};
+export const CARD_SPOTS = [[32, 40], [68, 40], [50, 62], [30, 76], [70, 76]];
+function cardItem(id) {
+  const [, , color, st = ''] = id.split('~');
+  const stickers = st ? st.split('.') : [];
+  return `<path d="M14 18H86V88H14Z" fill="${CARD_COLORS[color] || '#fff'}" stroke="#fff" stroke-width="4"/><path d="M14 18L50 8L86 18" fill="${CARD_COLORS[color] || '#fff'}" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+    ${stickers.map((k, i) => `<g transform="translate(${CARD_SPOTS[i][0]} ${CARD_SPOTS[i][1]}) scale(.8)">${STICKERS[k] || ''}</g>`).join('')}`;
 }
 
 // 優先給還沒有的；整個系列都有了就隨機重複一件。

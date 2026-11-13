@@ -4,13 +4,14 @@ import { state, save, exportData, importData, stampedToday, cardInfo, redeem, re
 import { dateKey, now, hour, testSettings, TEST_KEY, testing } from '../core/clock.js';
 import { REASONS, reasonIcon, shapeSvg, ensureInkFilter } from '../art/stamps.js';
 import * as weather from '../core/weather.js';
+import { listen } from '../core/mic.js';
 import * as fest from '../core/festival.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
   brush_morning: '早上刷牙', brush_evening: '睡前刷牙',
   wash_morning: '早上洗手', door_morning: '早上出門準備',
-  kitchen_breakfast: '早餐', kitchen_lunch: '午餐', kitchen_dinner: '晚餐', bedroom_evening: '睡前準備', car_day: '坐車安全', school_day: '上課', farm_day: '農場', wash_noon: '中午洗手', wash_evening: '傍晚洗手',
+  kitchen_breakfast: '早餐', kitchen_lunch: '午餐', kitchen_dinner: '晚餐', bedroom_evening: '睡前準備', car_day: '坐車安全', school_day: '上課', farm_day: '農場', party_day: '生日派對', wash_noon: '中午洗手', wash_evening: '傍晚洗手',
 };
 
 function stampSection(id) {
@@ -107,6 +108,14 @@ export function openParent(onClose, { onStamp } = {}) {
       <h2>今天</h2>
       <table><tr><th></th><th>遊玩時間</th><th>已領獎的活動</th><th>收藏品總數</th></tr>${rows}</table>
 
+      <h2>生日</h2>
+      <label>妍卉 <input type="date" data-bd="yh" value="${fest.birthday('yh')}"></label>
+      <label>向澤 <input type="date" data-bd="xz" value="${fest.birthday('xz')}"></label>
+      <p class="note">生日只存在這台 iPad。生日當天選房間畫面會出現「派對」房間；另一個小孩進去會偷偷幫壽星做生日卡。</p>
+      <button class="quiet" data-act="mic">允許麥克風（吹蠟燭用）</button>
+      <span class="mic-meter"><i></i></span> <span class="note mic-msg"></span>
+      <p class="note">麥克風只用來偵測吹氣的音量，不錄音、不上傳。iPad 主畫面 app 的麥克風授權通常只在這次開啟期間有效，生日當天把 iPad 交給小孩前先按一次；沒有允許的話，吹蠟燭會改成用點的。</p>
+
       <h2>聖誕節</h2>
       <label><input type="checkbox" data-xmas="real" ${fest.xmas().realGift ? 'checked' : ''}> 今年床邊有準備真禮物（12/25 早上聖誕老公公會說「快去看看你的床邊」）</label>
       <p class="note">12 月：選房間畫面會出現聖誕樹與降臨月曆；12/24 晚上可以擺餅乾牛奶；12/25 打開就會拆禮物。</p>
@@ -143,6 +152,7 @@ export function openParent(onClose, { onStamp } = {}) {
 
   node.addEventListener('change', (e) => {
     if (e.target.dataset?.xmas === 'real') { fest.setRealGift(e.target.checked); return; }
+    if (e.target.dataset?.bd) { fest.setBirthday(e.target.dataset.bd, e.target.value); return; }
     const key = e.target.dataset?.k;
     if (!key) return;
     const v = parseFloat(e.target.value);
@@ -214,6 +224,26 @@ export function openParent(onClose, { onStamp } = {}) {
         if (!k) return;
       }
       setTimeout(() => location.reload(), 700);
+      return;
+    }
+    if (act === 'mic') {
+      const m = node.querySelector('.mic-msg');
+      const bar = node.querySelector('.mic-meter i');
+      m.textContent = '請按「允許」，然後對著 iPad 吹吹看…';
+      let acc = 0;
+      let last = performance.now();
+      listen((rms) => {
+        const t = performance.now();
+        bar.style.width = `${Math.min(100, rms * 500)}%`;
+        if (rms > 0.08) acc += (t - last) / 1000;
+        last = t;
+        if (acc > 0.3) m.textContent = '✓ 有偵測到吹氣，生日當天可以用吹的。';
+      })
+        .then((probe) => {
+          if (!/✓/.test(m.textContent)) m.textContent = '已允許麥克風，對著 iPad 吹吹看…';
+          setTimeout(() => { probe.stop(); bar.style.width = '0'; }, 6000);
+        })
+        .catch(() => { m.textContent = '沒有取得麥克風（可能按了不允許），吹蠟燭會改成用點的。'; });
       return;
     }
     if (act === 'xreset') {

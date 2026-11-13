@@ -181,6 +181,11 @@ const TRACKS = {
     melody: seq('G4 . A4 B4 D5 . B4 . A4 . G4 . E4 . . .  G4 . A4 B4 D5 . E5 . D5 . B4 . A4 . . .'),
     bass: seq('G2 . D3 . E2 . B2 . C3 . G2 . D3 . . .  G2 . D3 . C3 . G2 . D3 . A2 . D3 . . .'),
   },
+  party: {
+    bpm: 132, lead: 'square', leadGain: 0.07,
+    melody: seq('C5 E5 G5 E5 C6 . G5 .  A5 F5 C5 F5 A5 . . .  G5 E5 C5 E5 G5 . C6 .  B5 G5 D5 G5 C6 . . .'),
+    bass: seq('C3 . G2 . C3 . G2 .  F2 . C3 . F2 . C3 .  C3 . G2 . E3 . G2 .  G2 . D3 . C3 . . .'),
+  },
   farm: {
     bpm: 116, lead: 'triangle', leadGain: 0.18,
     melody: seq('G4 . G4 B4 D5 . B4 . C5 . A4 . G4 . . .  G4 . G4 B4 D5 . E5 . D5 B4 A4 . G4 . . .'),
@@ -254,6 +259,28 @@ export function playMusic(name) {
   tick();
   music = m;
 }
+
+// 單次播放一段旋律：notes = [[音, 拍], ...]，回傳總秒數
+export function playTune(notes, bpm = 100, { lead = 'triangle', gain = 0.22 } = {}) {
+  if (!ctx) return 0;
+  const beat = 60 / bpm;
+  let t = ctx.currentTime + 0.1;
+  for (const [n, b] of notes) {
+    if (n !== '.') {
+      tone(hz(n), t, beat * b * 0.95, { type: lead, gain, dest: musicBus });
+      tone(hz(n) / 2, t, beat * b * 0.95, { type: 'sine', gain: gain * 0.6, dest: musicBus });
+    }
+    t += beat * b;
+  }
+  return t - ctx.currentTime;
+}
+// 生日快樂歌的旋律（公有領域）
+export const BIRTHDAY_SONG = [
+  ['G4', 0.75], ['G4', 0.25], ['A4', 1], ['G4', 1], ['C5', 1], ['B4', 2],
+  ['G4', 0.75], ['G4', 0.25], ['A4', 1], ['G4', 1], ['D5', 1], ['C5', 2],
+  ['G4', 0.75], ['G4', 0.25], ['G5', 1], ['E5', 1], ['C5', 1], ['B4', 1], ['A4', 2],
+  ['F5', 0.75], ['F5', 0.25], ['E5', 1], ['C5', 1], ['D5', 1], ['C5', 3],
+];
 
 export function stopMusic() {
   if (!music) return;

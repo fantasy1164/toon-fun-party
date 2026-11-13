@@ -1,9 +1,10 @@
 // 選房間：小房子裡的兩個房間，點一個進去。
-import { CHARACTERS } from '../config.js';
+import { CHARACTERS, PROFILES } from '../config.js';
 import { el, $, $$, onTap, wait, pick, burst, centerOf } from '../core/dom.js';
 import { sfx, playMusic } from '../core/audio.js';
 import { speak, hush } from '../core/voice.js';
-import { phase } from '../core/clock.js';
+import { phase, dateKey } from '../core/clock.js';
+import { state, save } from '../core/store.js';
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import { ICON } from './screens.js';
 import * as fest from '../core/festival.js';
@@ -11,6 +12,7 @@ import { ROOF_LIGHTS, TREE_ICON } from '../art/xmas.js';
 import { santaPop } from './xmas.js';
 import { SCHOOL_ICON } from '../art/school.js';
 import { FARM_ICON } from '../art/farm.js';
+import { HUB_BALLOONS, PARTY_ICON } from '../art/party.js';
 
 const BATH = `<svg viewBox="0 0 420 420" width="420" height="420">
   <rect width="420" height="420" rx="40" fill="#dcf3f5"/>
@@ -71,8 +73,10 @@ export function showHub(stage, profile) {
     const host = pick(Object.keys(CHARACTERS));
     const night = phase() === 'night';
     const avatars = profile.members.map((id) => `<div class="av">${avatarSvg(id, 96)}</div>`).join('');
+    const bids = fest.birthdayKids();
     const node = el(`
-      <div class="screen hub ${night ? 'night' : ''}">
+      <div class="screen hub ${night ? 'night' : ''} ${bids.length ? 'bday' : ''}">
+        ${bids.length ? HUB_BALLOONS : ''}
         <div class="roof"></div>
         <div class="avs">${avatars}</div>
         <button class="room" data-room="bathroom">${BATH}</button>
@@ -82,6 +86,7 @@ export function showHub(stage, profile) {
         <button class="room" data-room="car">${CAR}</button>
         <button class="room" data-room="school">${SCHOOL_ICON}</button>
         <button class="room" data-room="farm">${FARM_ICON}</button>
+        ${bids.length ? `<button class="room party-room" data-room="party">${PARTY_ICON}</button>` : ''}
         <button class="round-btn home">${ICON.home}</button>
         ${fest.isDecember() ? `${ROOF_LIGHTS}<button class="round-btn treebtn">${TREE_ICON}</button>` : ''}
       </div>`);
@@ -107,10 +112,43 @@ export function showHub(stage, profile) {
     if (tb) onTap(tb, () => go('tree', tb));
     // 12 月第一次進來：聖誕老公公從煙囪探頭打招呼
     const x = fest.isDecember() ? fest.xmas() : null;
-    if (x && fest.day() <= 24 && profile.members.some((id) => !x.greeted[id])) {
+    // 生日當天第一次進來：角色們一起說生日快樂（每個頭像每天一次）
+    const g = state.bdGreet?.date === dateKey() ? state.bdGreet : { date: dateKey(), seen: [] };
+    if (bids.length && !g.seen.includes(profile.id)) {
+      g.seen.push(profile.id);
+      state.bdGreet = g;
+      save();
+      bdGreet(node, profile, bids).then(() => { if (!done) $('.party-room', node)?.classList.add('glow'); });
+    } else if (x && fest.day() <= 24 && profile.members.some((id) => !x.greeted[id])) {
       santaPop(node, profile).then(() => { if (!done) speak(host, 'hub_pick', { name: profile.name, who: profile.id }); });
     } else {
       speak(host, 'hub_pick', { name: profile.name, who: profile.id });
     }
   });
+}
+
+// 生日當天：五位角色排排站說生日快樂；如果是另一個小孩，奇奇邀他一起準備驚喜
+async function bdGreet(hub, profile, bids) {
+  const bid = bids.find((id) => profile.members.includes(id));
+  const ids = ['kiki', 'dudu', 'bobo', 'mian', 'gugu'];
+  const ov = el(`<div class="bd-greet">
+    <svg viewBox="0 0 1200 900">${ids.map((id, i) => characterSvg(id, { x: 60 + i * 225, y: 360, s: 0.85 })).join('')}</svg>
+    ${bid ? `<div class="bd-av">${avatarSvg(bid, 170)}</div>` : ''}</div>`);
+  hub.appendChild(ov);
+  sfx('fanfare');
+  const c = centerOf(ov);
+  burst(c.x, c.y - 100, { n: 30, kind: 'star', spread: 360 });
+  let skip = false;
+  onTap(ov, () => { skip = true; hush(); });
+  if (bid) {
+    for (const id of ids) {
+      if (skip) break;
+      await speak(id, 'bd_hello', { name: PROFILES[bid].name, who: bid });
+    }
+  } else {
+    await speak('kiki', `bd_sib_hub_${profile.members[0]}`, { name: profile.name, who: profile.id });
+  }
+  ov.classList.add('away');
+  await wait(500);
+  ov.remove();
 }
