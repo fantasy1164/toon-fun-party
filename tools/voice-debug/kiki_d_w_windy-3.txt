@@ -1,0 +1,5 @@
+3 個停頓，長度 1.90 0.28 0.16
+
+kiki/d_w_windy	外面風好大！
+kiki/d_what	要穿什麼、帶什麼呢？你幫我選！
+kiki/d_need_normal	穿好鞋子就可以出發！
