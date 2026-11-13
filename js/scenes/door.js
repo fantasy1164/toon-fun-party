@@ -33,7 +33,7 @@ const NEEDS_HARD = {
 };
 
 // 真實天氣 → 這個場景的天氣種類
-function sceneWeather(w) {
+export function sceneWeather(w) {
   if (w.kind === 'storm') return 'storm';
   if (w.kind === 'rain') return 'rain';
   if (w.windy) return 'windy';

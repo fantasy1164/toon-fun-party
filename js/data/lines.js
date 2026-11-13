@@ -517,3 +517,93 @@ Object.assign(LINES.practice, { gugu: '今天練習得很好，下次再送你�
 Object.assign(LINES.bye, { gugu: '下課囉！{name}，明天見。' });
 Object.assign(LINES.bye_sunny, { gugu: '外面天氣很好，{name}，去外面跑一跑吧！明天見。' });
 Object.assign(LINES.time_soon, { gugu: '快要下課囉。' });
+
+// ================= 一起做：角色陪小孩做真實生活的事 =================
+Object.assign(LINES, {
+  // ---- 共用 ----
+  tg_pick: { dudu: '要玩遊戲，還是跟嘟嘟一起做？', kiki: '玩遊戲？還是跟奇奇一起做？選一個！', bobo: '要玩遊戲，還是跟波波一起做呢？', mian: '要玩遊戲……還是跟棉棉一起做呢？', gugu: '要玩遊戲，還是跟咕咕老師一起做呢？' },
+  tg_check: { dudu: '做好了，就按大勾勾。', kiki: '做好了就按大勾勾！', bobo: '做好了，就按大勾勾喔。', mian: '做好了……就按大勾勾喔。', gugu: '做好了，就按大勾勾。' },
+  tg_nudge: { dudu: '慢慢來，做好了再按勾勾。', kiki: '還在做嗎？加油加油！', bobo: '慢慢來，波波等你。', mian: '慢慢來喔……棉棉等你。', gugu: '不急，做好了再按勾勾。' },
+  tg_stamp: { dudu: '去給爸爸媽媽看，請他們幫你蓋章。', kiki: '快去給爸爸媽媽看，請他們蓋章！', bobo: '去給爸爸媽媽看，請他們幫你蓋章喔！', mian: '去給爸爸媽媽看……請他們幫你蓋章。', gugu: '去給爸爸媽媽看，請他們幫你蓋章。' },
+
+  // ---- 陪睡前（棉棉） ----
+  ts_hello: { mian: '睡覺時間到了。棉棉陪你一起準備睡覺。' },
+  ts_toys: { mian: '先收玩具。音樂停下來以前，把玩具都送回家。' },
+  ts_toys_end: { mian: '音樂停了。玩具都回家了嗎？' },
+  ts_pj: { mian: '換上睡衣。棉棉也換好囉。' },
+  ts_potty: { mian: '睡覺前去尿尿，再洗洗手。' },
+  ts_brush: { mian: '去刷牙。跟著音樂，刷刷刷。' },
+  ts_brush_end: { mian: '音樂停了，漱漱口，吐掉。' },
+  ts_book: { mian: '去拿一本你最喜歡的故事書。' },
+  ts_read: { mian: '請爸爸媽媽唸給你聽。棉棉唱歌給你聽……晚安。' },
+
+  // ---- 陪出門（奇奇） ----
+  to_hello: { kiki: '我們要出門囉！奇奇陪你一起準備！' },
+  to_potty: { kiki: '出門前，先去上廁所！' },
+  to_fetch: { kiki: '去拿來穿好，好了就按大勾勾！' },
+  to_ready: { kiki: '都準備好了！我們一起數，三、二、一，出發！' },
+
+  // ---- 陪吃飯（波波） ----
+  tm_hello: { bobo: '要吃飯囉！波波陪你一起吃。' },
+  tm_wash: { bobo: '吃飯前，先去洗手。' },
+  tm_table: { bobo: '幫忙擺碗、擺湯匙。' },
+  tm_sit: { bobo: '坐好了嗎？我們一起說，我要開動了！' },
+  tm_rest: { bobo: '吃飯的時候，iPad 也要休息喔。波波在旁邊陪你。' },
+  tm_r1: { bobo: '咬一口青菜。' },
+  tm_r2: { bobo: '坐好喔。' },
+  tm_r3: { bobo: '慢慢嚼，嚼一嚼再吞下去。' },
+  tm_r4: { bobo: '喝一口水。' },
+  tm_r5: { bobo: '你吃得好棒喔。' },
+  tm_r6: { bobo: '飯和菜都要吃喔。' },
+  tm_time: { bobo: '時間到了，吃飽了嗎？吃飽了就按大勾勾。' },
+  tm_thanks: { bobo: '吃飽了！我們一起說，謝謝爸爸媽媽！' },
+  tm_clear: { bobo: '把碗拿去放好。' },
+
+  // ---- 陪洗手（嘟嘟、奇奇） ----
+  tw_hello: { dudu: '嘟嘟陪你一起洗手。', kiki: '奇奇陪你洗手！走吧！' },
+  tw_ready: { dudu: '走到洗手台前面，準備好就按一下。', kiki: '去洗手台！準備好就按一下！' },
+  tw_rub: { dudu: '搓搓手心，搓出泡泡。跟著音樂一起搓。', kiki: '搓搓手心！跟著音樂搓搓搓！' },
+  tw_back: { dudu: '搓搓手背。', kiki: '手背也要搓！' },
+  tw_fingers: { dudu: '手指縫也要搓。', kiki: '手指縫！搓一搓！' },
+  tw_thumb: { dudu: '大拇指轉一轉。', kiki: '大拇指轉一轉！' },
+  tw_scoop: { dudu: '捧水沖一沖水龍頭，再關起來。', kiki: '捧一點水，沖沖水龍頭，關起來！' },
+
+  // ---- 陪整理書包、陪寫功課（咕咕老師） ----
+  tb_hello: { gugu: '明天要上學，咕咕老師陪你整理書包。' },
+  tb_fetch: { gugu: '找到了，放進書包，就按大勾勾。' },
+  tb_bottle: { gugu: '水壺。' },
+  tb_lunch: { gugu: '餐袋。' },
+  tb_book: { gugu: '聯絡簿。' },
+  tb_coat: { gugu: '外套。' },
+  tb_pencil: { gugu: '鉛筆盒。' },
+  tb_done: { gugu: '書包整理好了，把書包放在門口吧。' },
+  th_hello: { gugu: '我們一起寫功課。咕咕老師也在旁邊看書。' },
+  th_ready: { gugu: '把作業簿和鉛筆拿出來，準備好就按一下。' },
+  th_start: { gugu: '計時開始，專心寫喔。' },
+  th_mid: { gugu: '寫得很認真喔。' },
+  th_end: { gugu: '時間到了。寫完了，就按大勾勾。' },
+
+  // ---- 動物體操（棉棉） ----
+  tx_hello: { mian: '我們來做動物體操。站起來，把 iPad 放旁邊。' },
+  tx_bunny: { mian: '小兔子，跳一跳！' },
+  tx_duck: { mian: '小鴨子，搖搖擺擺走。' },
+  tx_cat: { mian: '小貓咪，伸一個大懶腰。' },
+  tx_chick: { mian: '小雞，拍拍翅膀！' },
+  tx_next: { mian: '換下一個。' },
+  tx_breathe: { mian: '最後，深呼吸。吸……吐……' },
+  tx_done: { mian: '動一動，身體好舒服。' },
+
+  // ---- 陪坐車：窗外尋寶（嘟嘟） ----
+  tr_hello: { dudu: '坐車囉，嘟嘟陪你。' },
+  tr_belt: { dudu: '先繫好安全帶，喀一聲。繫好了就按大勾勾。' },
+  tr_hunt: { dudu: '我們來玩窗外尋寶。眼睛看窗外，看到了就按一下。' },
+  tr_redcar: { dudu: '紅色的車子在哪裡？' },
+  tr_bus: { dudu: '有沒有看到公車？' },
+  tr_tree: { dudu: '找找看，大樹在哪裡？' },
+  tr_light: { dudu: '紅綠燈在哪裡？' },
+  tr_moto: { dudu: '機車在哪裡？' },
+  tr_zebra: { dudu: '有沒有看到斑馬線？' },
+  tr_found: { dudu: '找到了！' },
+  tr_done: { dudu: '全部找到了，你的眼睛好厲害。' },
+  tr_more: { dudu: '還沒找到的，下次坐車再找。' },
+});

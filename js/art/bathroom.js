@@ -97,6 +97,12 @@ function backLayer(phase, wx) {
   `);
 }
 
+// 「一起做」的背景：牆面加洗手台
+export function bathBack(phase, wx) {
+  const inner = (x) => x.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
+  return svg(inner(backLayer(phase, wx)) + inner(midLayer()));
+}
+
 function midLayer() {
   return svg(`
     <ellipse cx="490" cy="772" rx="290" ry="18" fill="#000" opacity=".12"/>

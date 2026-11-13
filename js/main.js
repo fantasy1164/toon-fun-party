@@ -16,6 +16,7 @@ import { mountFarm } from './scenes/farm.js';
 import { mountParty } from './scenes/party.js';
 import { mountNewYear } from './scenes/newyear.js';
 import { showHub } from './ui/hub.js';
+import { chooseMode, mountTogether } from './scenes/together.js';
 import { treeScreen, christmasMorning } from './ui/xmas.js';
 import * as fest from './core/festival.js';
 import { pickStamp, stampSession } from './ui/stamps.js';
@@ -109,16 +110,22 @@ async function goHub() {
   if (room === 'back') { profile = null; route(); return; }
   if (room === 'tree') { await treeScreen(stage, profile); goHub(); return; }
   if (closedReason()) { route(); return; }
+  // 先選：玩遊戲，還是跟角色一起做
+  const choice = await chooseMode(stage, room, profile);
+  if (choice.mode === 'home') { goHub(); return; }
+  if (closedReason()) { route(); return; }
   const mount = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, party: mountParty, newyear: mountNewYear }[room] || mountBathroom;
   if (state.session.usedMs === 0) warned = false;
-  scene = mount(stage, {
-    profile,
-    onExit: (why) => {
-      scene = null;
-      stage.querySelector('.playclock')?.remove();
-      if (why === 'home') goHub(); else route();
-    },
-  });
+  const onExit = (why) => {
+    scene = null;
+    stage.querySelector('.playclock')?.remove();
+    if (why === 'home') goHub(); else route();
+  };
+  if (choice.mode === 'together' && choice.kind !== 'brush') {
+    scene = mountTogether(stage, { profile, onExit, kind: choice.kind, host: choice.host });
+  } else {
+    scene = mount(stage, { profile, onExit, charId: choice.host, together: choice.kind === 'brush' });
+  }
   updateClock();
 }
 
@@ -141,7 +148,7 @@ function updateClock() {
   if (!scene) return;
   const total = sessionMs();
   const n = playClock();
-  if (!Number.isFinite(total)) { n.classList.add('hidden'); return; }
+  if (!Number.isFinite(total) || scene.noClock) { n.classList.add('hidden'); return; }
   const left = Math.max(0, 1 - state.session.usedMs / total);
   n.classList.remove('hidden');
   n.querySelector('.pie').setAttribute('stroke-dasharray', `${(C_SMALL * left).toFixed(1)} ${C_SMALL.toFixed(1)}`);
@@ -186,6 +193,8 @@ function hintTick() {
 // 每秒累計遊玩時間；時間到或睡覺時間到，請角色道別
 setInterval(() => {
   if (!scene || !profile || document.hidden) return;
+  // 一起做是在真實生活裡做事：不算遊玩時間、不提示、也不會被下班打斷
+  if (scene.noClock) { updateClock(); return; }
   addPlayTime(profile.members, 1000);
   if (state.session.usedMs % 10000 === 0) save();
   updateClock();

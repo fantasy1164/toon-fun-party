@@ -10,22 +10,13 @@ import { mainView, mouthView, handsView, togetherView, ZONES, BRUSH_CURSOR, TOOT
 import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
+import { nextCharacter } from './together.js';
 
 const BRUSH_PROPS = ['brush', 'paste', 'cup'];
 const WASH_PROPS = ['soap', 'faucet', 'towel'];
 
-// 角色輪替：不連續兩次同一位
-function nextCharacter() {
-  const ids = Object.keys(CHARACTERS);
-  const last = localStorage.getItem('tfp-last-char');
-  const pool = ids.filter((id) => id !== last);
-  const id = pick(pool.length ? pool : ids);
-  localStorage.setItem('tfp-last-char', id);
-  return id;
-}
-
-export function mountBathroom(stage, { profile, onExit }) {
-  const charId = nextCharacter();
+export function mountBathroom(stage, { profile, onExit, charId: chosen, together = false }) {
+  const charId = chosen || nextCharacter();
   const hard = profile.level === 'hard';
   const ph = phase();
   const track = ph === 'night' ? 'bath_night' : 'bath_day';
@@ -528,6 +519,14 @@ export function mountBathroom(stage, { profile, onExit }) {
     try {
       await activity();
       guard();
+      // 從「一起做」進來的陪刷：做完回到房子
+      if (together) {
+        mode = 'end';
+        await pause(1200);
+        destroy();
+        onExit('home');
+        return;
+      }
       if (timeUp) await goodbye();
       else idle();
     } catch (e) {
@@ -601,6 +600,7 @@ export function mountBathroom(stage, { profile, onExit }) {
     if (!alive) return;
     await say(ph === 'night' ? 'hello_night' : hour() < 11 ? 'hello_morning' : 'hello');
     if (!alive) return;
+    if (together) { run(runTogether); return; }
     const advice = weather.adviceLine(ph);
     if (advice) {
       await say(advice);
@@ -612,6 +612,7 @@ export function mountBathroom(stage, { profile, onExit }) {
   return {
     destroy,
     hostChar: charId,
+    noClock: together,
     // 時間到：正在活動就等做完，閒著就直接道別
     requestEnd() {
       if (timeUp || !alive) return;

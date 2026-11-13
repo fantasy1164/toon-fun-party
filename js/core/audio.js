@@ -234,6 +234,32 @@ const TRACKS = {
     melody: seq('C5 . E5 . G5 . E5 . A5 . G5 . E5 . . .  D5 . F5 . A5 . G5 . E5 . D5 . C5 . . .'),
     bass: seq('C3 . . G3 . . C3 . F2 . . C3 . . F2 .  D3 . . A2 . . G2 . C3 . . G2 . . C3 .'),
   },
+  // ---- 一起做 ----
+  tidy: {
+    bpm: 120, lead: 'square', leadGain: 0.07,
+    melody: seq('C5 . E5 . G5 . E5 . F5 . A5 . G5 . . .  E5 . G5 . C6 . A5 . G5 . E5 . D5 . . .  C5 D5 E5 . E5 D5 C5 . D5 E5 F5 . F5 E5 D5 .  E5 . D5 . G4 . B4 . C5 . . . . . . .'),
+    bass: seq('C3 . G2 . C3 . G2 . F2 . C3 . C3 . G2 .  C3 . G2 . A2 . E2 . G2 . G2 . G2 . . .  C3 . G2 . C3 . G2 . D3 . A2 . D3 . A2 .  G2 . D3 . G2 . D3 . C3 . G2 . C3 . . .'),
+  },
+  wash_song: {
+    bpm: 120, lead: 'triangle', leadGain: 0.2,
+    melody: seq('G4 A4 B4 . G4 A4 B4 . D5 C5 B4 A4 G4 . . .  B4 C5 D5 . B4 C5 D5 . G5 F#5 E5 D5 C5 . B4 .'),
+    bass: seq('G2 . D3 . G2 . D3 . C3 . G2 . G2 . D3 .  G2 . D3 . G2 . D3 . C3 . D3 . G2 . . .'),
+  },
+  gym: {
+    bpm: 132, lead: 'square', leadGain: 0.07,
+    melody: seq('C5 . C5 . G5 . G5 . A5 G5 F5 E5 D5 . G4 .  C5 . C5 . G5 . G5 . A5 B5 C6 . G5 . . .  F5 . F5 . E5 . E5 . D5 E5 F5 D5 C5 . . .'),
+    bass: seq('C3 . G2 . C3 . G2 . F2 . C3 . G2 . D3 .  C3 . G2 . C3 . E3 . F2 . G2 . C3 . . .  F2 . C3 . C3 . G2 . G2 . D3 . C3 . . .'),
+  },
+  meal: {
+    bpm: 72, lead: 'sine', leadGain: 0.07,
+    melody: seq('E5 . . G5 . . A5 . G5 . . . E5 . . .  D5 . . E5 . . G5 . E5 . . . . . . .'),
+    bass: seq('C3 . . . . . . . A2 . . . . . . .  F2 . . . . . . . G2 . . . . . . .'),
+  },
+  study: {
+    bpm: 66, lead: 'triangle', leadGain: 0.06,
+    melody: seq('C5 . . . E5 . . . D5 . . . G4 . . .  A4 . . . C5 . . . B4 . . . . . . .'),
+    bass: seq('C3 . . . . . . . G2 . . . . . . .  F2 . . . . . . . G2 . . . . . . .'),
+  },
 };
 
 let music = null;
@@ -289,6 +315,13 @@ export const BIRTHDAY_SONG = [
   ['G4', 0.75], ['G4', 0.25], ['G5', 1], ['E5', 1], ['C5', 1], ['B4', 1], ['A4', 2],
   ['F5', 0.75], ['F5', 0.25], ['E5', 1], ['C5', 1], ['D5', 1], ['C5', 3],
 ];
+
+// 調整目前背景音樂的音量（0~1），sec 秒內慢慢變過去
+export function musicLevel(v, sec = 1) {
+  if (!music || !ctx) return;
+  music.bus.gain.cancelScheduledValues(ctx.currentTime);
+  music.bus.gain.setTargetAtTime(Math.max(0.0001, v), ctx.currentTime, Math.max(0.05, sec / 3));
+}
 
 export function stopMusic() {
   if (!music) return;
