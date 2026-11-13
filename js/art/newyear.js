@@ -144,7 +144,7 @@ export function fireworkSky() {
 
 // 大廳過年布置與房間圖示
 export const HUB_NY = `<svg class="ny-deco" viewBox="0 0 1200 900">
-  ${[[70, 40], [1130, 40]].map(([x, y]) => `<g class="swing" style="transform-origin:${x}px ${y}px"><path d="M${x} 0V${y}" stroke="#8a5a2b" stroke-width="4"/><g transform="translate(${x - 45} ${y}) scale(.75)">${LANTERN('#e8262d', true).replace(/<svg[^>]*>|<\/svg>/g, '')}</g></g>`).join('')}
+  ${[[255, 30], [945, 30]].map(([x, y]) => `<g class="swing" style="transform-origin:${x}px ${y}px"><path d="M${x} 0V${y}" stroke="#8a5a2b" stroke-width="4"/><g transform="translate(${x - 45} ${y}) scale(.75)">${LANTERN('#e8262d', true).replace(/<svg[^>]*>|<\/svg>/g, '')}</g></g>`).join('')}
 </svg>`;
 export const NY_ICON = `<svg viewBox="0 0 420 420" width="420" height="420">
   <rect width="420" height="420" rx="40" fill="#fff1dd"/><rect width="420" height="40" fill="#d6262b"/>

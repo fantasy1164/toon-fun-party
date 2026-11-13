@@ -295,21 +295,8 @@ html, body {
 @keyframes drip { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .9; } 100% { transform: translateY(90px); opacity: 0; } }
 
 /* ---------- 選房間 ---------- */
-.hub { background: linear-gradient(#bfe9ff, #e6f7ff 70%, #b6e6a8 70%); }
-.hub.night { background: linear-gradient(#0d1b4a, #25357a 70%, #16305a 70%); }
-.hub .roof { position: absolute; left: 90px; top: 30px; width: 1020px; height: 140px; background: #e5734f; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-.hub .avs { position: absolute; left: 50%; top: 70px; transform: translateX(-50%); display: flex; gap: 10px; }
 .hub .av { width: 96px; height: 96px; border-radius: 50%; overflow: hidden; border: 6px solid #fff; }
-.hub .room { border-width: 10px !important; position: absolute; width: 235px; height: 235px; padding: 0; border: 14px solid #fff; border-radius: 54px; background: none; overflow: hidden; box-shadow: 0 14px 0 rgba(0, 0, 0, .15); animation: bob 1.5s ease-in-out infinite alternate; }
-.hub .room[data-room="bathroom"] { left: 70px; top: 185px; }
-.hub .room[data-room="kitchen"] { left: 345px; top: 185px; animation-delay: .1s; }
-.hub .room[data-room="door"] { left: 620px; top: 185px; animation-delay: .2s; }
-.hub .room[data-room="bedroom"] { left: 895px; top: 185px; animation-delay: .3s; }
-.hub .room[data-room="car"] { left: 207px; top: 470px; animation-delay: .4s; }
-.hub .room[data-room="school"] { left: 482px; top: 470px; animation-delay: .5s; }
-.hub .room[data-room="farm"] { left: 757px; top: 470px; animation-delay: .6s; }
 .hub .room svg { width: 100%; height: 100%; }
-.hub .room.chosen { border-color: #ffd34d; animation: pulse .25s ease-in-out 4 alternate; }
 .hub .room svg { display: block; }
 .hub .bub { animation: twinkle 1s ease-in-out infinite alternate; }
 .hub .home { left: 22px; top: 22px; width: 92px; height: 92px; }
@@ -379,8 +366,6 @@ html, body {
 .cookies .eaten { display: none; } .plate.eaten .cookies .full { display: none; } .plate.eaten .cookies .eaten { display: block; }
 .plate.eaten .milk-level { height: 8px; y: -15px; }
 .hub .xlights { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; }
-.hub .roof { z-index: 0; }
-.hub .treebtn { left: 530px; top: 690px; width: 150px; height: 150px; animation: pulse .9s ease-in-out infinite alternate; }
 .santa-pop { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; transform: translateX(420px); transition: transform .8s cubic-bezier(.3, 1.3, .5, 1); }
 .santa-pop.up { transform: translateX(0); }
 .closed-tree { position: absolute; right: 60px; bottom: 60px; }
@@ -737,11 +722,6 @@ html, body {
 .farm .fsheep svg { width: 100%; height: 100%; overflow: visible; }
 
 /* ---------- 生日 ---------- */
-.hub.bday .room[data-room="car"] { left: 70px; }
-.hub.bday .room[data-room="school"] { left: 345px; }
-.hub.bday .room[data-room="farm"] { left: 620px; }
-.hub .room[data-room="party"] { left: 895px; top: 470px; animation-delay: .7s; }
-.hub .party-room.glow { box-shadow: 0 0 0 12px rgba(255, 208, 0, .85), 0 14px 0 rgba(0, 0, 0, .15); }
 .hub .bd-balloons { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; }
 .hub .bd-balloons .bb { animation: floaty 2s ease-in-out infinite alternate; }
 @keyframes floaty { from { transform: translateY(0); } to { transform: translateY(-14px); } }
@@ -804,7 +784,6 @@ html, body {
 .hub .ny-deco { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; }
 .hub .ny-deco .swing { animation: lswing 2.4s ease-in-out infinite alternate; }
 @keyframes lswing { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
-.hub .ny-room.glow { box-shadow: 0 0 0 12px rgba(255, 208, 0, .85), 0 14px 0 rgba(0, 0, 0, .15); }
 .newyear { background: #fff1dd; }
 .newyear .p-char.glow-c { pointer-events: auto; }
 .newyear .p-char.glow-c svg { filter: drop-shadow(0 0 12px #ffd000) drop-shadow(0 0 5px #ffd000); animation: pulse .7s ease-in-out infinite alternate; }
@@ -870,3 +849,21 @@ html, body {
 .newyear .fwb { position: absolute; width: 280px; height: 280px; pointer-events: none; animation: fwpop 1.3s ease-out forwards; }
 .newyear .fwb svg { width: 100%; height: 100%; }
 @keyframes fwpop { 0% { transform: scale(.15); opacity: 1; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1.25) translateY(20px); opacity: 0; } }
+
+/* ---------- 選房間：社區與剖面房子 ---------- */
+.hub { background: #bfe6fb; }
+.hub .h-back { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; pointer-events: none; }
+.hub .h-back svg { width: 100%; height: 100%; display: block; }
+.hub .tw { animation: twinkle 1.2s ease-in-out infinite alternate; }
+.hub .room { position: absolute; padding: 0; border: 0; background: none; box-shadow: none; overflow: visible; animation: none; transition: transform .2s; }
+.hub .room svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.hub .room.in { overflow: hidden; border-radius: 4px; }
+.hub .room.in::after { content: ''; position: absolute; inset: 0; border-radius: 4px; pointer-events: none; box-shadow: inset 0 0 0 4px rgba(255, 255, 255, .35); }
+.hub.night .room.in::after { background: radial-gradient(circle at 80% 15%, rgba(255, 210, 90, .22), transparent 60%), rgba(20, 20, 60, .15); }
+.hub .room:active { transform: scale(.97); }
+.hub .room.chosen { transform: scale(1.04); filter: drop-shadow(0 0 14px #ffd000) drop-shadow(0 0 6px #ffd000); z-index: 5; }
+.hub .room.chosen .char { animation: jump .3s ease-out infinite alternate; }
+.hub .garage .carbody { animation: bob 1.2s ease-in-out infinite alternate; }
+.hub .room.yard svg { overflow: visible; }
+.hub .room.yard.glow svg, .hub .treebtn svg { animation: pulse .8s ease-in-out infinite alternate; filter: drop-shadow(0 0 12px #ffd000) drop-shadow(0 0 5px #ffd000); }
+.hub .avs { position: absolute; left: 600px; top: 192px; transform: translate(-50%, -50%); display: flex; gap: 8px; padding: 8px; background: #fff8e6; border: 8px solid #8a5a2b; border-radius: 70px; z-index: 3; }
