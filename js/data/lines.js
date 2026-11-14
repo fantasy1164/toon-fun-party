@@ -612,6 +612,10 @@ Object.assign(LINES, {
 Object.assign(LINES, {
   tg_turn_yh: { dudu: '妍卉，換你囉。', kiki: '妍卉！換你囉！', bobo: '妍卉，換你囉！', mian: '妍卉……換你囉。', gugu: '妍卉，換你囉。' },
   tg_turn_xz: { dudu: '向澤，換你囉。', kiki: '向澤！換你囉！', bobo: '向澤，換你囉！', mian: '向澤……換你囉。', gugu: '向澤，換你囉。' },
+  tg_name_yh: { dudu: '妍卉。', kiki: '妍卉！', bobo: '妍卉！', mian: '妍卉……', gugu: '妍卉。' },
+  tg_name_xz: { dudu: '向澤。', kiki: '向澤！', bobo: '向澤！', mian: '向澤……', gugu: '向澤。' },
+  tg_tx_yh: { dudu: '謝謝。換妍卉。', kiki: '謝謝！換妍卉！', bobo: '謝謝！換妍卉！', mian: '謝謝……換妍卉。', gugu: '謝謝。換妍卉。' },
+  tg_tx_xz: { dudu: '謝謝。換向澤。', kiki: '謝謝！換向澤！', bobo: '謝謝！換向澤！', mian: '謝謝……換向澤。', gugu: '謝謝。換向澤。' },
   tg_both: { dudu: '你們兩個都好棒。', kiki: '耶！你們兩個都好棒！', bobo: '你們兩個都好棒喔！', mian: '你們兩個都好棒……', gugu: '你們兩個都非常好！' },
   tg_check2: { dudu: '做好了，就按自己的勾勾。', kiki: '做好了就按自己的勾勾！', bobo: '做好了，就按自己的勾勾喔。', mian: '做好了……就按自己的勾勾喔。', gugu: '做好了，就按自己的勾勾。' },
   k_both_plate: { bobo: '一人一個盤子，輪流放菜喔！' },

@@ -17,6 +17,7 @@ import { mountParty } from './scenes/party.js';
 import { mountNewYear } from './scenes/newyear.js';
 import { showHub } from './ui/hub.js';
 import { chooseMode, mountTogether } from './scenes/together.js';
+import { setupTurns, turnsScene } from './core/turns.js';
 import { treeScreen, christmasMorning } from './ui/xmas.js';
 import * as fest from './core/festival.js';
 import { pickStamp, stampSession } from './ui/stamps.js';
@@ -64,6 +65,7 @@ function leaveScene() {
   scene?.destroy();
   scene = null;
   profile = null;
+  setupTurns(null);
 }
 
 function parentGate() {
@@ -97,6 +99,7 @@ async function route() {
     if (!p.stamp || p.repick) await pickStamp(stage, id);
   }
   profile = chosen;
+  setupTurns(profile);
   goHub();
 }
 
@@ -128,6 +131,8 @@ async function goHub() {
   } else {
     scene = mount(stage, { profile, onExit, charId: choice.host, together: choice.kind === 'brush' });
   }
+  // 一起玩：每個場景都放兩個頭像、輪流（誰先開始每次換）
+  turnsScene(stage.querySelector('.screen'));
   updateClock();
 }
 

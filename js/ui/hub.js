@@ -1,6 +1,7 @@
 // 選房間：一個社區，中間是剖開的兩層樓房子，點房間或建築進去。
 import { CHARACTERS, PROFILES } from '../config.js';
 import { el, $, $$, onTap, wait, pick, burst, centerOf } from '../core/dom.js';
+import { turnsScene, callTurn } from '../core/turns.js';
 import { sfx, playMusic } from '../core/audio.js';
 import { speak, hush } from '../core/voice.js';
 import { phase, dateKey } from '../core/clock.js';
@@ -45,6 +46,9 @@ export function showHub(stage, profile) {
     stage.replaceChildren(node);
     playMusic('lobby');
     let done = false;
+    // 一起玩：輪流選房間，被唱名的小孩選
+    turnsScene(node);
+    const pickLine = async () => { await callTurn(host); if (!done) speak(host, 'hub_pick', { name: profile.name, who: profile.id }); };
     const go = async (room, btn) => {
       if (done) return;
       done = true;
@@ -68,18 +72,18 @@ export function showHub(stage, profile) {
       g.seen.push(profile.id);
       state.bdGreet = g;
       save();
-      bdGreet(node, profile, bids).then(() => { if (!done) $('.party-room', node)?.classList.add('glow'); });
+      bdGreet(node, profile, bids).then(() => { if (!done) { $('.party-room', node)?.classList.add('glow'); callTurn(host); } });
     } else if (ny && !(state.nyGreet?.date === dateKey() && state.nyGreet.seen.includes(profile.id))) {
       const ng = state.nyGreet?.date === dateKey() ? state.nyGreet : { date: dateKey(), seen: [] };
       ng.seen.push(profile.id);
       state.nyGreet = ng;
       save();
       $('.ny-room', node)?.classList.add('glow');
-      speak('kiki', `ny_hub_${ny.stage}`, { name: profile.name, who: profile.id });
+      speak('kiki', `ny_hub_${ny.stage}`, { name: profile.name, who: profile.id }).then(() => { if (!done) callTurn('kiki'); });
     } else if (x && fest.day() <= 24 && profile.members.some((id) => !x.greeted[id])) {
-      santaPop(node, profile).then(() => { if (!done) speak(host, 'hub_pick', { name: profile.name, who: profile.id }); });
+      santaPop(node, profile).then(() => { if (!done) pickLine(); });
     } else {
-      speak(host, 'hub_pick', { name: profile.name, who: profile.id });
+      pickLine();
     }
   });
 }

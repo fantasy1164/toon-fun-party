@@ -13,6 +13,7 @@ import { itemSvg, nextItem } from '../art/items.js';
 import { tgIcon, backFor } from '../art/together.js';
 import { ICON, openCabinet } from '../ui/screens.js';
 import { sceneWeather } from './door.js';
+import { callTurn, passTurn, turnsOn, turnsScene, freeTurns } from '../core/turns.js';
 
 // 角色輪替（廁所用）：不連續兩次同一位
 export function nextCharacter() {
@@ -77,8 +78,10 @@ export function chooseMode(stage, room, profile) {
   const hostIn = $('.tg-host-in', root);
   playMusic(MODES[kinds[0]].track || 'lobby');
   let done = false;
+  // 一起玩：被唱名的小孩選
+  turnsScene(root);
   const say = () => speak(host, 'tg_pick', { name: profile.name, who: profile.id, node: hostIn });
-  setTimeout(() => { if (!done) say(); }, 300);
+  setTimeout(async () => { if (done) return; await callTurn(host, hostIn); if (!done) say(); }, 300);
   const again = setTimeout(() => { if (!done) say(); }, 14000);
   return new Promise((resolve) => {
     const finish = (v) => {
@@ -123,7 +126,6 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
       <div class="tg-plate hidden"></div>
       <div class="tg-grid hidden"></div>
       <button class="round-btn tg-ok hidden">${CHECK}</button>
-      ${two ? profile.members.map((id) => `<button class="round-btn tg-ok kid k-${id} hidden" data-id="${id}">${CHECK}<span class="who">${avatarSvg(id, 86)}</span></button>`).join('') : ''}
       <div class="hud">
         <button class="round-btn home">${ICON.home}</button>
         <button class="round-btn cab">${ICON.cab}</button>
@@ -151,7 +153,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
 
   // 稱讚：一起玩時等兩個人都好了，一起稱讚（不比誰快）
   const praise = () => say(two ? 'tg_both' : pick(['praise1', 'praise2', 'praise3']));
-  const checkLine = () => say(two ? 'tg_check2' : 'tg_check');
+  const checkLine = () => say('tg_check');
 
   // iPad 放旁邊時不要自動關螢幕
   let lock = null;
@@ -190,42 +192,51 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
   }
 
   // 等小孩按大勾勾。nudge：太久沒按，角色溫柔提醒（最多兩次）
+  // 一起玩：一個口令一個動作。先叫輪到的人按，再換另一個人按（勾勾是輪到的人的顏色）
   function waitOk({ nudge = true, play = false } = {}) {
     guard();
-    const btns = two && !play ? $$('.tg-ok.kid', root) : [okBtn];
-    if (btns[0] === okBtn) {
-      okBtn.classList.toggle('play', play);
-      okBtn.innerHTML = play ? tgIcon('go', 130) : CHECK;
-    }
-    btns.forEach((b) => { b.classList.remove('hidden', 'done'); });
+    let cancelled = false;
+    let cur = null;
+    const p = (async () => {
+      const rounds = two && !play ? 2 : 1;
+      for (let r = 0; r < rounds; r++) {
+        if (two && !play) {
+          if (r === 0) await callTurn(host, hostIn);
+          else await passTurn(host, hostIn);
+        }
+        if (cancelled || !alive) return false;
+        cur = oneOk({ nudge, play });
+        const ok = await cur;
+        if (!ok || cancelled) return false;
+      }
+      return true;
+    })();
+    p.cancel = () => { cancelled = true; cur?.cancel?.(); okBtn.classList.add('hidden'); };
+    cleanups.push(p.cancel);
+    return p;
+  }
+  function oneOk({ nudge = true, play = false } = {}) {
+    okBtn.classList.toggle('play', play);
+    okBtn.innerHTML = play ? tgIcon('go', 130) : CHECK;
+    okBtn.classList.remove('hidden');
     let cancel = null;
     const p = new Promise((resolve) => {
       let n = 0;
-      const left = new Set(btns);
       const nag = nudge ? setInterval(() => {
         if (n >= 2 || isSpeaking() || quietFor() < 20000) return;
         n++;
         sayBg('tg_nudge');
       }, 5000) : 0;
-      const hs = new Map();
-      const off = () => { clearInterval(nag); hs.forEach((h, b) => b.removeEventListener('pointerdown', h)); hs.clear(); };
-      const hide = () => btns.forEach((b) => b.classList.add('hidden'));
-      btns.forEach((b) => {
-        const h = (e) => {
-          e.preventDefault();
-          if (!left.has(b)) return;
-          left.delete(b);
-          sfx('tap');
-          b.classList.add('done');
-          if (left.size) return;
-          off();
-          hide();
-          resolve(true);
-        };
-        hs.set(b, h);
-        b.addEventListener('pointerdown', h);
-      });
-      cancel = () => { off(); hide(); resolve(false); };
+      const off = () => { clearInterval(nag); okBtn.removeEventListener('pointerdown', h); };
+      const h = (e) => {
+        e.preventDefault();
+        off();
+        sfx('tap');
+        okBtn.classList.add('hidden');
+        resolve(true);
+      };
+      okBtn.addEventListener('pointerdown', h);
+      cancel = () => { off(); okBtn.classList.add('hidden'); resolve(false); };
       cleanups.push(cancel);
     });
     p.cancel = cancel;
@@ -322,7 +333,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
   async function celebrate() {
     guard();
     card.classList.add('hidden');
-    $$('.tg-ok', root).forEach((b) => b.classList.add('hidden'));
+    okBtn.classList.add('hidden');
     hostBox.classList.add('happy');
     sfx('fanfare');
     confetti(hostBox, 16);
@@ -592,6 +603,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     grid.innerHTML = targets.map((t) => `<button class="tg-find" data-t="${t}">${tgIcon(t, 150)}<i>${CHECK}</i></button>`).join('');
     root.classList.add('dim');
     musicLevel(0.35, 2);
+    freeTurns(true);   // 窗外尋寶：兩個人可以一起找
     const left = new Set(targets);
     let lastAct = Date.now();
     // 先接好點擊，角色說明的時候就可以開始找
@@ -627,6 +639,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     await say('tr_hunt');
     if (left.size === targets.length) sayBg(`tr_${pick(targets)}`);
     await hunt;
+    freeTurns(false);
     guard();
     root.classList.remove('dim');
     musicLevel(1, 1);

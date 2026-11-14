@@ -15,6 +15,7 @@ import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
 import { PROFILES } from '../config.js';
+import { turnsOn, turnCall, callTurn, passTurn, setTurn, whoseTurn } from '../core/turns.js';
 
 const SET_ICON = `<svg viewBox="0 0 100 100" width="96" height="96"><path d="M14 46H86Q82 82 50 86Q18 82 14 46Z" fill="#7cc4d8"/><ellipse cx="50" cy="46" rx="36" ry="9" fill="#fff" opacity=".6"/>
   <ellipse cx="26" cy="20" rx="9" ry="12" fill="#ffb3c7"/><rect x="23" y="30" width="6" height="22" rx="3" fill="#ffb3c7"/><path d="M66 10H86L83 38H69Z" fill="#ffd34d"/></svg>`;
@@ -100,9 +101,9 @@ export function mountKitchen(stage, { profile, onExit }) {
     counter.innerHTML = `
       <button class="round-btn pick set glow">${SET_ICON}</button>
       <button class="round-btn pick meal glow">${MEAL_ICON}</button>`;
-    onTap($('.set', counter), () => run(runSet));
-    onTap($('.meal', counter), () => run(runMeal));
-    say('bobo', 'k_pick');
+    onTap($('.set', counter), () => { passTurn(); run(runSet); });
+    onTap($('.meal', counter), () => { passTurn(); run(runMeal); });
+    say('bobo', 'k_pick').then(() => { if (mode === 'idle') turnCall('bobo', charNode('bobo')); });
   }
 
   async function run(activity) {
@@ -169,15 +170,18 @@ export function mountKitchen(stage, { profile, onExit }) {
         showWare(seat, kind);
         const n = placed.filter((s) => s.has(kind)).length;
         await speak('bobo', `n_${Math.min(n, 4)}`, { node: charNode('bobo') });
+        passTurn();
         if (n === SEATS.length) {
           kindIndex++;
           if (kindIndex >= WARE_IDS.length) { counter.innerHTML = ''; resolve(); return; }
           await say('bobo', `k_${WARE_IDS[kindIndex]}`);
           glowNext();
         }
+        await turnCall('bobo', charNode('bobo'));
         busy = false;
       }));
-      say('bobo', `k_${WARE_IDS[0]}`);
+      busy = true;
+      say('bobo', `k_${WARE_IDS[0]}`).then(() => turnCall('bobo', charNode('bobo'))).then(() => { busy = false; });
       cleanups.push(() => resolve());
     });
   }
@@ -394,12 +398,15 @@ export function mountKitchen(stage, { profile, onExit }) {
 
     // 收碗
     await say('bobo', 'k_clear');
+    await turnCall('bobo', charNode('bobo'));
+    guard();
     const sink = $('.sink', root);
     sink.classList.add('glow');
     await new Promise((resolve) => {
       const h = async () => {
         sink.removeEventListener('pointerdown', h);
         sink.classList.remove('glow');
+        passTurn();
         sfx('whoosh');
         const to = rectOf($('.sink rect', root));
         const tasks = $$('.ware.on', root).map((w) => fly(`<svg viewBox="0 0 100 100" width="100%" height="100%">${w.innerHTML}</svg>`, rectOf(w), { x: to.x + 40, y: to.y + 10, w: 60, h: 60 }, 600));
@@ -439,7 +446,7 @@ export function mountKitchen(stage, { profile, onExit }) {
     guard();
     counter.className = 'counter foods';
     counter.innerHTML = FOOD_IDS.map((f) => `<button class="food-btn" data-f="${f}">${foodSvg(f, 92)}</button>`).join('');
-    let turn = ids[0];
+    let turn = whoseTurn() || ids[0];
     const showTurn = () => {
       $$('.plate-pos', root).forEach((g) => g.classList.toggle('turn', g.dataset.id === turn));
       $$('.kid-face', root).forEach((g) => g.classList.toggle('turn', g.dataset.id === turn));
@@ -447,7 +454,7 @@ export function mountKitchen(stage, { profile, onExit }) {
       const next = !me || me.hard ? null : EASY_SET.find((f) => !me.foods.includes(f));
       $$('.food-btn', counter).forEach((b) => b.classList.toggle('glow', b.dataset.f === next));
     };
-    const announce = async () => { showTurn(); await speak('bobo', `tg_turn_${turn}`, { node: charNode('bobo') }); };
+    const announce = async () => { setTurn(turn); showTurn(); await callTurn('bobo', charNode('bobo')); };
     onTap(charNode('other'), async () => {
       if (!needEncourage || encouraged) return;
       encouraged = true;
@@ -507,7 +514,7 @@ export function mountKitchen(stage, { profile, onExit }) {
           } else resolve();
           return;
         }
-        if (nextId !== turn) { turn = nextId; busy = true; await announce(); busy = false; } else showTurn();
+        if (nextId !== turn) { passTurn(); turn = nextId; busy = true; await announce(); busy = false; } else showTurn();
       }));
       cleanups.push(() => resolve());
     });
@@ -525,6 +532,8 @@ export function mountKitchen(stage, { profile, onExit }) {
     await say(other, 'k_fruit_want');
     await say('bobo', 'k_fruit_ask');
     guard();
+    await turnCall('bobo', charNode('bobo'));
+    guard();
     counter.className = 'counter share';
     counter.innerHTML = `<button class="round-btn knife glow">${KNIFE}</button>`;
     const bobo = charNode('bobo');
@@ -540,6 +549,7 @@ export function mountKitchen(stage, { profile, onExit }) {
       cleanups.push(() => { bobo.removeEventListener('pointerdown', hb); oth.removeEventListener('pointerdown', ho); resolve('share'); });
     });
     guard();
+    passTurn();
     bobo.classList.remove('glow-char');
     oth.classList.remove('glow-char');
     counter.innerHTML = '';

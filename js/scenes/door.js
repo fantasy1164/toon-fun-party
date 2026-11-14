@@ -10,6 +10,7 @@ import { doorView, rackSvg, kikiSvg, ITEM_IDS, SPIN_ICON } from '../art/door.js'
 import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
+import { turnsOn, turnCall, passTurn } from '../core/turns.js';
 
 const CHAR = 'kiki';
 const RAIN_GEAR = ['raincoat', 'umbrella', 'boots'];
@@ -147,9 +148,17 @@ export function mountDoor(stage, { profile, onExit }) {
     glow(left.length ? left : ['door']);
   }
 
+  // 一起玩：唱名時先不能點；點對一樣就換人
+  let calling = false;
+  async function callNext() {
+    if (!turnsOn()) return;
+    calling = true;
+    try { await turnCall(CHAR, kikiIn); } finally { calling = false; }
+  }
+
   // ---------- 穿脫衣物 ----------
   function onItem(id, node) {
-    if (mode !== 'dress') return;
+    if (mode !== 'dress' || calling) return;
     if (worn.has(id)) {
       // 再點一次衣帽架上的空位：拿下來（6 歲版才需要）
       if (!hard) return;
@@ -166,13 +175,17 @@ export function mountDoor(stage, { profile, onExit }) {
     const c = centerOf(kiki);
     burst(c.x, c.y, { n: 6, kind: 'star', spread: 90 });
     node.classList.remove('glow');
+    passTurn();
+    calling = turnsOn();
     (async () => {
       await say(`i_${id}`);
       if (hard && mode === 'dress') await say(`en_${id}`);
       if (!hard && mode === 'dress') {
         hintEasy();
-        if (easyComplete()) say('d_door');
+        if (easyComplete()) await say('d_door');
       }
+      if (mode === 'dress') await callNext();
+      calling = false;
     })();
     if (hard) glow(['door']);
   }
@@ -193,10 +206,12 @@ export function mountDoor(stage, { profile, onExit }) {
   }
 
   async function onDoor() {
-    if (mode === 'storm') { await stormOpen(); return; }
+    if (calling) return;
+    if (mode === 'storm') { passTurn(); await stormOpen(); return; }
     if (mode !== 'dress') return;
     if (!hard && !easyComplete()) { flash($('.doorhit', root), 'nope'); hintEasy(); return; }
     mode = 'go';
+    passTurn();
     clearGlow();
     try {
       await walkToDoor();
@@ -216,6 +231,7 @@ export function mountDoor(stage, { profile, onExit }) {
       mode = 'dress';
       // 提示還缺的東西
       glow(NEEDS_HARD[wk].filter((i) => !worn.has(i)));
+      await callNext();
     } catch (e) { if (e.message !== 'scene-closed') throw e; }
   }
 
@@ -260,7 +276,7 @@ export function mountDoor(stage, { profile, onExit }) {
     mode = 'done';
     spinBtn.classList.remove('hidden');
     spinBtn.classList.add('glow-btn');
-    say('d_spin');
+    say('d_spin').then(() => { if (mode === 'done') callNext(); });
   }
 
   async function showGift(gifts) {
@@ -307,23 +323,27 @@ export function mountDoor(stage, { profile, onExit }) {
       mode = 'storm';
       await say('d_storm_look');
       glow(['door']);
+      await callNext();
       return;
     }
     await say(`d_w_${wk}`);
     guard();
     mode = 'dress';
+    calling = turnsOn();   // 一起玩：說明和唱名完才可以點
     if (hard) {
-      say('d_what');
+      await say('d_what');
     } else {
       hintEasy();
-      say(`d_need_${wk}`);
+      await say(`d_need_${wk}`);
     }
+    await callNext();
   }
 
   // ---------- 天氣轉盤 ----------
   async function spin() {
-    if (mode !== 'done') return;
+    if (mode !== 'done' || calling) return;
     mode = 'intro';
+    passTurn();
     spinBtn.classList.remove('glow-btn');
     spinBtn.classList.add('spinning');
     sfx('whoosh');

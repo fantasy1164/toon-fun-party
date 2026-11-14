@@ -12,6 +12,7 @@ import {
 import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
+import { turnCall, passTurn } from '../core/turns.js';
 
 const CHAR = 'mian';
 const NEXT = `<svg viewBox="0 0 100 100" width="70" height="70"><path d="M34 18L74 50L34 82Z" fill="#fff"/></svg>`;
@@ -59,6 +60,13 @@ export function mountBedroom(stage, { profile, onExit }) {
   const spot = (k) => $(`.spot[data-spot="${k}"]`, root);
   function glowSpots(keys) {
     $$('.spot', root).forEach((s) => s.classList.toggle('glow', keys.includes(s.dataset.spot)));
+  }
+  // 一起玩：叫輪到的小孩，點了就換人
+  async function waitTurn(node) {
+    await turnCall(CHAR, mianIn);
+    guard();
+    await waitTap(node);
+    passTurn();
   }
   // 等小孩點某個地方
   function waitTap(node) {
@@ -112,9 +120,14 @@ export function mountBedroom(stage, { profile, onExit }) {
         await storeToy(t, n);
         i++;
         await speak(CHAR, `m_n${i}`, { node: mianIn });
+        passTurn();
+        if (i >= TOYS.length) { busy = false; resolve(); return; }
+        await turnCall(CHAR, mianIn);
         busy = false;
-        if (i >= TOYS.length) resolve(); else glowNext();
+        glowNext();
       }));
+      busy = true;
+      turnCall(CHAR, mianIn).then(() => { busy = false; });
       cleanups.push(() => resolve());
     });
   }
@@ -160,7 +173,7 @@ export function mountBedroom(stage, { profile, onExit }) {
   async function pajamas() {
     await say('m_pj');
     glowSpots(['wardrobe']);
-    await waitTap(spot('wardrobe'));
+    await waitTurn(spot('wardrobe'));
     guard();
     glowSpots([]);
     root.classList.add('wd-open');
@@ -168,11 +181,13 @@ export function mountBedroom(stage, { profile, onExit }) {
     const opts = hard ? ['swim', 'pj', 'rain'] : ['pj'];
     counter.innerHTML = opts.map((o) => `<button class="outfit ${!hard ? 'glow' : ''}" data-o="${o}">${OUTFIT_ICONS[o]}</button>`).join('');
     if (hard) say('m_pj_hard');
+    await turnCall(CHAR, mianIn);
     await new Promise((resolve) => {
       let busy = false;
       $$('.outfit', counter).forEach((b) => onTap(b, async () => {
         if (busy) return;
         busy = true;
+        passTurn();
         const o = b.dataset.o;
         sfx('pop');
         mianIn.classList.remove('o-day', 'o-pj', 'o-swim', 'o-rain');
@@ -184,6 +199,7 @@ export function mountBedroom(stage, { profile, onExit }) {
         await say(`m_pj_${o}`);
         mianIn.classList.remove('shiver', `o-${o}`);
         mianIn.classList.add('o-day');
+        await turnCall(CHAR, mianIn);
         busy = false;
       }));
       cleanups.push(() => resolve());
@@ -197,13 +213,14 @@ export function mountBedroom(stage, { profile, onExit }) {
   async function storyTime() {
     await say('m_book');
     glowSpots(['shelf']);
-    await waitTap(spot('shelf'));
+    await waitTurn(spot('shelf'));
     guard();
     glowSpots([]);
     counter.innerHTML = Object.entries(BOOKS).map(([k, b]) =>
       `<button class="bookbtn glow" data-b="${k}"><svg viewBox="0 0 200 260" width="150" height="195">${b.cover}</svg></button>`).join('');
+    await turnCall(CHAR, mianIn);
     const which = await new Promise((resolve) => {
-      $$('.bookbtn', counter).forEach((b) => onTap(b, () => resolve(b.dataset.b)));
+      $$('.bookbtn', counter).forEach((b) => onTap(b, () => { passTurn(); resolve(b.dataset.b); }));
       cleanups.push(() => resolve('moon'));
     });
     guard();
@@ -221,7 +238,7 @@ export function mountBedroom(stage, { profile, onExit }) {
       guard();
       const next = $('.next', node);
       next.classList.remove('hidden');
-      await waitTap(node);
+      await waitTurn(node);
       guard();
       next.classList.add('hidden');
     }
@@ -235,7 +252,7 @@ export function mountBedroom(stage, { profile, onExit }) {
   async function lightsOut() {
     await say('m_light');
     glowSpots(['switch']);
-    await waitTap(spot('switch'));
+    await waitTurn(spot('switch'));
     guard();
     glowSpots([]);
     sfx('tap');
@@ -245,6 +262,8 @@ export function mountBedroom(stage, { profile, onExit }) {
     await say('m_dark');
     guard();
     if (hard) say('m_hold_hint');
+    await turnCall(CHAR, mianIn);
+    guard();
     mianBox.classList.add('huggable');
     await new Promise((resolve) => {
       let timer = null;
@@ -264,6 +283,7 @@ export function mountBedroom(stage, { profile, onExit }) {
     });
     guard();
     mianBox.classList.remove('huggable');
+    passTurn();
     mianIn.classList.remove('shiver');
     sfx('sparkle');
     const c = centerOf(mianIn);

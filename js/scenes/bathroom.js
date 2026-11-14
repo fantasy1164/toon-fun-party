@@ -11,6 +11,7 @@ import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
 import { nextCharacter } from './together.js';
+import { turnsOn, turnCall, passTurn } from '../core/turns.js';
 
 const BRUSH_PROPS = ['brush', 'paste', 'cup'];
 const WASH_PROPS = ['soap', 'faucet', 'towel'];
@@ -97,7 +98,10 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
   }
 
   // 等小孩點對的道具。3 歲版只有正確的會發光；6 歲版要自己找，太久或點錯才提示。
-  function choose(target) {
+  // 一起玩：口令說完，叫輪到的小孩，他點對了才換人
+  async function choose(target) {
+    guard();
+    await turnCall(charId, charBox);
     guard();
     return new Promise((resolve) => {
       expect = { target, resolve };
@@ -109,6 +113,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
   function onProp(name, node) {
     if (!alive) return;
     if (mode === 'idle') {
+      if (turnsOn() && ['together', ...BRUSH_PROPS, ...WASH_PROPS].includes(name)) passTurn();
       if (name === 'together') run(runTogether);
       else if (BRUSH_PROPS.includes(name)) run(runBrush);
       else if (WASH_PROPS.includes(name)) run(runWash);
@@ -123,6 +128,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
       burst(c.x, c.y, { n: 6, kind: 'star', spread: 70 });
       const { resolve } = expect;
       expect = null;
+      passTurn();
       resolve(node);
     } else if (hard) {
       sfx('wrong');
@@ -227,6 +233,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
           node.classList.add('clean');
           sfx('bubble');
           if (dirt.every((d) => d === 0)) finish();
+          else if (turnsOn()) { passTurn(); turnCall(charId, charBox); }   // 一起玩：刷乾淨一顆就換人
         }
       });
       const move = (e) => { cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; };
@@ -405,6 +412,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
         b.style.cssText = `left:${fx - size / 2 + rand(-20, 20)}px;top:${fy - size / 2 + rand(-20, 20)}px;width:${size}px;height:${size}px`;
         foam.appendChild(b);
         dirtNodes.forEach((d, k) => { d.style.opacity = Math.max(0, 1 - (n / need) * (1 + k * 0.08)); });
+        if (turnsOn() && n === Math.floor(need / 2)) { passTurn(); turnCall(charId, charBox); }   // 一起玩：搓一半換人
         if (n >= need) {
           clearInterval(nag);
           off();
@@ -538,7 +546,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
     mode = 'idle';
     expect = null;
     glow(['brush', 'soap', 'together']);
-    say('bath_pick');
+    say('bath_pick').then(() => { if (mode === 'idle') turnCall(charId, charBox); });
   }
 
   async function goodbye() {
