@@ -6,6 +6,7 @@ import { REASONS, reasonIcon, shapeSvg, ensureInkFilter } from '../art/stamps.js
 import * as weather from '../core/weather.js';
 import { listen } from '../core/mic.js';
 import * as fest from '../core/festival.js';
+import { setMusicVolume, playMusic } from '../core/audio.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
@@ -124,6 +125,11 @@ export function openParent(onClose, { onStamp } = {}) {
       <h2>天氣</h2>
       <div class="wx">${weatherSection()}</div>
 
+      <h2>聲音</h2>
+      <span>音樂大小</span>
+      ${[['low', '小'], ['mid', '中'], ['high', '大']].map(([v, t]) => `<label><input type="radio" name="mv" data-mv="${v}" ${(s.musicVol || 'mid') === v ? 'checked' : ''}> ${t}</label>`).join('')}
+      <p class="note">只調背景音樂和活動歌（刷牙歌、洗手歌……），角色說話的音量不變。改了馬上生效。</p>
+
       <h2>時間設定</h2>
       <label>每次可玩 <input type="number" data-k="sessionMin" min="1" max="60" value="${s.sessionMin}"> 分鐘</label>
       <label>下班後休息 <input type="number" data-k="restMin" min="0" max="600" value="${s.restMin}"> 分鐘</label><br>
@@ -153,6 +159,13 @@ export function openParent(onClose, { onStamp } = {}) {
   node.addEventListener('change', (e) => {
     if (e.target.dataset?.xmas === 'real') { fest.setRealGift(e.target.checked); return; }
     if (e.target.dataset?.bd) { fest.setBirthday(e.target.dataset.bd, e.target.value); return; }
+    if (e.target.dataset?.mv) {
+      state.settings.musicVol = e.target.dataset.mv;
+      save();
+      setMusicVolume(state.settings.musicVol);
+      playMusic('lobby');   // 沒有音樂在放的話，放一段讓家長聽
+      return;
+    }
     const key = e.target.dataset?.k;
     if (!key) return;
     const v = parseFloat(e.target.value);

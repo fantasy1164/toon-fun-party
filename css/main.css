@@ -948,3 +948,4 @@ html, body {
 .tg-pick .tg-choice .badge { position: absolute; right: -14px; top: -14px; width: 104px; height: 104px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 0 rgba(0, 0, 0, .12); }
 .tg-pick .tg-choices.n3 .tg-choice .badge svg { transform: none; }
 .tg-pick .tg-choice.picked { animation: pulse .25s ease-in-out infinite alternate; box-shadow: 0 0 0 16px #ffd34d, 0 14px 0 16px rgba(0, 0, 0, .12); }
+.parent input[type=radio] { width: 28px; height: 28px; margin: 0; }

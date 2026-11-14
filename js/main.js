@@ -2,7 +2,7 @@
 import { STAGE_W, STAGE_H } from './config.js';
 import { state, save, addPlayTime } from './core/store.js';
 import { isAsleep, testing, dateKey, hour, testSettings } from './core/clock.js';
-import { unlock, sfx } from './core/audio.js';
+import { unlock, sfx, setMusicVolume } from './core/audio.js';
 import { loadVoiceManifest, hush, primeTts, speak, isSpeaking, quietFor } from './core/voice.js';
 import { showSplash, showProfiles, showClosed } from './ui/screens.js';
 import { openParent } from './ui/parent.js';
@@ -21,6 +21,8 @@ import { treeScreen, christmasMorning } from './ui/xmas.js';
 import * as fest from './core/festival.js';
 import { pickStamp, stampSession } from './ui/stamps.js';
 import * as weather from './core/weather.js';
+
+setMusicVolume(state.settings.musicVol);
 
 const stage = document.getElementById('stage');
 const params = new URLSearchParams(location.search);

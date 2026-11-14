@@ -13,8 +13,12 @@ export function unlock() {
     ctx = new AC();
     const master = ctx.createGain();
     master.gain.value = 0.9;
-    master.connect(ctx.destination);
-    musicBus = ctx.createGain(); musicBus.gain.value = 0.32; musicBus.connect(master);
+    // 限制器：音樂、音效、說話疊在一起時不要爆音
+    const lim = ctx.createDynamicsCompressor();
+    lim.threshold.value = -8; lim.knee.value = 6; lim.ratio.value = 8;
+    lim.attack.value = 0.004; lim.release.value = 0.2;
+    master.connect(lim).connect(ctx.destination);
+    musicBus = ctx.createGain(); musicBus.gain.value = musicBase(); musicBus.connect(master);
     sfxBus = ctx.createGain(); sfxBus.gain.value = 0.7; sfxBus.connect(master);
     voiceBus = ctx.createGain(); voiceBus.gain.value = 1; voiceBus.connect(master);
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
@@ -30,10 +34,23 @@ document.addEventListener('visibilitychange', () => {
   else ctx.resume().catch(() => {});
 });
 
-// 說話時把音樂壓低
+// 音樂大小（家長頁：小、中、大）
+const MUSIC_VOL = { low: 0.4, mid: 0.7, high: 1.1 };
+let musicVol = 'mid';
+let ducked = false;
+function musicBase() { return MUSIC_VOL[musicVol] || MUSIC_VOL.mid; }
+export function setMusicVolume(v) {
+  musicVol = MUSIC_VOL[v] ? v : 'mid';
+  if (ctx) musicBus.gain.setTargetAtTime(musicBase() * (ducked ? duckFactor() : 1), ctx.currentTime, 0.1);
+}
+
+// 說話時把音樂壓低一點（活動歌壓得最少，讓小孩還能跟著節奏）
+const DUCK = { song: 0.6, bg: 0.45, quiet: 0.55 };
+function duckFactor() { return DUCK[(music && TRACKS[music.name]?.style) || 'bg']; }
 export function duck(on) {
+  ducked = on;
   if (!ctx) return;
-  musicBus.gain.setTargetAtTime(on ? 0.1 : 0.32, ctx.currentTime, 0.15);
+  musicBus.gain.setTargetAtTime(musicBase() * (on ? duckFactor() : 1), ctx.currentTime, 0.15);
 }
 
 // ---------- 基本合成 ----------
@@ -165,104 +182,199 @@ const seq = (s) => s.trim().split(/\s+/);
 // 每格是八分音符，'.' 是休止。旋律皆為本專案原創。
 const TRACKS = {
   bath_day: {
-    bpm: 108, lead: 'triangle', leadGain: 0.2,
+    style: 'bg', bpm: 108, lead: 'triangle', leadGain: 0.2,
     melody: seq('E5 . G5 . A5 G5 E5 . D5 . E5 . C5 . . .  E5 . G5 . C6 A5 G5 . A5 . G5 E5 D5 . . .'),
     bass: seq('C3 . G3 . A2 . E3 . F2 . C3 . G2 . D3 .  C3 . G3 . A2 . E3 . F2 . G2 . C3 . . .'),
   },
   bath_night: {
-    bpm: 70, lead: 'sine', leadGain: 0.16,
+    style: 'quiet', bpm: 70, lead: 'sine', leadGain: 0.16,
     melody: seq('E4 . G4 . A4 . G4 . D4 . E4 . C4 . . .  E4 . G4 . C5 . A4 . G4 . E4 . D4 . . .'),
     bass: seq('C3 . . . A2 . . . F2 . . . G2 . . .  C3 . . . A2 . . . F2 . . . C3 . . .'),
   },
   brush_song: {
-    bpm: 132, lead: 'square', leadGain: 0.09,
+    style: 'song', bpm: 132, lead: 'square', leadGain: 0.13,
     melody: seq('G4 G4 A4 G4 E5 . D5 . G4 G4 A4 G4 D5 . C5 .  E5 E5 D5 C5 A4 . C5 . D5 D5 E5 D5 C5 . . .'),
     bass: seq('C3 . C3 G3 C3 . G3 . G2 . G2 D3 G2 . D3 .  A2 . A2 E3 F2 . F2 . G2 . G2 D3 C3 . C3 .'),
   },
   living: {
-    bpm: 112, lead: 'triangle', leadGain: 0.18,
+    style: 'bg', bpm: 112, lead: 'triangle', leadGain: 0.18,
     melody: seq('G4 . A4 B4 D5 . B4 . A4 . G4 . E4 . . .  G4 . A4 B4 D5 . E5 . D5 . B4 . A4 . . .'),
     bass: seq('G2 . D3 . E2 . B2 . C3 . G2 . D3 . . .  G2 . D3 . C3 . G2 . D3 . A2 . D3 . . .'),
   },
   newyear: {
-    bpm: 120, lead: 'triangle', leadGain: 0.2,
+    style: 'bg', bpm: 120, lead: 'triangle', leadGain: 0.2,
     melody: seq('E5 G5 A5 . G5 E5 D5 .  E5 D5 C5 D5 E5 . . .  A4 C5 D5 . E5 G5 E5 D5  C5 D5 E5 . C5 . . .'),
     bass: seq('C3 . G2 . C3 . G2 .  A2 . E2 . A2 . E2 .  F2 . C3 . G2 . D3 .  C3 . G2 . C3 . . .'),
   },
   party: {
-    bpm: 132, lead: 'square', leadGain: 0.07,
+    style: 'song', bpm: 132, lead: 'square', leadGain: 0.13,
     melody: seq('C5 E5 G5 E5 C6 . G5 .  A5 F5 C5 F5 A5 . . .  G5 E5 C5 E5 G5 . C6 .  B5 G5 D5 G5 C6 . . .'),
     bass: seq('C3 . G2 . C3 . G2 .  F2 . C3 . F2 . C3 .  C3 . G2 . E3 . G2 .  G2 . D3 . C3 . . .'),
   },
   farm: {
-    bpm: 116, lead: 'triangle', leadGain: 0.18,
+    style: 'bg', bpm: 116, lead: 'triangle', leadGain: 0.18,
     melody: seq('G4 . G4 B4 D5 . B4 . C5 . A4 . G4 . . .  G4 . G4 B4 D5 . E5 . D5 B4 A4 . G4 . . .'),
     bass: seq('G2 . D3 . G2 . D3 . C3 . G2 . G2 . D3 .  G2 . D3 . C3 . E3 . D3 . D3 . G2 . . .'),
   },
   school: {
-    bpm: 112, lead: 'triangle', leadGain: 0.18,
+    style: 'bg', bpm: 112, lead: 'triangle', leadGain: 0.18,
     melody: seq('E5 . D5 C5 D5 . E5 . G5 . E5 . D5 . . .  C5 . D5 E5 G5 . A5 . G5 E5 D5 . C5 . . .'),
     bass: seq('C3 . G2 . A2 . E2 . F2 . C3 . G2 . . .  A2 . E2 . F2 . C3 . G2 . G2 . C3 . . .'),
   },
   car: {
-    bpm: 126, lead: 'square', leadGain: 0.08,
+    style: 'bg', bpm: 126, lead: 'square', leadGain: 0.13,
     melody: seq('C5 . C5 E5 G5 . G5 . A5 G5 E5 . C5 . . .  D5 . D5 F5 A5 . G5 . E5 D5 C5 . . . . .'),
     bass: seq('C3 . G2 . C3 . G2 . A2 . E2 . A2 . E2 .  D3 . A2 . G2 . D3 . C3 . G2 . C3 . . .'),
   },
   bedroom: {
-    bpm: 84, lead: 'sine', leadGain: 0.16,
+    style: 'quiet', bpm: 84, lead: 'sine', leadGain: 0.16,
     melody: seq('E5 . D5 . C5 . D5 . E5 . E5 . E5 . . .  D5 . D5 . D5 . . . E5 . G5 . G5 . . .'),
     bass: seq('C3 . . . G2 . . . C3 . . . C3 . . .  G2 . . . G2 . . . C3 . . . C3 . . .'),
   },
   lullaby: {
-    bpm: 60, lead: 'sine', leadGain: 0.13,
+    style: 'quiet', bpm: 60, lead: 'sine', leadGain: 0.13,
     melody: seq('G4 . . E4 G4 . . E4 G4 . A4 G4 F4 . E4 .  D4 . . . E4 . F4 . E4 . . . . . . .'),
     bass: seq('C3 . . . . . . . G2 . . . . . . .  G2 . . . . . . . C3 . . . . . . .'),
   },
   kitchen: {
-    bpm: 104, lead: 'triangle', leadGain: 0.18,
+    style: 'bg', bpm: 104, lead: 'triangle', leadGain: 0.18,
     melody: seq('C5 . E5 G5 . E5 C5 . D5 . F5 A5 . F5 D5 .  E5 . G5 C6 . G5 E5 . D5 . G5 . C5 . . .'),
     bass: seq('C3 . . G2 . . C3 . D3 . . A2 . . D3 .  C3 . . G2 . . A2 . G2 . . D3 . . C3 .'),
   },
   xmas: {
-    bpm: 118, lead: 'triangle', leadGain: 0.2,
+    style: 'bg', bpm: 118, lead: 'triangle', leadGain: 0.2,
     melody: seq('E5 . E5 G5 C5 . D5 . E5 . . . . . . .  F5 . F5 F5 E5 . E5 . D5 . D5 E5 D5 . G5 .'),
     bass: seq('C3 . G3 . C3 . G3 . A2 . E3 . A2 . E3 .  F2 . C3 . C3 . G3 . G2 . D3 . G2 . . .'),
   },
   lobby: {
-    bpm: 100, lead: 'triangle', leadGain: 0.18,
+    style: 'bg', bpm: 100, lead: 'triangle', leadGain: 0.18,
     melody: seq('C5 . E5 . G5 . E5 . A5 . G5 . E5 . . .  D5 . F5 . A5 . G5 . E5 . D5 . C5 . . .'),
     bass: seq('C3 . . G3 . . C3 . F2 . . C3 . . F2 .  D3 . . A2 . . G2 . C3 . . G2 . . C3 .'),
   },
   // ---- 一起做 ----
   tidy: {
-    bpm: 120, lead: 'square', leadGain: 0.07,
+    style: 'song', bpm: 120, lead: 'square', leadGain: 0.13,
     melody: seq('C5 . E5 . G5 . E5 . F5 . A5 . G5 . . .  E5 . G5 . C6 . A5 . G5 . E5 . D5 . . .  C5 D5 E5 . E5 D5 C5 . D5 E5 F5 . F5 E5 D5 .  E5 . D5 . G4 . B4 . C5 . . . . . . .'),
     bass: seq('C3 . G2 . C3 . G2 . F2 . C3 . C3 . G2 .  C3 . G2 . A2 . E2 . G2 . G2 . G2 . . .  C3 . G2 . C3 . G2 . D3 . A2 . D3 . A2 .  G2 . D3 . G2 . D3 . C3 . G2 . C3 . . .'),
   },
   wash_song: {
-    bpm: 120, lead: 'triangle', leadGain: 0.2,
+    style: 'song', bpm: 120, lead: 'triangle', leadGain: 0.2,
     melody: seq('G4 A4 B4 . G4 A4 B4 . D5 C5 B4 A4 G4 . . .  B4 C5 D5 . B4 C5 D5 . G5 F#5 E5 D5 C5 . B4 .'),
     bass: seq('G2 . D3 . G2 . D3 . C3 . G2 . G2 . D3 .  G2 . D3 . G2 . D3 . C3 . D3 . G2 . . .'),
   },
   gym: {
-    bpm: 132, lead: 'square', leadGain: 0.07,
+    style: 'song', bpm: 132, lead: 'square', leadGain: 0.13,
     melody: seq('C5 . C5 . G5 . G5 . A5 G5 F5 E5 D5 . G4 .  C5 . C5 . G5 . G5 . A5 B5 C6 . G5 . . .  F5 . F5 . E5 . E5 . D5 E5 F5 D5 C5 . . .'),
     bass: seq('C3 . G2 . C3 . G2 . F2 . C3 . G2 . D3 .  C3 . G2 . C3 . E3 . F2 . G2 . C3 . . .  F2 . C3 . C3 . G2 . G2 . D3 . C3 . . .'),
   },
   meal: {
-    bpm: 72, lead: 'sine', leadGain: 0.07,
+    style: 'quiet', bpm: 72, lead: 'sine', leadGain: 0.07,
     melody: seq('E5 . . G5 . . A5 . G5 . . . E5 . . .  D5 . . E5 . . G5 . E5 . . . . . . .'),
     bass: seq('C3 . . . . . . . A2 . . . . . . .  F2 . . . . . . . G2 . . . . . . .'),
   },
   study: {
-    bpm: 66, lead: 'triangle', leadGain: 0.06,
+    style: 'quiet', bpm: 66, lead: 'triangle', leadGain: 0.06,
     melody: seq('C5 . . . E5 . . . D5 . . . G4 . . .  A4 . . . C5 . . . B4 . . . . . . .'),
     bass: seq('C3 . . . . . . . G2 . . . . . . .  F2 . . . . . . . G2 . . . . . . .'),
   },
 };
 
 let music = null;
+
+// ---------- 編曲 ----------
+// 每首曲子有 style：song＝活動歌（鼓最明顯）、bg＝場景背景音樂（輕鼓）、quiet＝安靜（不打鼓）
+// 一格是八分音符；每半小節（4 格）用那時的低音當根音鋪一個和弦（根音＋五度＋八度，不會跟旋律打架）
+const STYLE = {
+  song: { pad: 0.07, bass: 0.26, lead: 1.15, octave: 0.32, kick: 0.85, clap: 0.32, hat: 0.07 },
+  bg: { pad: 0.06, bass: 0.24, lead: 1.05, octave: 0.25, kick: 0.55, clap: 0.14, hat: 0.045 },
+  quiet: { pad: 0.07, bass: 0.2, lead: 1.0, octave: 0.18, kick: 0, clap: 0, hat: 0 },
+};
+
+function osc(c, dest, freq, t, dur, { type = 'sine', gain = 0.2, attack = 0.01, release = null, lp = 0 } = {}) {
+  const o = c.createOscillator();
+  const g = c.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(gain, t + attack);
+  if (release == null) {
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  } else {
+    // 鋪底：持續到最後才淡出
+    g.gain.setValueAtTime(gain, t + Math.max(attack, dur - release));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  }
+  let node = o;
+  if (lp) {
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = lp; f.Q.value = 0.5;
+    o.connect(f); node = f;
+  }
+  node.connect(g).connect(dest);
+  o.start(t);
+  o.stop(t + dur + 0.05);
+}
+function hiss(c, nb, dest, t, dur, { freq = 2000, q = 1, gain = 0.2, type = 'bandpass' } = {}) {
+  const s = c.createBufferSource();
+  s.buffer = nb; s.loop = true;
+  const f = c.createBiquadFilter();
+  f.type = type; f.frequency.value = freq; f.Q.value = q;
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(gain, t + 0.004);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f).connect(g).connect(dest);
+  s.start(t, Math.random());
+  s.stop(t + dur + 0.05);
+}
+function kick(c, dest, t, gain) {
+  const o = c.createOscillator();
+  const g = c.createGain();
+  o.frequency.setValueAtTime(160, t);
+  o.frequency.exponentialRampToValueAtTime(48, t + 0.13);
+  g.gain.setValueAtTime(gain, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+  o.connect(g).connect(dest);
+  o.start(t); o.stop(t + 0.25);
+  // 小喇叭聽得到的「咚」：一點中頻
+  osc(c, dest, 330, t, 0.05, { type: 'triangle', gain: gain * 0.25, attack: 0.002 });
+}
+function clap(c, nb, dest, t, gain) {
+  [0, 0.011, 0.022].forEach((d) => hiss(c, nb, dest, t + d, 0.03, { freq: 1500, q: 0.9, gain }));
+  hiss(c, nb, dest, t + 0.03, 0.14, { freq: 1300, q: 0.7, gain: gain * 0.6 });
+}
+
+// 排一格（八分音符）的所有聲音
+function scheduleStep(c, nb, dest, tr, i, t, stepDur) {
+  const st = STYLE[tr.style] || STYLE.bg;
+  const n = tr.melody[i % tr.melody.length];
+  const b = tr.bass[i % tr.bass.length];
+  // 旋律：主音色（方波過濾得柔一點）＋高八度的亮音
+  if (n !== '.') {
+    const f = hz(n);
+    const lp = tr.lead === 'square' ? 2600 : 0;
+    osc(c, dest, f, t, stepDur * 1.8, { type: tr.lead, gain: tr.leadGain * st.lead, lp });
+    osc(c, dest, f * 2, t, stepDur * 1.2, { type: 'sine', gain: tr.leadGain * st.octave });
+  }
+  // 低音：三角波＋高八度，iPad 小喇叭也聽得到
+  if (b !== '.') {
+    const f = hz(b);
+    osc(c, dest, f, t, stepDur * 1.9, { type: 'triangle', gain: st.bass });
+    osc(c, dest, f * 2, t, stepDur * 1.6, { type: 'sine', gain: st.bass * 0.45 });
+  }
+  // 和弦鋪底：每半小節一次
+  if (i % 4 === 0 && b !== '.') {
+    let root = hz(b);
+    while (root < 220) root *= 2;
+    const len = stepDur * 4;
+    [1, 1.5, 2].forEach((m, k) => osc(c, dest, root * m, t, len, { type: 'triangle', gain: st.pad * (k === 0 ? 1 : 0.7), attack: 0.06, release: 0.12, lp: 1800 }));
+  }
+  // 鼓：大鼓在每拍一、三，拍手在二、四，沙鈴在反拍
+  const pos = i % 8;
+  if (st.kick && (pos === 0 || pos === 4)) kick(c, dest, t, st.kick);
+  if (st.clap && (pos === 2 || pos === 6)) clap(c, nb, dest, t, st.clap);
+  if (st.hat && pos % 2 === 1) hiss(c, nb, dest, t, 0.045, { freq: 8000, q: 0.8, gain: st.hat, type: 'highpass' });
+}
 
 export function playMusic(name) {
   if (!ctx) return;
@@ -280,11 +392,7 @@ export function playMusic(name) {
     // 背景分頁或休眠回來時，不要一口氣補排一堆音
     if (m.next < ctx.currentTime - 0.2) m.next = ctx.currentTime + 0.05;
     while (m.next < ctx.currentTime + 0.25) {
-      const i = m.step % tr.melody.length;
-      const n = tr.melody[i];
-      if (n !== '.') tone(hz(n), m.next, stepDur * 1.7, { type: tr.lead, gain: tr.leadGain, dest: bus });
-      const b = tr.bass[i % tr.bass.length];
-      if (b !== '.') tone(hz(b), m.next, stepDur * 1.9, { type: 'sine', gain: 0.22, dest: bus });
+      scheduleStep(ctx, noiseBuf, bus, tr, m.step, m.next, stepDur);
       m.step++;
       m.next += stepDur;
     }
@@ -292,6 +400,25 @@ export function playMusic(name) {
   m.timer = setInterval(tick, 80);
   tick();
   music = m;
+  if (ducked) duck(true);
+}
+
+// 離線算出一段音樂（試聽、測音量用）：回傳 Float32Array
+export async function renderMusic(name, sec = 15, { vol = 'mid', sampleRate = 44100 } = {}) {
+  const tr = TRACKS[name];
+  const c = new OfflineAudioContext(1, Math.ceil(sec * sampleRate), sampleRate);
+  const nb = c.createBuffer(1, sampleRate * 2, sampleRate);
+  const d = nb.getChannelData(0);
+  for (let k = 0; k < d.length; k++) d[k] = Math.random() * 2 - 1;
+  const master = c.createGain(); master.gain.value = 0.9;
+  const lim = c.createDynamicsCompressor();
+  lim.threshold.value = -8; lim.knee.value = 6; lim.ratio.value = 8; lim.attack.value = 0.004; lim.release.value = 0.2;
+  master.connect(lim).connect(c.destination);
+  const bus = c.createGain(); bus.gain.value = MUSIC_VOL[vol]; bus.connect(master);
+  const stepDur = 60 / tr.bpm / 2;
+  for (let i = 0, t = 0.05; t < sec - 0.3; i++, t += stepDur) scheduleStep(c, nb, bus, tr, i, t, stepDur);
+  const buf = await c.startRendering();
+  return buf.getChannelData(0);
 }
 
 // 單次播放一段旋律：notes = [[音, 拍], ...]，回傳總秒數

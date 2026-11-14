@@ -7,6 +7,7 @@ export const DEFAULT_SETTINGS = {
   restMin: 60,    // 下班後休息幾分鐘才能再玩
   bedtime: 21,    // 幾點後角色都睡了
   wake: 6,        // 幾點起床
+  musicVol: 'mid', // 音樂大小：low、mid、high
 };
 
 export const PROFILES = {

@@ -1,5 +1,5 @@
 // 離線快取：有網路時一律抓最新版並更新快取，沒網路時用快取。
-const CACHE = 'tfp-v21';
+const CACHE = 'tfp-v22';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest', 'css/main.css',
   'js/main.js', 'js/config.js', 'js/core/store.js', 'js/core/clock.js',
