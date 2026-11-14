@@ -1,0 +1,7 @@
+8 個停頓，長度 0.20 1.24 1.48 0.34 1.64 0.28 1.36 0.12
+
+bobo/bd_flavor_straw	草莓蛋糕！
+bobo/bd_flavor_mango	芒果蛋糕！
+bobo/bd_top_easy	點一下水果，放到蛋糕上。
+bobo/bd_top_hard	把水果拖到蛋糕上。
+bobo/bd_yummy	哇，看起來好好吃喔！

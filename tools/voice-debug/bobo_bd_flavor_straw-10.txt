@@ -1,0 +1,12 @@
+12 個停頓，長度 1.80 1.92 0.32 1.82 1.56 1.48 1.50 1.80 0.34 1.44 1.64 0.34
+
+bobo/bd_flavor_straw	草莓蛋糕！
+bobo/bd_flavor_mango	芒果蛋糕！
+bobo/bd_top_easy	點一下水果，放到蛋糕上。
+bobo/bd_top_hard	把水果拖到蛋糕上。
+bobo/bd_yummy	哇，看起來好好吃喔！
+bobo/bd_song_end	生日快樂～
+bobo/bd_gift	這是我的禮物～
+bobo/ny_t_drum	咚咚咚！敲鑼打鼓！
+bobo/ny_dinner	年夜飯來囉！把菜端上桌。
+bobo/ny_d_fish	吃魚，年年有餘！
