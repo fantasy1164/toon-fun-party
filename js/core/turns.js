@@ -7,7 +7,7 @@ import { avatarSvg } from '../art/characters.js';
 let ids = [];          // 一起玩：['yh', 'xz']；一個人玩：[]
 let cur = null;        // 現在輪到誰
 let said = false;      // 這個場景說過「換你囉」了沒
-let thank = false;     // 剛換人：下次唱名說「謝謝，換向澤」
+let thank = false;     // 剛換人：下次唱名說「換向澤囉」
 let free = false;      // 可以同時一起點的時候
 let bar = null;
 
@@ -68,7 +68,7 @@ export function turnsScene(root, { first = null } = {}) {
   paint();
 }
 
-// 唱名：第一次「妍卉，換你囉」，剛換人時「謝謝，換向澤」，其他時候只叫名字
+// 唱名：第一次「妍卉，換你囉」，剛換人時「換向澤囉」，其他時候只叫名字
 export async function callTurn(charId, node = null, { line = null } = {}) {
   if (!turnsOn()) return;
   free = false;
@@ -91,7 +91,7 @@ export async function turnCall(charId, node = null) {
   await callTurn(charId, node);
 }
 
-// 做完一個動作：換另一個人。給 charId 就馬上說「謝謝，換向澤」；不給就等下一次唱名時說
+// 做完一個動作：換另一個人。給 charId 就馬上說「換向澤囉」；不給就等下一次唱名時說
 export async function passTurn(charId = null, node = null) {
   if (!turnsOn()) return;
   window.__turns?.push(`pass:${cur}`);
