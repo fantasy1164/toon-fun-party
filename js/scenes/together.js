@@ -104,6 +104,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
   const host = M.host || hostHint || nextCharacter();
   const series = M.series || host;
   const hard = profile.level === 'hard';
+  const two = profile.members.length > 1;   // 一起玩：每一步兩個勾勾，兩個人都按了才下一步
   const ph = phase();
   const wx = weather.current();
 
@@ -122,6 +123,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
       <div class="tg-plate hidden"></div>
       <div class="tg-grid hidden"></div>
       <button class="round-btn tg-ok hidden">${CHECK}</button>
+      ${two ? profile.members.map((id) => `<button class="round-btn tg-ok kid k-${id} hidden" data-id="${id}">${CHECK}<span class="who">${avatarSvg(id, 86)}</span></button>`).join('') : ''}
       <div class="hud">
         <button class="round-btn home">${ICON.home}</button>
         <button class="round-btn cab">${ICON.cab}</button>
@@ -147,6 +149,10 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
   const say = async (id) => { guard(); await speak(host, id, { name: profile.name, who: profile.id, node: hostIn }); guard(); };
   const sayBg = (id) => { if (alive) speak(host, id, { name: profile.name, who: profile.id, node: hostIn }); };
 
+  // 稱讚：一起玩時等兩個人都好了，一起稱讚（不比誰快）
+  const praise = () => say(two ? 'tg_both' : pick(['praise1', 'praise2', 'praise3']));
+  const checkLine = () => say(two ? 'tg_check2' : 'tg_check');
+
   // iPad 放旁邊時不要自動關螢幕
   let lock = null;
   (async () => {
@@ -166,10 +172,11 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     d.classList.add(cls);
     if (cls === 'done') d.classList.remove('on');
   }
-  function showIcon(id, anim = '') {
+  function showIcon(id, anim = '', per = false) {
     card.classList.remove('hidden');
     iconBox.className = `tg-icon ${anim}`;
-    iconBox.innerHTML = tgIcon(id, 300);
+    // 一起玩時，要拿的東西標上兩個頭像：一人一份
+    iconBox.innerHTML = tgIcon(id, 300) + (per && two ? `<div class="tg-per">${profile.members.map((m) => avatarSvg(m, 84)).join('')}</div>` : '');
     void iconBox.getBoundingClientRect();
     iconBox.classList.add('in');
   }
@@ -185,27 +192,40 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
   // 等小孩按大勾勾。nudge：太久沒按，角色溫柔提醒（最多兩次）
   function waitOk({ nudge = true, play = false } = {}) {
     guard();
-    okBtn.classList.toggle('play', play);
-    okBtn.innerHTML = play ? tgIcon('go', 130) : CHECK;
-    okBtn.classList.remove('hidden');
+    const btns = two && !play ? $$('.tg-ok.kid', root) : [okBtn];
+    if (btns[0] === okBtn) {
+      okBtn.classList.toggle('play', play);
+      okBtn.innerHTML = play ? tgIcon('go', 130) : CHECK;
+    }
+    btns.forEach((b) => { b.classList.remove('hidden', 'done'); });
     let cancel = null;
     const p = new Promise((resolve) => {
       let n = 0;
+      const left = new Set(btns);
       const nag = nudge ? setInterval(() => {
         if (n >= 2 || isSpeaking() || quietFor() < 20000) return;
         n++;
         sayBg('tg_nudge');
       }, 5000) : 0;
-      const off = () => { clearInterval(nag); okBtn.removeEventListener('pointerdown', h); };
-      const h = (e) => {
-        e.preventDefault();
-        off();
-        sfx('tap');
-        okBtn.classList.add('hidden');
-        resolve(true);
-      };
-      okBtn.addEventListener('pointerdown', h);
-      cancel = () => { off(); okBtn.classList.add('hidden'); resolve(false); };
+      const hs = new Map();
+      const off = () => { clearInterval(nag); hs.forEach((h, b) => b.removeEventListener('pointerdown', h)); hs.clear(); };
+      const hide = () => btns.forEach((b) => b.classList.add('hidden'));
+      btns.forEach((b) => {
+        const h = (e) => {
+          e.preventDefault();
+          if (!left.has(b)) return;
+          left.delete(b);
+          sfx('tap');
+          b.classList.add('done');
+          if (left.size) return;
+          off();
+          hide();
+          resolve(true);
+        };
+        hs.set(b, h);
+        b.addEventListener('pointerdown', h);
+      });
+      cancel = () => { off(); hide(); resolve(false); };
       cleanups.push(cancel);
     });
     p.cancel = cancel;
@@ -235,7 +255,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
   async function step(i, s) {
     guard();
     markDot(i, 'on');
-    showIcon(s.icon, s.anim || '');
+    showIcon(s.icon, s.anim || '', s.per);
     setRing(s.ms ? 1 : null);
     s.before?.();
     if (s.music) playMusic(s.music);
@@ -263,7 +283,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     if (!s.auto) await waitOk();
     guard();
     done(i, s);
-    if (!s.auto) await say(pick(['praise1', 'praise2', 'praise3']));
+    if (!s.auto) await praise();
   }
   function done(i, s) {
     markDot(i, 'done');
@@ -278,7 +298,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     for (let i = 0; i < list.length; i++) {
       await step(i, list[i]);
       // 計時步驟提早按勾勾時，要稱讚一下
-      if (list[i].ms && !list[i].auto && !list[i].lock) await say(pick(['praise1', 'praise2', 'praise3']));
+      if (list[i].ms && !list[i].auto && !list[i].lock) await praise();
     }
   }
 
@@ -302,11 +322,11 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
   async function celebrate() {
     guard();
     card.classList.add('hidden');
-    okBtn.classList.add('hidden');
+    $$('.tg-ok', root).forEach((b) => b.classList.add('hidden'));
     hostBox.classList.add('happy');
     sfx('fanfare');
     confetti(hostBox, 16);
-    await say(pick(['praise1', 'praise2', 'praise3']));
+    await praise();
     const slot = currentSlot(REWARD_SLOTS[M.reward], hour());
     const winners = slot ? profile.members.filter((id) => !hasClaimed(id, `${M.reward}_${slot}`)) : [];
     hostBox.classList.remove('happy');
@@ -336,7 +356,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
   // ---------- 陪睡前 ----------
   async function runSleep() {
     await say('ts_hello');
-    await say('tg_check');
+    await checkLine();
     await runSteps([
       { icon: 'toybox', line: 'ts_toys', ms: 180000, music: 'tidy', endLine: 'ts_toys_end' },
       { icon: 'pajamas', line: 'ts_pj', before: () => { hostIn.classList.replace('o-day', 'o-pj'); sfx('pop'); } },
@@ -384,7 +404,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     await say(`d_w_${wk === 'storm' ? 'rain' : wk}`);
     await runSteps([
       { icon: 'toilet', line: 'to_potty' },
-      ...list.map((id, i) => ({ icon: id, line: i === 0 ? [`i_${id}`, 'to_fetch'] : `i_${id}` })),
+      ...list.map((id, i) => ({ icon: id, per: true, line: i === 0 ? [`i_${id}`, 'to_fetch'] : `i_${id}` })),
     ]);
     // 三、二、一，出發！
     showIcon('go', 'pop');
@@ -448,7 +468,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
   }
   async function runMeal() {
     await say('tm_hello');
-    await say('tg_check');
+    await checkLine();
     const list = [
       { icon: 'hands', line: 'tm_wash' },
       { icon: 'table', line: 'tm_table' },
@@ -464,7 +484,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
         markDot(2, 'on');
         await mealClock();
         markDot(2, 'done');
-        await say(pick(['praise1', 'praise2', 'praise3']));
+        await praise();
       }
     }
     await celebrate();
@@ -497,7 +517,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     await say('tb_hello');
     const items = [['bottle', 'tb_bottle'], ['lunch', 'tb_lunch'], ['notebook', 'tb_book'], ['jacket', 'tb_coat']];
     if (hard) items.push(['pencilcase', 'tb_pencil']);
-    await runSteps(items.map(([icon, line], i) => ({ icon, line: i === 0 ? [line, 'tb_fetch'] : line })));
+    await runSteps(items.map(([icon, line], i) => ({ icon, per: true, line: i === 0 ? [line, 'tb_fetch'] : line })));
     showIcon('bag', 'pop');
     await say('tb_done');
     await celebrate();

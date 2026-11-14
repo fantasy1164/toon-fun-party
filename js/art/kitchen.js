@@ -10,6 +10,14 @@ export const SEATS = [
 ];
 export const TABLE_Y = 600;
 
+// 一起玩：四個座位（波波、妍卉、向澤、另一位角色），餐具縮小一點
+export function seatsFor(profile) {
+  if (profile.members.length > 1) {
+    return [{ x: 150, who: 'bobo', s: 0.85 }, ...profile.members.map((id, i) => ({ x: i === 0 ? 450 : 750, who: 'kid', id, s: 0.85 })), { x: 1050, who: 'other', s: 0.85 }];
+  }
+  return SEATS.map((st) => ({ ...st, s: 1, id: st.who === 'kid' ? profile.members[0] : undefined }));
+}
+
 export const SEAT_COLORS = { bobo: '#6b3f1d', dudu: '#3aa6d0', kiki: '#f08a3c', yh: '#ff7fa8', xz: '#2ea05a', both: '#ffb300' };
 
 // ---------- 餐具（100x100） ----------
@@ -75,37 +83,40 @@ export function kitchenBack(ph, wx) {
 }
 
 // 坐在桌子後面的角色（桌子會蓋住下半身）
-export function seatedChars(other) {
+export function seatedChars(other, seats = seatsFor({ members: ['yh'] })) {
+  const bobo = seats[0];
+  const oth = seats[seats.length - 1];
+  const sc = bobo.s;
+  const chair = (x) => `<g class="kid-chair"><rect x="${x - 90 * sc}" y="${380 + (1 - sc) * 150}" width="${180 * sc}" height="${230 * sc}" rx="30" fill="#c8915a"/><rect x="${x - 70 * sc}" y="${400 + (1 - sc) * 150}" width="${140 * sc}" height="${190 * sc}" rx="22" fill="#d9a066"/></g>`;
   return `<svg viewBox="0 0 1200 900">
-    <g class="seat-char" data-who="bobo">${characterSvg('bobo', { x: 80, y: 300, s: 1.0 })}</g>
-    <g class="kid-chair"><rect x="510" y="380" width="180" height="230" rx="30" fill="#c8915a"/><rect x="530" y="400" width="140" height="190" rx="22" fill="#d9a066"/></g>
-    <g class="seat-char" data-who="other">${characterSvg(other, { x: 880, y: 300, s: 1.0 })}</g>
+    <g class="seat-char" data-who="bobo">${characterSvg('bobo', { x: bobo.x - 120 * sc, y: 300 + (1 - sc) * 200, s: sc })}</g>
+    ${seats.filter((st) => st.who === 'kid').map((st) => chair(st.x)).join('')}
+    <g class="seat-char" data-who="other">${characterSvg(other, { x: oth.x - 120 * sc, y: 300 + (1 - sc) * 200, s: sc })}</g>
   </svg>`;
 }
 
-export function tableFront(profile) {
-  const kid = profile.members.length > 1 ? 'both' : profile.members[0];
+export function tableFront(profile, seats = seatsFor(profile)) {
   return `<svg viewBox="0 0 1200 900">
     <rect x="20" y="${TABLE_Y - 20}" width="1160" height="60" rx="20" fill="#d9a066"/>
     <rect x="20" y="${TABLE_Y + 30}" width="1160" height="20" fill="#b9824f"/>
     <rect x="60" y="${TABLE_Y + 50}" width="40" height="200" fill="#b9824f"/><rect x="1100" y="${TABLE_Y + 50}" width="40" height="200" fill="#b9824f"/>
     <path d="M20 ${TABLE_Y - 8}H1180" stroke="#fff" stroke-width="10" stroke-dasharray="30 30" opacity=".5"/>
-    <g class="kid-face" transform="translate(${600 - 40} ${TABLE_Y - 220})"><circle cx="40" cy="40" r="44" fill="#fff"/>${avatarSvg(kid, 80).replace('<svg ', '<svg x="0" y="0" ')}</g>
+    ${seats.filter((st) => st.who === 'kid').map((st) => `<g class="kid-face" data-id="${st.id}" transform="translate(${st.x - 40} ${TABLE_Y - 220})"><circle cx="40" cy="40" r="44" fill="#fff"/>${avatarSvg(st.id, 80).replace('<svg ', '<svg x="0" y="0" ')}</g>`).join('')}
   </svg>`;
 }
 
 // 座位上的餐具（先畫好，用 class 決定顯示），以及點座位用的透明感應區
-export function placeSettings(colors) {
+export function placeSettings(colors, seats = SEATS.map((st) => ({ ...st, s: 1 }))) {
   return `<svg class="places" viewBox="0 0 1200 900">
-    ${SEATS.map((st, i) => `
-      <g class="place" data-seat="${i}">
+    ${seats.map((st, i) => `
+      <g class="place" data-seat="${i}"><g transform="translate(${st.x} ${TABLE_Y}) scale(${st.s}) translate(${-st.x} ${-TABLE_Y})">
         <ellipse class="mat" cx="${st.x}" cy="${TABLE_Y - 10}" rx="150" ry="34" fill="${colors[i]}" opacity=".28"/>
         ${WARE_IDS.map((k) => {
           const [dx, dy, s] = WARE_POS[k];
           return `<g class="ware ${k}" transform="translate(${st.x + dx - 50 * s} ${TABLE_Y + dy - 60 * s}) scale(${s})">${WARE[k](colors[i])}</g>`;
         }).join('')}
         <rect class="hit" x="${st.x - 170}" y="${TABLE_Y - 220}" width="340" height="260" fill="transparent"/>
-      </g>`).join('')}
+      </g></g>`).join('')}
   </svg>`;
 }
 

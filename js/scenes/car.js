@@ -6,20 +6,24 @@ import { speak, hush } from '../core/voice.js';
 import { phase, hour, currentSlot } from '../core/clock.js';
 import { state, save, hasClaimed, claim, addItem } from '../core/store.js';
 import * as weather from '../core/weather.js';
-import { roadSvg, CABIN, MIRROR, backSeat, beltsSvg, BTN, DOORS } from '../art/car.js';
+import { roadSvg, CABIN, MIRROR, backSeat, beltsSvg, seatLayout, BTN, DOORS } from '../art/car.js';
+import { PROFILES } from '../config.js';
 import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
 
 export function mountCar(stage, { profile, onExit }) {
   const hard = profile.level === 'hard';
+  // 一起玩時兩張安全座椅，各自扣自己的
+  const kidKeys = seatLayout(profile).kids.map((k) => k.key);
+  const kidIdOf = Object.fromEntries(seatLayout(profile).kids.map((k) => [k.key, k.id]));
   const ph = phase();
   const wx = weather.current();
 
   const root = el(`
     <div class="screen scene car ${ph}">
       <svg class="c-art" viewBox="0 0 1200 900">${CABIN}<g class="road">${roadSvg(ph, wx)}</g>${MIRROR}${backSeat(profile)}</svg>
-      <div class="c-belts">${beltsSvg()}</div>
+      <div class="c-belts">${beltsSvg(profile)}</div>
       <div class="drive">
         ${(hard ? ['stop', 'slow', 'go', 'side'] : ['stop', 'go']).map((k) => `<button class="round-btn dbtn" data-k="${k}">${BTN[k]}</button>`).join('')}
       </div>
@@ -88,7 +92,8 @@ export function mountCar(stage, { profile, onExit }) {
     await say('dudu', 'c_belt');
     if (!hard) await say('dudu', 'c_belt_easy');
     guard();
-    const order = ['kiki', 'dudu', 'kid'];
+    const order = ['kiki', 'dudu', ...kidKeys];
+    if (kidKeys.length > 1) await say('dudu', 'c_belt_both');
     const done = new Set();
     await new Promise((resolve) => {
       const glowNext = () => {
@@ -107,9 +112,12 @@ export function mountCar(stage, { profile, onExit }) {
         const c = centerOf(b);
         burst(c.x, c.y, { n: 8, kind: 'star', spread: 90 });
         glowNext();
-        if (who === 'kid') await say('dudu', 'c_kid_ok');
+        if (kidKeys.includes(who)) {
+          const id = kidIdOf[who];
+          await speak('dudu', 'c_kid_ok', { name: PROFILES[id].name, who: kidKeys.length > 1 ? id : profile.id, node: rider('dudu') });
+        }
         else await say(who, 'c_click');
-        if (done.size === 3 && !hard) resolve();
+        if (done.size === order.length && !hard) resolve();
       }));
       if (hard) {
         // 6 歲版：自己判斷，點「走」時檢查有沒有每個人都扣好
@@ -118,7 +126,7 @@ export function mountCar(stage, { profile, onExit }) {
           if (!b) return;
           e.preventDefault();
           if (b.dataset.k !== 'go') { flash(b, 'nope'); return; }
-          if (done.size < 3) {
+          if (done.size < order.length) {
             sfx('wrong');
             await say('dudu', 'c_not_yet');
             return;
@@ -257,7 +265,7 @@ export function mountCar(stage, { profile, onExit }) {
     guard();
     // 解開安全帶（點扣環）
     await new Promise((resolve) => {
-      const left = new Set(['kiki', 'dudu', 'kid']);
+      const left = new Set(['kiki', 'dudu', ...kidKeys]);
       $$('.buckle', root).forEach((b) => { b.classList.remove('done'); b.classList.add('glow'); });
       $$('.buckle', root).forEach((b) => onTap(b, () => {
         const who = b.dataset.who;

@@ -606,7 +606,7 @@ html, body {
 .school .kidchair { transform-box: fill-box; transform-origin: 50% 100%; }
 .school.kid-wave .kidchair { animation: wiggle .4s ease-in-out 3; }
 .school .raised { position: absolute; left: 660px; top: 470px; opacity: 0; transform: translateY(60px); transition: transform .3s, opacity .3s; pointer-events: none; }
-.school.kid-hand .raised { opacity: 1; transform: none; animation: pulse .5s ease-in-out infinite alternate; }
+.school.kid-hand .raised.up { opacity: 1; transform: none; animation: pulse .5s ease-in-out infinite alternate; }
 .school .kidbtn { position: absolute; left: 538px; top: 762px; width: 124px; height: 124px; z-index: 5; }
 .school .kidbtn.glow, .school .scard.glow, .school .hifive.glow { animation: pulse .6s ease-in-out infinite alternate; box-shadow: 0 0 0 10px rgba(255, 208, 0, .85), 0 10px 0 rgba(0, 0, 0, .15); }
 .school .tears { position: absolute; left: 922px; top: 600px; width: 80px; height: 120px; pointer-events: none; }
@@ -949,3 +949,28 @@ html, body {
 .tg-pick .tg-choices.n3 .tg-choice .badge svg { transform: none; }
 .tg-pick .tg-choice.picked { animation: pulse .25s ease-in-out infinite alternate; box-shadow: 0 0 0 16px #ffd34d, 0 14px 0 16px rgba(0, 0, 0, .12); }
 .parent input[type=radio] { width: 28px; height: 28px; margin: 0; }
+/* 一起玩：兩個勾勾，各有頭像 */
+.tg .tg-ok.kid { width: 180px; height: 180px; bottom: 60px; }
+.tg .tg-ok.kid > svg { width: 100px; height: 100px; }
+.tg .tg-ok.kid.k-yh { right: 270px; box-shadow: 0 0 0 12px #ff9fc0, 0 10px 0 rgba(0, 0, 0, .15); }
+.tg .tg-ok.kid.k-xz { right: 50px; box-shadow: 0 0 0 12px #8fdba8, 0 10px 0 rgba(0, 0, 0, .15); }
+.tg .tg-ok.kid .who { position: absolute; left: -26px; top: -26px; width: 86px; height: 86px; border-radius: 50%; background: #fff; overflow: hidden; }
+.tg .tg-ok.kid.done { background: #b9c4bd; animation: none; opacity: .75; }
+.tg .tg-per { position: absolute; left: 50%; bottom: -30px; transform: translateX(-50%); display: flex; gap: 14px; }
+.tg .tg-per svg { background: #fff; border-radius: 50%; box-shadow: 0 0 0 6px #fff; }
+.tg .tg-per svg:first-child { box-shadow: 0 0 0 6px #ff9fc0; }
+.tg .tg-per svg:last-child { box-shadow: 0 0 0 6px #8fdba8; }
+.kitchen .plate-pos .turn-halo { opacity: 0; }
+.kitchen .plate-pos.turn .turn-halo { animation: tglow .8s ease-in-out infinite alternate; }
+@keyframes tglow { from { opacity: .15; } to { opacity: .5; } }
+.kitchen .kid-face.turn > circle { fill: #ffd34d; animation: tglow2 .6s ease-in-out infinite alternate; }
+@keyframes tglow2 { from { r: 44px; } to { r: 54px; } }
+.newyear .ny-kid.k-yh { box-shadow: 0 0 0 8px #ff9fc0; }
+.newyear .ny-kid.k-xz { left: 1040px; box-shadow: 0 0 0 8px #8fdba8; }
+.party .kid.sib { left: 1000px; box-shadow: 0 0 0 8px #8fdba8; }
+.party .kid.sib .hat { transform: rotate(12deg); }
+.party.two .gifts { right: 210px; gap: 6px; }
+.party.two .gbox { width: 144px; height: 160px; }
+.party .gbox.wait { opacity: .6; }
+.party .gbox .bd-first { position: absolute; left: -10px; top: -10px; width: 70px; height: 70px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 5px #ffd34d; overflow: hidden; z-index: 2; }
+.party .gbox.open .bd-first { display: none; }

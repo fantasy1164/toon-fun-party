@@ -8,12 +8,13 @@ import { phase, hour, currentSlot } from '../core/clock.js';
 import { state, save, hasClaimed, claim, addItem } from '../core/store.js';
 import * as weather from '../core/weather.js';
 import {
-  SEATS, SEAT_COLORS, WARE_IDS, wareSvg, FOODS, FOOD_IDS, GROUPS, foodSvg, PLATE_SPOT,
+  seatsFor, SEAT_COLORS, WARE_IDS, wareSvg, FOODS, FOOD_IDS, GROUPS, foodSvg, PLATE_SPOT,
   kitchenBack, seatedChars, tableFront, placeSettings, SINK, PLATE, KNIFE,
 } from '../art/kitchen.js';
 import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
+import { PROFILES } from '../config.js';
 
 const SET_ICON = `<svg viewBox="0 0 100 100" width="96" height="96"><path d="M14 46H86Q82 82 50 86Q18 82 14 46Z" fill="#7cc4d8"/><ellipse cx="50" cy="46" rx="36" ry="9" fill="#fff" opacity=".6"/>
   <ellipse cx="26" cy="20" rx="9" ry="12" fill="#ffb3c7"/><rect x="23" y="30" width="6" height="22" rx="3" fill="#ffb3c7"/><path d="M66 10H86L83 38H69Z" fill="#ffd34d"/></svg>`;
@@ -29,18 +30,24 @@ export function mountKitchen(stage, { profile, onExit }) {
   const last = localStorage.getItem('tfp-last-char');
   const other = last === 'dudu' ? 'kiki' : last === 'kiki' ? 'dudu' : pick(['dudu', 'kiki']);
   localStorage.setItem('tfp-last-char', other);
-  const kidKey = profile.members.length > 1 ? 'both' : profile.members[0];
-  const colors = [SEAT_COLORS.bobo, SEAT_COLORS[kidKey], SEAT_COLORS[other]];
+  // 一起玩：四個座位，兩個小孩各有自己的餐具與盤子
+  const two = profile.members.length > 1;
+  const SEATS = seatsFor(profile);
+  const colors = SEATS.map((st) => (st.who === 'bobo' ? SEAT_COLORS.bobo : st.who === 'kid' ? SEAT_COLORS[st.id] : SEAT_COLORS[other]));
   const wx = weather.current();
+  // 盤子：一個人一個（一起玩時放在各自的座位前）
+  const plates = two
+    ? SEATS.filter((st) => st.who === 'kid').map((st) => ({ id: st.id, x: st.x, y: 640, s: 0.6 }))
+    : [{ id: profile.members[0], x: 600, y: 630, s: 0.86 }];
 
   const root = el(`
     <div class="screen scene kitchen ${ph === 'night' ? 'sleepy' : ''}">
       <div class="k-layer back">${kitchenBack(ph, wx)}</div>
-      <div class="k-layer chars">${seatedChars(other)}</div>
-      <div class="k-layer table">${tableFront(profile)}</div>
-      <div class="k-layer placesl">${placeSettings(colors)}</div>
+      <div class="k-layer chars">${seatedChars(other, SEATS)}</div>
+      <div class="k-layer table">${tableFront(profile, SEATS)}</div>
+      <div class="k-layer placesl">${placeSettings(colors, SEATS)}</div>
       <div class="k-layer sinkl"><svg viewBox="0 0 1200 900"><g transform="translate(-920 -150)">${SINK}</g></svg></div>
-      <div class="k-layer mealplate hidden"><svg viewBox="0 0 1200 900"><g class="plate-pos" transform="translate(600 630) scale(.86)">${PLATE}<g class="on-plate"></g></g>
+      <div class="k-layer mealplate hidden"><svg viewBox="0 0 1200 900">${plates.map((p) => `<g class="plate-pos" data-id="${p.id}" transform="translate(${p.x} ${p.y}) scale(${p.s})"><circle class="turn-halo" r="182" fill="#ffd000"/>${PLATE}<g class="on-plate"></g></g>`).join('')}
         <g class="dish hidden" transform="translate(600 548)"><ellipse rx="70" ry="20" fill="#fff" stroke="#e6e6e6" stroke-width="5"/><g class="slice"><path d="M-30 -6A30 30 0 0 1 30 -6Z" fill="#e5484d"/><path d="M-26 -8A26 26 0 0 1 26 -8Z" fill="#fff3d6"/></g></g></svg></div>
       <div class="counter"></div>
       <div class="hud">
@@ -161,7 +168,7 @@ export function mountKitchen(stage, { profile, onExit }) {
         await fly(wareSvg(kind, colors[seat], 110), rectOf(b), rectOf(wareTarget(seat, kind)));
         showWare(seat, kind);
         const n = placed.filter((s) => s.has(kind)).length;
-        await speak('bobo', `n_${n}`, { node: charNode('bobo') });
+        await speak('bobo', `n_${Math.min(n, 4)}`, { node: charNode('bobo') });
         if (n === SEATS.length) {
           kindIndex++;
           if (kindIndex >= WARE_IDS.length) { counter.innerHTML = ''; resolve(); return; }
@@ -235,7 +242,7 @@ export function mountKitchen(stage, { profile, onExit }) {
     }
     const plateLayer = $('.k-layer.mealplate', root);
     const onPlate = $('.on-plate', root);
-    onPlate.innerHTML = '';
+    $$('.on-plate', root).forEach((n) => { n.innerHTML = ''; });
     plateLayer.classList.remove('hidden');
     $('.dish', root).classList.add('hidden');
     sfx('whoosh');
@@ -247,9 +254,11 @@ export function mountKitchen(stage, { profile, onExit }) {
       burst(c.x, c.y, { n: 10, kind: 'bubble', spread: 120 });
     }
     await say('bobo', 'k_meal');
-    if (!hard) await say('bobo', 'k_meal_easy');
+    if (!hard && !two) await say('bobo', 'k_meal_easy');
     guard();
 
+    if (two) await fillTogether();
+    else {
     const onPlateFoods = [];
     let meatSaid = false;
     let needEncourage = false;
@@ -368,12 +377,13 @@ export function mountKitchen(stage, { profile, onExit }) {
     });
     guard();
     counter.innerHTML = '';
+    }
 
     // 一起開動
     await say('bobo', 'k_itadaki');
     await say(other, 'k_itadaki');
     $$('.seat-char', root).forEach((c) => c.classList.add('eating'));
-    for (const n of $$('.pf', onPlate)) { sfx('bubble'); n.classList.add('gone'); await pause(350); }
+    for (const n of $$('.pf', root)) { sfx('bubble'); n.classList.add('gone'); await pause(two ? 220 : 350); }
     $$('.seat-char', root).forEach((c) => c.classList.remove('eating'));
     await say(other, 'k_yum');
     await say('bobo', 'k_yum');
@@ -407,6 +417,103 @@ export function mountKitchen(stage, { profile, onExit }) {
     await say('bobo', 'k_bye_meal');
     await say(other, 'k_bye_meal');
     await celebrate();
+  }
+
+  // 一起玩：一人一個盤子，輪流放菜。輪到誰就用誰的難度（妍卉自己判斷、向澤跟著亮亮的放）
+  async function fillTogether() {
+    const ids = profile.members;
+    const EASY_SET = ['rice', 'broccoli', 'egg', 'apple'];
+    const st = Object.fromEntries(ids.map((id) => [id, {
+      foods: [],
+      g: $(`.plate-pos[data-id="${id}"]`, root),
+      plate: plates.find((p) => p.id === id),
+      hard: PROFILES[id].level === 'hard',
+    }]));
+    const isDone = (id) => (st[id].hard
+      ? GROUPS.every((g) => st[id].foods.some((f) => FOODS[f].g === g))
+      : EASY_SET.every((f) => st[id].foods.includes(f)));
+    let needEncourage = false;
+    let encouraged = false;
+    let meatSaid = false;
+    await say('bobo', 'k_both_plate');
+    guard();
+    counter.className = 'counter foods';
+    counter.innerHTML = FOOD_IDS.map((f) => `<button class="food-btn" data-f="${f}">${foodSvg(f, 92)}</button>`).join('');
+    let turn = ids[0];
+    const showTurn = () => {
+      $$('.plate-pos', root).forEach((g) => g.classList.toggle('turn', g.dataset.id === turn));
+      $$('.kid-face', root).forEach((g) => g.classList.toggle('turn', g.dataset.id === turn));
+      const me = st[turn];
+      const next = !me || me.hard ? null : EASY_SET.find((f) => !me.foods.includes(f));
+      $$('.food-btn', counter).forEach((b) => b.classList.toggle('glow', b.dataset.f === next));
+    };
+    const announce = async () => { showTurn(); await speak('bobo', `tg_turn_${turn}`, { node: charNode('bobo') }); };
+    onTap(charNode('other'), async () => {
+      if (!needEncourage || encouraged) return;
+      encouraged = true;
+      charNode('other').classList.remove('glow-char');
+      await say('bobo', 'k_encourage');
+      await say('kiki', 'k_kiki_try');
+      sfx('sparkle');
+    });
+    await announce();
+    await new Promise((resolve) => {
+      let busy = false;
+      $$('.food-btn', counter).forEach((b) => onTap(b, async () => {
+        if (busy || mode !== 'act' || !turn) return;
+        const f = b.dataset.f;
+        const me = st[turn];
+        if (!me.hard) {
+          const next = EASY_SET.find((x) => !me.foods.includes(x));
+          if (f !== next) { flash(b, 'nope'); return; }
+        }
+        busy = true;
+        if (FOODS[f].g === 'junk') {
+          // 零食不能當飯吃
+          sfx('wrong');
+          flash(b, 'nope');
+          await say('bobo', 'k_tummy');
+          busy = false;
+          return;
+        }
+        sfx('pop');
+        const [px, py] = PLATE_SPOT[FOODS[f].g];
+        const same = me.foods.filter((x) => FOODS[x].g === FOODS[f].g).length;
+        const P = me.plate;
+        const size = 96 * P.s;
+        const target = { x: P.x + (px + same * 20) * P.s - size / 2, y: P.y + (py + same * 12) * P.s - size / 2, w: size, h: size };
+        await fly(foodSvg(f, 92), rectOf(b), target);
+        $('.on-plate', me.g).insertAdjacentHTML('beforeend', `<g class="pf" data-f="${f}" transform="translate(${px + same * 20 - 48} ${py + same * 12 - 48}) scale(.95)">${FOODS[f].svg}</g>`);
+        me.foods.push(f);
+        await say('bobo', `f_${f}`);
+        if (me.hard) await say('bobo', `en_${f}`);
+        if (FOODS[f].g === 'protein' && !meatSaid) { meatSaid = true; await say('bobo', 'k_bobo_meat'); }
+        if (FOODS[f].g === 'veg' && other === 'kiki' && !needEncourage) {
+          needEncourage = true;
+          await say('kiki', 'k_kiki_noveg');
+          charNode('other').classList.add('glow-char');
+        }
+        if (isDone(turn)) { sfx('sparkle'); const c = centerOf(me.g); burst(c.x, c.y, { n: 10, kind: 'star', spread: 120 }); }
+        // 換另一個人；另一個人已經裝好了就繼續
+        const nextId = ids.find((id) => id !== turn && !isDone(id)) || (isDone(turn) ? null : turn);
+        busy = false;
+        if (!nextId) {
+          turn = null;
+          showTurn();
+          $$('.plate-pos, .kid-face', root).forEach((g) => g.classList.remove('turn'));
+          if (needEncourage && !encouraged) {
+            const w2 = setInterval(() => { if (encouraged || !alive) { clearInterval(w2); resolve(); } }, 200);
+            cleanups.push(() => clearInterval(w2));
+          } else resolve();
+          return;
+        }
+        if (nextId !== turn) { turn = nextId; busy = true; await announce(); busy = false; } else showTurn();
+      }));
+      cleanups.push(() => resolve());
+    });
+    guard();
+    counter.innerHTML = '';
+    await say('bobo', 'tg_both');
   }
 
   // 最後一片水果：給誰？還是切一半分享？
@@ -443,7 +550,7 @@ export function mountKitchen(stage, { profile, onExit }) {
       dish.classList.add('hidden');
       dish.classList.remove('cut');
       $$('.seat-char', root).forEach((c) => c.classList.add('happy'));
-      await say('bobo', 'k_share');
+      await say('bobo', two ? 'k_share4' : 'k_share');
       $$('.seat-char', root).forEach((c) => c.classList.remove('happy'));
     } else {
       const winner = choice === 'bobo' ? 'bobo' : other;

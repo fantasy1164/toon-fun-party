@@ -19,6 +19,11 @@ const shuffle = (a) => a.map((x) => [Math.random(), x]).sort((p, q) => p[0] - q[
 const nest = (svg, x, y) => svg.replace('<svg ', `<svg x="${x}" y="${y}" `);
 // 已經貼好的春聯與倒福（除夕以後的客廳）
 const DOOR_DONE = `<svg class="door-done" viewBox="0 0 1200 900">${nest(COUPLET, 716, 150)}${nest(COUPLET, 1104, 150)}${nest(FU(150, true), 875, 190)}</svg>`;
+// 拜年收紅包：一起玩時兩個頭像（妍卉左下、向澤右下），紅包各疊在自己旁邊
+const ENV_X = { solo: (n) => 220 + n * 26, yh: (n) => 175 + n * 22, xz: (n) => 965 - n * 22 };
+const kidAvs = (profile) => (profile.members.length > 1
+  ? profile.members.map((id) => `<div class="ny-kid k-${id}" data-id="${id}">${avatarSvg(id, 130)}</div>`).join('')
+  : `<div class="ny-kid">${avatarSvg(profile.members[0], 130)}</div>`);
 const kidAv = (profile) => `<div class="ny-kid">${avatarSvg(profile.members.length > 1 ? 'both' : profile.members[0], 130)}</div>`;
 
 export function mountNewYear(stage, opts) {
@@ -359,7 +364,7 @@ function mountDays(stage, { profile, onExit }, ny) {
   const inner = `
     ${DOOR_DONE}
     ${order.map((id) => charDiv(id, xs[id], 352, 0.65)).join('')}
-    ${kidAv(profile)}
+    ${kidAvs(profile)}
     <div class="envs"></div>
     <div class="hands hidden"><button class="hand l">${HANDS.l}</button><button class="hand r">${HANDS.r}</button></div>
     <button class="piggy hidden">${PIGGY}</button>
@@ -431,9 +436,11 @@ function mountDays(stage, { profile, onExit }, ny) {
         root.classList.remove('hold');
       }
       const from = ctl.rectOf(node);
-      await ctl.fly(ENVELOPE, { x: from.x + from.w / 2 - 40, y: from.y + from.h / 2, w: 80, h: 112 }, { x: 220 + n * 26, y: 700, w: 60, h: 84 }, 500);
+      // 一起玩：每位角色給兩個小孩各一個紅包
+      const kids = profile.members.length > 1 ? profile.members : ['solo'];
+      await Promise.all(kids.map((k) => ctl.fly(ENVELOPE, { x: from.x + from.w / 2 - 40, y: from.y + from.h / 2, w: 80, h: 112 }, { x: ENV_X[k](n), y: 700, w: 60, h: 84 }, 500)));
       guard();
-      envs.insertAdjacentHTML('beforeend', `<div class="env" style="left:${220 + n * 26}px;top:700px">${ENVELOPE}</div>`);
+      kids.forEach((k) => envs.insertAdjacentHTML('beforeend', `<div class="env" data-k="${k}" style="left:${ENV_X[k](n)}px;top:700px">${ENVELOPE}</div>`));
       sfx('sparkle');
       if (n === 0) { await say('kiki', 'ny_say_thanks'); guard(); }
       n += 1;
@@ -445,11 +452,16 @@ function mountDays(stage, { profile, onExit }, ny) {
     if (profile.members.some((id) => !hasClaimed(id, 'ny_day'))) {
       await say('gugu', 'ny_open');
       guard();
-      const last = $$('.env', envs).pop();
-      last.classList.add('glow');
-      await ctl.tapOnce(last);
+      // 每個小孩打開自己的最後一個紅包
+      const kids = profile.members.length > 1 ? profile.members : ['solo'];
+      await Promise.all(kids.map(async (k) => {
+        const last = $$(`.env[data-k="${k}"]`, envs).pop();
+        last.classList.add('glow');
+        await ctl.tapOnce(last);
+        last.remove();
+        sfx('pop');
+      }));
       guard();
-      last.remove();
       await nyGift(ctl, profile, 'gugu', say);
       guard();
     }

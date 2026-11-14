@@ -5,6 +5,11 @@ import { hour } from '../core/clock.js';
 
 // 前排三張桌子的中心
 export const DESKS = { kiki: 240, kid: 600, dudu: 960 };
+// 一起玩：中間兩張小孩桌（妍卉、向澤），四張桌子都窄一點
+export function kidDesks(profile) {
+  if (profile.members.length > 1) return profile.members.map((id, i) => ({ id, x: i === 0 ? 480 : 720 }));
+  return [{ id: profile.members[0], x: DESKS.kid }];
+}
 export const DESK_TOP = 700;
 
 // 牆上的時鐘：指針跟現實時間一樣
@@ -58,16 +63,24 @@ export function charDiv(id, cls, x, y, s) {
 
 // 前排桌子、小孩的椅子與頭像、嘟嘟的積木
 export function desksSvg(profile) {
-  const kid = profile.members.length > 1 ? 'both' : profile.members[0];
+  const kids = kidDesks(profile);
+  const two = kids.length > 1;
+  const hw = two ? 110 : 160;     // 桌子一半寬
   const desk = (cx) => `<g>
-    <path d="M${cx - 160} ${DESK_TOP}H${cx + 160}L${cx + 176} ${DESK_TOP + 36}H${cx - 176}Z" fill="#f2c48a"/>
-    <rect x="${cx - 176}" y="${DESK_TOP + 36}" width="352" height="200" fill="#e0a868"/>
-    <rect x="${cx - 176}" y="${DESK_TOP + 36}" width="352" height="12" fill="#c98f4f"/></g>`;
+    <path d="M${cx - hw} ${DESK_TOP}H${cx + hw}L${cx + hw + 16} ${DESK_TOP + 36}H${cx - hw - 16}Z" fill="#f2c48a"/>
+    <rect x="${cx - hw - 16}" y="${DESK_TOP + 36}" width="${hw * 2 + 32}" height="200" fill="#e0a868"/>
+    <rect x="${cx - hw - 16}" y="${DESK_TOP + 36}" width="${hw * 2 + 32}" height="12" fill="#c98f4f"/></g>`;
+  const chair = ({ id, x }) => {
+    const s = two ? 0.82 : 1;
+    const color = two ? (id === 'yh' ? '#ff9fc0' : '#6fcf97') : '#5fa8e8';
+    return `<g class="kidchair" data-id="${id}"><rect x="${x - 80 * s}" y="${720 - 200 * s}" width="${160 * s}" height="${200 * s}" rx="30" fill="${color}"/>
+      <g class="kidav" transform="translate(${x - 70 * s} ${730 - 200 * s}) scale(${s})"><circle cx="70" cy="70" r="72" fill="#fff"/>${avatarSvg(id, 140).replace('<svg ', '<svg x="0" y="0" ')}</g></g>`;
+  };
+  const bo = two ? 50 : 0;   // 嘟嘟的積木跟著桌子往右一點
   return `<svg viewBox="0 0 1200 900">
-    <g class="kidchair"><rect x="520" y="520" width="160" height="200" rx="30" fill="#5fa8e8"/>
-      <g class="kidav" transform="translate(530 530)"><circle cx="70" cy="70" r="72" fill="#fff"/>${avatarSvg(kid, 140).replace('<svg ', '<svg x="0" y="0" ')}</g></g>
-    ${desk(DESKS.kiki)}${desk(DESKS.kid)}${desk(DESKS.dudu)}
-    <g class="blocks">
+    ${kids.map(chair).join('')}
+    ${desk(DESKS.kiki)}${kids.map((k) => desk(k.x)).join('')}${desk(DESKS.dudu)}
+    <g class="blocks" transform="translate(${bo} 0)">    <g class="blocks">
       <g class="blk b1"><rect x="${DESKS.dudu - 160}" y="${DESK_TOP - 50}" width="80" height="50" rx="6" fill="#e5484d"/></g>
       <g class="blk b2"><rect x="${DESKS.dudu - 152}" y="${DESK_TOP - 100}" width="64" height="50" rx="6" fill="#ffd34d"/></g>
       <g class="blk b3"><rect x="${DESKS.dudu - 144}" y="${DESK_TOP - 146}" width="48" height="46" rx="6" fill="#4caf50"/></g>

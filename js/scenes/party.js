@@ -13,7 +13,7 @@ import {
   PARTY_CHARS, partyRoom, DECOR, SPOTS, FLAVORS, cakeSvg, TOPPINGS, TOP_SPOTS, topSvg, candlesSvg,
   GIFT_OF, boxSvg, kidSeat, BIG_CARD,
 } from '../art/party.js';
-import { characterSvg } from '../art/characters.js';
+import { characterSvg, avatarSvg } from '../art/characters.js';
 import { itemSvg, CARD_COLORS, STICKERS, CARD_SPOTS } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
 
@@ -161,16 +161,19 @@ function mountCelebrate(stage, { profile, onExit }, bid) {
   const hard = profile.level === 'hard';
   const bname = PROFILES[bid].name;
   const age = Math.max(1, Math.min(10, fest.ageOf(bid) || 1));
+  // 一起玩：另一個小孩也戴派對帽坐在旁邊，一起唱歌、吹蠟燭；拆禮物時壽星先拆第一個
+  const sib = profile.members.find((id) => id !== bid);
   const inner = `
     <div class="p-decor"></div>
     ${PARTY_CHARS.map(([id, x, y]) => charDiv(id, x, y)).join('')}
     <svg class="table" viewBox="0 0 1200 900"><rect x="290" y="640" width="620" height="40" rx="14" fill="#fff" opacity=".95"/><path d="M290 660H910V700Q600 730 290 700Z" fill="#ffb3c7"/><rect x="330" y="700" width="20" height="120" fill="#c8915a"/><rect x="850" y="700" width="20" height="120" fill="#c8915a"/></svg>
     <div class="cake hidden"></div>
-    ${kidSeat(bid)}
+    ${kidSeat(bid)}${sib ? kidSeat(sib, 'sib') : ''}
     <div class="p-tray hidden"></div>
     <div class="gifts hidden"></div>`;
   const ctl = makeScene(stage, profile, onExit, inner, 'kiki');
   const { root, guard, pause } = ctl;
+  if (sib) root.classList.add('two');
   const who = (id) => $(`.p-char[data-who="${id}"]`, root);
   const say = (id, line) => speak(id, line, { name: bname, who: bid, node: who(id) });
   const tray = $('.p-tray', root);
@@ -364,14 +367,16 @@ function mountCelebrate(stage, { profile, onExit }, bid) {
     guard();
     const order = ['kiki', 'dudu', 'bobo', 'mian', 'gugu'];
     const box = $('.gifts', root);
-    box.innerHTML = order.map((id) => `<button class="gbox glow" data-who="${id}">${boxSvg(id)}</button>`).join('');
+    box.innerHTML = order.map((id, i) => `<button class="gbox${!sib || i === 0 ? ' glow' : ' wait'}" data-who="${id}">${boxSvg(id)}${sib && i === 0 ? `<span class="bd-first">${avatarSvg(bid, 70)}</span>` : ''}</button>`).join('');
     box.classList.remove('hidden');
     let opened = 0;
     await new Promise((resolve) => {
       let busy = false;
       $$('.gbox', box).forEach((b) => onTap(b, async () => {
-        if (busy || b.classList.contains('open')) return;
+        if (busy || b.classList.contains('open') || b.classList.contains('wait')) return;
         busy = true;
+        // 壽星拆完第一個，其他的兩個人都可以拆
+        $$('.gbox.wait', box).forEach((x) => { x.classList.remove('wait'); x.classList.add('glow'); });
         b.classList.remove('glow');
         b.classList.add('open');
         sfx('fanfare');

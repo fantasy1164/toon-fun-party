@@ -1,5 +1,5 @@
 // 學堂：咕咕老師上課（打招呼 → 舉手回答 → 垃圾分類 → 說對不起）。下午 5 點以後換成看星星。
-import { REWARD_SLOTS } from '../config.js';
+import { PROFILES, REWARD_SLOTS } from '../config.js';
 import { el, $, $$, wait, pick, burst, centerOf, onTap } from '../core/dom.js';
 import { sfx, playMusic, rainOn, rainOff } from '../core/audio.js';
 import { speak, hush } from '../core/voice.js';
@@ -7,7 +7,7 @@ import { phase, hour, currentSlot } from '../core/clock.js';
 import { state, save, hasClaimed, claim, addItem } from '../core/store.js';
 import * as weather from '../core/weather.js';
 import {
-  DESKS, classroomBack, charDiv, desksSvg, WAVE, HAND, HIFIVE, QUESTIONS, SORRY_CARD, RUN_CARD,
+  DESKS, kidDesks, classroomBack, charDiv, desksSvg, WAVE, HAND, HIFIVE, QUESTIONS, SORRY_CARD, RUN_CARD,
   TRASH, EASY_TRASH, HARD_TRASH, EASY_BINS, HARD_BINS, binSvg, nightSky, DIPPER,
 } from '../art/school.js';
 import { avatarSvg } from '../art/characters.js';
@@ -23,6 +23,9 @@ export function mountSchool(stage, opts) {
 // ================= 白天：上課 =================
 function mountClass(stage, { profile, onExit }) {
   const hard = profile.level === 'hard';
+  // 一起玩：兩張小孩桌，各有自己的按鈕；回答問題輪流，輪到誰就用誰的難度
+  const desks = kidDesks(profile);
+  const two = desks.length > 1;
   const ph = phase();
   const wx = weather.current();
   const root = el(`
@@ -33,8 +36,8 @@ function mountClass(stage, { profile, onExit }) {
       ${charDiv('dudu', 'pupil', DESKS.dudu - 90, 520, 0.75)}
       <div class="tears hidden"><i></i><i></i></div>
       <div class="s-layer desks">${desksSvg(profile)}</div>
-      <div class="raised">${HAND}</div>
-      <button class="round-btn kidbtn hidden"></button>
+      ${desks.map((d) => `<div class="raised" data-id="${d.id}" style="left:${d.x + (two ? 30 : 60)}px">${HAND}</div>`).join('')}
+      ${desks.map((d) => `<button class="round-btn kidbtn hidden" data-id="${d.id}" style="left:${d.x - 62}px"></button>`).join('')}
       <div class="s-cards hidden"></div>
       <div class="trash hidden"></div>
       <div class="s-bins hidden"></div>
@@ -48,7 +51,7 @@ function mountClass(stage, { profile, onExit }) {
     </div>`);
   stage.replaceChildren(root);
   const who = (id) => $(`.s-char[data-who="${id}"]`, root);
-  const kidbtn = $('.kidbtn', root);
+  const raisedOf = (id) => $(`.raised[data-id="${id}"]`, root);
   const cardsBox = $('.s-cards', root);
 
   let alive = true;
@@ -70,20 +73,25 @@ function mountClass(stage, { profile, onExit }) {
       cleanups.push(() => { node.removeEventListener('pointerdown', h); resolve(); });
     });
   }
-  async function kidButton(svg) {
-    kidbtn.innerHTML = svg;
-    kidbtn.classList.remove('hidden');
-    kidbtn.classList.add('glow');
-    await tapOnce(kidbtn);
+  // 小孩桌上的按鈕：ids 裡每個人都按了才繼續
+  async function kidButton(svg, ids = desks.map((d) => d.id)) {
+    await Promise.all(ids.map(async (id) => {
+      const b = $(`.kidbtn[data-id="${id}"]`, root);
+      b.innerHTML = svg;
+      b.classList.remove('hidden');
+      b.classList.add('glow');
+      await tapOnce(b);
+      b.classList.add('hidden');
+      b.classList.remove('glow');
+      sfx('pop');
+      if (svg === HAND) raisedOf(id).classList.add('up');
+    }));
     guard();
-    kidbtn.classList.add('hidden');
-    kidbtn.classList.remove('glow');
-    sfx('pop');
   }
   // 圖卡選擇題：回傳選對時結束；選錯會說 wrongLine
-  async function choose(rightSvg, wrongSvgs, wrongLine) {
+  async function choose(rightSvg, wrongSvgs, wrongLine, isHard = hard) {
     const items = shuffle([{ ok: true, svg: rightSvg }, ...wrongSvgs.map((svg) => ({ ok: false, svg }))]);
-    cardsBox.innerHTML = items.map((c, i) => `<button class="round-btn scard${!hard && c.ok ? ' glow' : ''}" data-i="${i}">${c.svg}</button>`).join('');
+    cardsBox.innerHTML = items.map((c, i) => `<button class="round-btn scard${!isHard && c.ok ? ' glow' : ''}" data-i="${i}">${c.svg}</button>`).join('');
     cardsBox.classList.remove('hidden');
     await new Promise((resolve) => {
       let busy = false;
@@ -96,7 +104,7 @@ function mountClass(stage, { profile, onExit }) {
           flash(b, 'nope');
           await say('gugu', wrongLine);
           busy = false;
-          if (hard) $$('.scard', cardsBox).forEach((x) => x.classList.toggle('glow', items[+x.dataset.i].ok));
+          if (isHard) $$('.scard', cardsBox).forEach((x) => x.classList.toggle('glow', items[+x.dataset.i].ok));
           return;
         }
         b.classList.add('picked');
@@ -132,8 +140,8 @@ function mountClass(stage, { profile, onExit }) {
   }
 
   async function handUp() {
-    const key = pick(Object.keys(QUESTIONS));
-    const q = QUESTIONS[key];
+    const keys = shuffle(Object.keys(QUESTIONS));
+    const q = QUESTIONS[keys[0]];
     await say('gugu', 's_ask_intro');
     await say('gugu', q.q);
     guard();
@@ -157,12 +165,29 @@ function mountClass(stage, { profile, onExit }) {
     await kidButton(HAND);
     root.classList.add('kid-hand');
     k.classList.remove('hand');
-    await say('gugu', 's_call_kid');
-    guard();
-    await choose(q.right, hard ? q.wrong : q.wrong.slice(0, 1), 's_a_wrong');
+    // 一起玩：一人一題，妍卉先（6 歲版），再換向澤（3 歲版）
+    for (const [i, d] of desks.entries()) {
+      const qq = QUESTIONS[keys[i]];
+      const kidHard = two ? PROFILES[d.id].level === 'hard' : hard;
+      if (i > 0) {
+        await say('gugu', 's_ask_intro');
+        await say('gugu', qq.q);
+        guard();
+      }
+      if (two) {
+        $$('.raised', root).forEach((r) => r.classList.toggle('up', r.dataset.id === d.id));
+        await speak('gugu', 's_call_kid', { name: PROFILES[d.id].name, who: d.id, node: who('gugu') });
+      } else {
+        await say('gugu', 's_call_kid');
+      }
+      guard();
+      await choose(qq.right, kidHard ? qq.wrong : qq.wrong.slice(0, 1), 's_a_wrong', kidHard);
+      await say('gugu', qq.a);
+      guard();
+    }
     root.classList.remove('kid-hand');
-    await say('gugu', q.a);
-    guard();
+    $$('.raised', root).forEach((r) => r.classList.remove('up'));
+    if (two) await say('gugu', 'tg_both');
   }
 
   // ---------- 二、垃圾分類 ----------

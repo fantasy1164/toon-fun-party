@@ -85,8 +85,8 @@ export function boxSvg(c) {
 // 派對帽（戴在小孩頭像上）
 export const HAT = `<svg viewBox="0 0 80 90" width="80" height="90"><path d="M40 4L72 84H8Z" fill="#c77dff"/><path d="M24 44L56 44M18 62H62" stroke="#ffd34d" stroke-width="7"/><circle cx="40" cy="6" r="9" fill="#ffd34d"/></svg>`;
 
-export function kidSeat(id) {
-  return `<div class="kid">${avatarSvg(id, 140)}<div class="hat">${HAT}</div></div>`;
+export function kidSeat(id, cls = '') {
+  return `<div class="kid ${cls}" data-id="${id}">${avatarSvg(id, 140)}<div class="hat">${HAT}</div></div>`;
 }
 
 // 大廳生日布置

@@ -85,39 +85,55 @@ export const SEATS = [
   { who: 'dudu', x: 990 },
 ];
 
+// 一起玩：兩張安全座椅（妍卉左、向澤右），奇奇、嘟嘟往兩邊坐
+export function seatLayout(profile) {
+  if (profile.members.length > 1) {
+    return { kiki: 150, dudu: 1050, kids: profile.members.map((id, i) => ({ key: `kid-${id}`, id, x: i === 0 ? 470 : 730, w: 100 })) };
+  }
+  return { kiki: SEATS[0].x, dudu: SEATS[2].x, kids: [{ key: 'kid', id: profile.members[0], x: 600, w: 120 }] };
+}
+
 export function backSeat(profile) {
-  const kid = profile.members.length > 1 ? 'both' : profile.members[0];
+  const L = seatLayout(profile);
+  const two = L.kids.length > 1;
+  const sc = two ? 0.9 : 1.0;
+  const seat = ({ id, x, w }) => `<g class="kidseat">
+    <path d="M${x - w - 20} 900V600Q${x - w - 20} 520 ${x} 520Q${x + w + 20} 520 ${x + w + 20} 600V900Z" fill="${two ? (id === 'yh' ? '#e8738f' : '#3fa86a') : '#e5734f'}"/>
+    <path d="M${x - w} 900V610Q${x - w} 550 ${x} 550Q${x + w} 550 ${x + w} 610V900Z" fill="${two ? (id === 'yh' ? '#f59ab0' : '#62c48a') : '#f08a6a'}"/>
+    <g transform="translate(${x - 60} 580)"><circle cx="60" cy="60" r="62" fill="#fff"/>${avatarSvg(id, 120).replace('<svg ', '<svg x="0" y="0" ')}</g>
+  </g>`;
   return `
   <rect x="0" y="560" width="1200" height="340" fill="#6a76a0"/>
   <rect x="20" y="600" width="1160" height="300" rx="50" fill="#7a86b0"/>
   <!-- 奇奇 -->
-  <g class="rider" data-who="kiki"><g class="rider-in">${characterSvg('kiki', { x: 90, y: 520, s: 1.0 })}</g></g>
+  <g class="rider" data-who="kiki"><g class="rider-in">${characterSvg('kiki', { x: L.kiki - 120 * sc, y: 520 + (two ? 30 : 0), s: sc })}</g></g>
   <!-- 嘟嘟 -->
-  <g class="rider" data-who="dudu"><g class="rider-in">${characterSvg('dudu', { x: 870, y: 520, s: 1.0 })}</g></g>
+  <g class="rider" data-who="dudu"><g class="rider-in">${characterSvg('dudu', { x: L.dudu - 120 * sc, y: 520 + (two ? 30 : 0), s: sc })}</g></g>
   <!-- 小孩的安全座椅 -->
-  <g class="kidseat">
-    <path d="M480 900V600Q480 520 600 520Q720 520 720 600V900Z" fill="#e5734f"/>
-    <path d="M500 900V610Q500 550 600 550Q700 550 700 610V900Z" fill="#f08a6a"/>
-    <g transform="translate(540 580)"><circle cx="60" cy="60" r="62" fill="#fff"/>${avatarSvg(kid, 120).replace('<svg ', '<svg x="0" y="0" ')}</g>
-  </g>`;
+  ${L.kids.map(seat).join('')}`;
 }
 
 // 安全帶（扣好才顯示）與扣環感應區
-export function beltsSvg() {
+export function beltsSvg(profile) {
+  const L = seatLayout(profile);
   const belt = (x, cls) => `<g class="belt ${cls}">
     <path d="M${x - 90} 640L${x + 70} 830" stroke="#2b2f3a" stroke-width="22" stroke-linecap="round"/>
     <path d="M${x - 100} 800H${x + 90}" stroke="#2b2f3a" stroke-width="20" stroke-linecap="round"/>
     <rect x="${x + 50}" y="805" width="44" height="34" rx="8" fill="#c0c6d0"/></g>`;
-  const harness = `<g class="belt kid">
-    <path d="M560 720V860M640 720V860" stroke="#2b2f3a" stroke-width="18" stroke-linecap="round"/>
-    <rect x="572" y="800" width="56" height="40" rx="10" fill="#c0c6d0"/></g>`;
+  const harness = ({ key, x }) => `<g class="belt ${key}">
+    <path d="M${x - 40} 720V860M${x + 40} 720V860" stroke="#2b2f3a" stroke-width="18" stroke-linecap="round"/>
+    <rect x="${x - 28}" y="800" width="56" height="40" rx="10" fill="#c0c6d0"/></g>`;
   const buckle = (x, y, who) => `<g class="buckle" data-who="${who}">
     <circle class="halo" cx="${x}" cy="${y}" r="58" fill="#ffd000"/>
     <rect x="${x - 26}" y="${y - 20}" width="52" height="40" rx="10" fill="#e5484d"/><rect x="${x - 14}" y="${y - 8}" width="28" height="16" rx="4" fill="#fff"/>
     <rect class="hit" x="${x - 70}" y="${y - 70}" width="140" height="140" fill="transparent"/></g>`;
+  const two = L.kids.length > 1;
+  // 兩張座椅時，奇奇、嘟嘟的扣環放在靠外側，不要跟小孩的擠在一起
+  const kikiB = two ? L.kiki + 60 : L.kiki + 120;
+  const duduB = two ? L.dudu + 60 : L.dudu + 120;
   return `<svg class="belts" viewBox="0 0 1200 900">
-    ${belt(SEATS[0].x, 'kiki')}${harness}${belt(SEATS[2].x, 'dudu')}
-    ${buckle(SEATS[0].x + 120, 830, 'kiki')}${buckle(600, 860, 'kid')}${buckle(SEATS[2].x + 120, 830, 'dudu')}
+    ${belt(L.kiki, 'kiki')}${L.kids.map(harness).join('')}${belt(L.dudu, 'dudu')}
+    ${buckle(kikiB, 830, 'kiki')}${L.kids.map((k) => buckle(k.x, 860, k.key)).join('')}${buckle(duduB, 830, 'dudu')}
   </svg>`;
 }
 
