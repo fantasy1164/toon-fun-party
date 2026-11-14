@@ -8,7 +8,9 @@ import { phase, dateKey } from '../core/clock.js';
 import { state, save } from '../core/store.js';
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import * as weather from '../core/weather.js';
-import { hubBack, roomSvg, SPOTS, YARD, GARAGE_CAR, schoolExt, farmExt, tentSvg, parkExt } from '../art/hub.js';
+import { hubBack, roomSvg, SPOTS, YARD, GARAGE_CAR, schoolExt, farmExt, tentSvg, parkExt, TOWN_SIGN } from '../art/hub.js';
+import { theaterNews } from './town.js';
+import { quakeDue, runQuake } from './quake.js';
 import { ICON } from './screens.js';
 import * as fest from '../core/festival.js';
 import { TREE_ICON } from '../art/xmas.js';
@@ -42,6 +44,7 @@ export function showHub(stage, profile) {
         <button class="room out" data-room="school" style="${pos(SPOTS.school)}">${schoolExt(ph)}</button>
         <button class="room out" data-room="farm" style="${pos(SPOTS.farm)}">${farmExt(ph)}</button>
         <button class="room out park-room${weekend && !night ? ' glow-park' : ''}" data-room="park" style="${pos(SPOTS.park)}">${parkExt(ph)}</button>
+        <button class="room out town-sign${theaterNews(profile) ? ' glow-park' : ''}" data-room="town" style="${pos(SPOTS.town)}">${TOWN_SIGN}</button>
         ${yard.slice(0, YARD.length).map(([room, cls, svg], i) => `<button class="room out yard ${cls}" data-room="${room}" style="${pos(YARD[i])}">${svg}</button>`).join('')}
         <div class="avs">${avatars}</div>
         <button class="round-btn home">${ICON.home}</button>
@@ -54,6 +57,8 @@ export function showHub(stage, profile) {
     const pickLine = async () => { await callTurn(host); if (!done) speak(host, 'hub_pick', { name: profile.name, who: profile.id }); };
     const go = async (room, btn) => {
       if (done) return;
+      // 地震演習中只能按回家
+      if (node.classList.contains('in-quake') && room !== 'back') return;
       done = true;
       hush();
       sfx('fanfare');
@@ -85,6 +90,8 @@ export function showHub(stage, profile) {
       speak('kiki', `ny_hub_${ny.stage}`, { name: profile.name, who: profile.id }).then(() => { if (!done) callTurn('kiki'); });
     } else if (x && fest.day() <= 24 && profile.members.some((id) => !x.greeted[id])) {
       santaPop(node, profile).then(() => { if (!done) pickLine(); });
+    } else if (quakeDue(profile)) {
+      runQuake(node, profile, () => done).then(() => { if (!done) pickLine(); });
     } else if (weekend && !night && !state.parkHint?.[profile.id + dateKey()]) {
       state.parkHint = { [profile.id + dateKey()]: true };
       save();

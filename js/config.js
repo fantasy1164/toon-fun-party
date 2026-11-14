@@ -34,6 +34,8 @@ export const GUESTS = {
   pupu: { id: 'pupu', name: '噗噗', tts: { pitch: 0.8, rate: 0.9 } },
   doudou: { id: 'doudou', name: '豆豆', tts: { pitch: 1.3, rate: 1.0 } },
   tiaotiao: { id: 'tiaotiao', name: '跳跳', tts: { pitch: 1.5, rate: 1.1 } },
+  yuanyuan: { id: 'yuanyuan', name: '圓圓醫生', tts: { pitch: 1.05, rate: 0.9 } },
+  lili: { id: 'lili', name: '栗栗', tts: { pitch: 1.45, rate: 1.05 } },
 };
 
 // 各活動每天可領獎的時段（對應現實作息）。[開始小時, 結束小時)
@@ -47,4 +49,14 @@ export const REWARD_SLOTS = {
   school: { day: [8, 17] },
   farm: { day: [8, 17] },
   park: { day: [8, 18] },
+  clinic: { day: [8, 18] },
+  market: { day: [8, 20] },
+  bath: { evening: [17, 22] },
 };
+
+// 明星牆：每位角色一塊星星牌（照這個順序）
+export const STARS = ['dudu', 'kiki', 'bobo', 'mian', 'gugu', 'doudou', 'pupu', 'tiaotiao', 'yuanyuan', 'lili'];
+// 好朋友星星：一起做幾次集滿
+export const FRIEND_MAX = 5;
+// 小明星徽章：累計幾次變銅、銀、金
+export const BADGE_TIERS = [1, 5, 15];

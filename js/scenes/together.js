@@ -5,7 +5,7 @@ import { el, $, $$, wait, pick, burst, centerOf, onTap } from '../core/dom.js';
 import { sfx, playMusic, stopMusic, musicLevel } from '../core/audio.js';
 import { speak, hush, isSpeaking, quietFor } from '../core/voice.js';
 import { phase, hour, currentSlot } from '../core/clock.js';
-import { state, save, hasClaimed, claim, addItem } from '../core/store.js';
+import { state, save, hasClaimed, claim, addItem, recordHabit } from '../core/store.js';
 import * as weather from '../core/weather.js';
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import { mianSvg } from '../art/bedroom.js';
@@ -14,6 +14,7 @@ import { tgIcon, backFor } from '../art/together.js';
 import { ICON, openCabinet } from '../ui/screens.js';
 import { sceneWeather } from './door.js';
 import { callTurn, passTurn, turnsOn, turnsScene, freeTurns } from '../core/turns.js';
+import { LIST_POOL } from '../art/market.js';
 
 // 廁所固定由嘟嘟負責（11/14 起每個場景一位負責的角色）
 export function nextCharacter() {
@@ -22,10 +23,10 @@ export function nextCharacter() {
 
 // 每個房間有哪些「一起做」
 export const TOGETHER = {
-  bedroom: ['sleep'], door: ['out'], kitchen: ['meal'], bathroom: ['brush', 'wash'],
-  school: ['bag', 'homework'], farm: ['gym'], car: ['ride'], park: ['outing'],
+  bedroom: ['sleep'], door: ['out'], kitchen: ['meal'], bathroom: ['brush', 'wash', 'bath'],
+  school: ['bag', 'homework'], farm: ['gym'], car: ['ride'], park: ['outing'], clinic: ['doctor'], market: ['shop'],
 };
-const ROOM_HOST = { bedroom: 'mian', door: 'kiki', kitchen: 'bobo', school: 'gugu', farm: 'doudou', car: 'pupu', park: 'tiaotiao' };
+const ROOM_HOST = { bedroom: 'mian', door: 'kiki', kitchen: 'bobo', school: 'gugu', farm: 'doudou', car: 'pupu', park: 'tiaotiao', clinic: 'yuanyuan', market: 'lili' };
 // host：陪的角色（null＝廁所輪替）；reward：算哪個場景的每日獎勵；series：送哪一系列的禮物
 const MODES = {
   sleep: { host: 'mian', reward: 'bedroom', series: 'mian', track: 'bedroom', icon: 'moon' },
@@ -38,12 +39,16 @@ const MODES = {
   gym: { host: 'doudou', reward: 'farm', series: 'doudou', track: 'farm', icon: 'bunny' },
   ride: { host: 'pupu', reward: 'car', series: 'pupu', track: 'car', icon: 'redcar' },
   outing: { host: 'tiaotiao', reward: 'park', series: 'tiaotiao', track: 'park', icon: 'park' },
+  doctor: { host: 'yuanyuan', reward: 'clinic', series: 'yuanyuan', track: 'clinic', icon: 'steth' },
+  shop: { host: 'lili', reward: 'market', series: 'lili', track: 'market', icon: 'cart' },
+  bath: { host: 'dudu', reward: 'bath', series: 'dudu', track: 'bath', icon: 'bathtub' },
 };
 export const MEAL_MIN = 25;   // 吃飯盤子時鐘幾分鐘走完
 export const LULLABY_MIN = 10;
 export const HOMEWORK_MIN = 10;
 export const PARK_MAX_MIN = 60;   // 陪去公園：最多陪 60 分鐘
 export const PARK_REMIND_MIN = 15;
+export const WAIT_MAX_MIN = 60;    // 陪看醫生候診、陪買東西：最多等 60 分鐘
 
 const CHECK = `<svg viewBox="0 0 100 100" width="120" height="120"><path d="M18 52L40 74L84 26" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const RING_C = 2 * Math.PI * 92;
@@ -336,6 +341,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     sfx('fanfare');
     confetti(hostBox, 16);
     await praise();
+    recordHabit(profile.members, kind, host);
     const slot = currentSlot(REWARD_SLOTS[M.reward], hour());
     const winners = slot ? profile.members.filter((id) => !hasClaimed(id, `${M.reward}_${slot}`)) : [];
     hostBox.classList.remove('happy');
@@ -688,7 +694,146 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     await finish();
   }
 
-  const RUN = { outing: runOuting, sleep: runSleep, out: runOut, meal: runMeal, wash: runWash, bag: runBag, homework: runHomework, gym: runGym, ride: runRide };
+  // ---------- 陪看醫生 ----------
+  async function runDoctor() {
+    await say('tdc_hello');
+    await checkLine();
+    const list = [
+      { icon: 'mask', line: 'tdc_mask', per: true },
+      { icon: 'nhicard', line: 'tdc_card' },
+      { icon: 'bottle', line: 'tdc_water', per: true },
+      { icon: 'chair', line: 'tdc_wait' },
+      { icon: 'breath', line: 'tdc_breathe' },
+      { icon: 'thanks', line: 'tdc_thanks' },
+    ];
+    setDots(list.map((x) => x.icon));
+    for (let i = 0; i < 3; i++) await step(i, list[i]);
+    // 候診：螢幕變暗、安靜等，叫到名字時按勾勾
+    markDot(3, 'on');
+    showIcon('chair');
+    await say('tdc_wait');
+    root.classList.add('dim');
+    musicLevel(0.3, 2);
+    const t = timer(WAIT_MAX_MIN * 60000);
+    const ok = oneOk({ nudge: false });
+    const r = await Promise.race([t, ok.then(() => 'ok')]);
+    guard();
+    if (r === 'ok') t.stop(); else ok.cancel();
+    root.classList.remove('dim');
+    musicLevel(1, 1);
+    done(3, list[3]);
+    // 看醫生：深呼吸三次，再勇敢地張開嘴巴
+    markDot(4, 'on');
+    showIcon('breath', 'breathing');
+    await say('tdc_breathe');
+    for (let i = 0; i < 3; i++) { await say('cl_in'); await pause(1500); await say('cl_out'); await pause(1500); }
+    await say('tdc_brave');
+    await waitOk();
+    guard();
+    done(4, list[4]);
+    await praise();
+    await step(5, list[5]);
+    showIcon('sticker', 'pop');
+    await celebrate();
+    await finish();
+  }
+
+  // ---------- 陪去買東西 ----------
+  async function runShop() {
+    await say('tsh_hello');
+    // 先做購物清單：一個人挑 3 樣，一起玩一人挑 2 樣
+    const n = two ? 4 : 3;
+    const grid = $('.tg-grid', root);
+    grid.className = 'tg-grid n8';
+    grid.innerHTML = LIST_POOL.map((t) => `<button class="tg-find" data-t="${t}">${tgIcon(t, 130)}<i>${CHECK}</i></button>`).join('');
+    card.classList.add('hidden');
+    await say('tsh_pick');
+    const chosen = [];
+    while (chosen.length < n) {
+      if (two) await callTurn(host, hostIn);
+      const b = await new Promise((resolve) => {
+        const h = (e) => {
+          const x = e.target.closest('.tg-find:not(.found)');
+          if (!x) return;
+          e.preventDefault();
+          grid.removeEventListener('pointerdown', h);
+          resolve(x);
+        };
+        grid.addEventListener('pointerdown', h);
+        cleanups.push(() => { grid.removeEventListener('pointerdown', h); resolve(null); });
+      });
+      guard();
+      if (!b) return;
+      if (two) passTurn();
+      b.classList.add('found');
+      sfx('pop');
+      chosen.push(b.dataset.t);
+    }
+    await pause(600);
+    grid.classList.add('hidden');
+    await praise();
+    setDots(['ecobag', 'list', 'cashier', 'thanks']);
+    await step(0, { icon: 'ecobag', line: 'tsh_bag' });
+    // 到超市：螢幕變暗，找到清單上的東西就點一下（兩個人可以一起找）
+    markDot(1, 'on');
+    grid.className = `tg-grid n${chosen.length}`;
+    grid.innerHTML = chosen.map((t) => `<button class="tg-find" data-t="${t}">${tgIcon(t, 150)}<i>${CHECK}</i></button>`).join('');
+    grid.classList.remove('hidden');
+    root.classList.add('dim');
+    musicLevel(0.35, 2);
+    freeTurns(true);
+    const left = new Set(chosen);
+    const hunt = new Promise((resolve) => {
+      const cap = setTimeout(() => { off(); resolve(); }, WAIT_MAX_MIN * 60000);
+      const h = (e) => {
+        const b = e.target.closest('.tg-find:not(.found)');
+        if (!b) return;
+        e.preventDefault();
+        b.classList.add('found');
+        left.delete(b.dataset.t);
+        sfx('sparkle');
+        confetti(b, 10);
+        hush();
+        if (!left.size) { clearTimeout(cap); off(); resolve(); return; }
+        sayBg('tsh_found');
+      };
+      const off = () => grid.removeEventListener('pointerdown', h);
+      grid.addEventListener('pointerdown', h);
+      cleanups.push(() => { clearTimeout(cap); off(); resolve(); });
+    });
+    await say('tsh_go');
+    await hunt;
+    freeTurns(false);
+    guard();
+    root.classList.remove('dim');
+    musicLevel(1, 1);
+    markDot(1, 'done');
+    await say('tsh_all');
+    grid.classList.add('hidden');
+    await step(2, { icon: 'cashier', line: 'tsh_pay' });
+    await step(3, { icon: 'thanks', line: 'tsh_thanks' });
+    await celebrate();
+    await finish();
+  }
+
+  // ---------- 陪洗澡（iPad 放浴室外面，手濕濕的步驟自動進行） ----------
+  async function runBath() {
+    const sec = hard ? 60000 : 45000;
+    await say('tba_hello');
+    await checkLine();
+    await runSteps([
+      { icon: 'pajamas', line: 'tba_pj' },
+      { icon: 'bathtub', line: 'tba_water' },
+      { icon: 'shampoo', line: 'tba_hair', ms: sec, music: 'bath', auto: true, cues: [[sec / 3, 'tba_eyes'], [(sec * 2) / 3, 'tba_scrub']], endLine: 'tba_hair_end' },
+      { icon: 'soap', line: 'tba_body', ms: sec, music: 'bath', auto: true, cues: [[sec / 4, 'tba_arms'], [sec / 2, 'tba_belly'], [(sec * 3) / 4, 'tba_feet']] },
+      { icon: 'shower', line: 'tba_rinse', ms: 40000, music: 'bath', auto: true, endLine: 'tba_rinse_end' },
+      { icon: 'towel', line: 'tba_dry' },
+    ]);
+    await celebrate();
+    await finish();
+  }
+
+  const RUN = { doctor: runDoctor, shop: runShop, bath: runBath, outing: runOuting, sleep: runSleep, out: runOut, meal: runMeal, wash: runWash, bag: runBag, homework: runHomework, gym: runGym, ride: runRide };
 
   function destroy() {
     if (!alive) return;

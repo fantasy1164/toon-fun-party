@@ -7,7 +7,9 @@ const KEY = 'toon-fun-party';
 function blankProfile() {
   // stamp：選好的印章 { shape, color }；card：目前這張卡上的章；log：所有蓋章紀錄
   // owed：集滿但家長還沒發的獎品數；repick：下次進來可以換印章圖案
-  return { collection: {}, claims: {}, playMs: {}, stamp: null, card: [], log: [], owed: 0, cardsDone: 0, repick: false, shelf: [] };
+  // friends：跟每位角色一起做了幾次（好朋友星星）；habits：每種一起做累計幾次（小明星徽章）
+  // partyDue：集滿印章、還沒在明星劇場開派對的次數；starSeen：已經看過好朋友表演的角色
+  return { collection: {}, claims: {}, playMs: {}, stamp: null, card: [], log: [], owed: 0, cardsDone: 0, repick: false, shelf: [], friends: {}, habits: {}, partyDue: 0, starSeen: {} };
 }
 
 function blank() {
@@ -178,9 +180,19 @@ export function addStamp(id, reasons) {
   p.card.push(entry);
   p.log.push({ d: entry.d, r: reasons });
   const full = p.card.length >= size;
-  if (full) { p.owed += 1; p.cardsDone += 1; p.repick = true; }
+  if (full) { p.owed += 1; p.cardsDone += 1; p.repick = true; p.partyDue = (p.partyDue || 0) + 1; }
   save();
   return full;
+}
+
+// 完成一次「一起做」（或地震演習）：累計習慣次數，陪的角色多一顆好朋友星星
+export function recordHabit(ids, kind, charId = null) {
+  for (const id of ids) {
+    const p = state.profiles[id];
+    p.habits[kind] = (p.habits[kind] || 0) + 1;
+    if (charId) p.friends[charId] = (p.friends[charId] || 0) + 1;
+  }
+  save();
 }
 
 export function redeem(id) {

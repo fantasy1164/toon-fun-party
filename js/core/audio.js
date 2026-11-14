@@ -122,6 +122,17 @@ const SFX = {
   drum: (t) => [0, 0.22, 0.44].forEach((d) => { tone(110, t + d, 0.25, { type: 'sine', to: 50, gain: 0.5 }); noise(t + d, 0.08, { freq: 900, q: 1, gain: 0.2 }); }),
   boom: (t) => { noise(t, 0.6, { freq: 200, q: 0.8, gain: 0.5 }); [0, 0.1, 0.2, 0.35].forEach((d) => noise(t + 0.3 + d, 0.05, { freq: 4000, q: 2, gain: 0.12 })); },
   boing: (t) => tone(300, t, 0.35, { type: 'sine', to: 900, gain: 0.2 }),
+  // 地震、劇場、診所、超市
+  rumble: (t) => { noise(t, 3.2, { freq: 90, to: 50, q: 0.6, gain: 0.6, type: 'lowpass' }); for (let i = 0; i < 8; i++) noise(t + i * 0.35, 0.2, { freq: 300 + Math.random() * 300, q: 2, gain: 0.12 }); },
+  horn: (t) => { tone(392, t, 0.22, { type: 'square', gain: 0.1 }); tone(392, t + 0.3, 0.3, { type: 'square', gain: 0.1 }); },
+  trumpet: (t) => { tone(220, t, 0.7, { type: 'sawtooth', to: 440, gain: 0.12, attack: 0.08 }); tone(330, t + 0.1, 0.6, { type: 'sawtooth', to: 660, gain: 0.08, attack: 0.08 }); },
+  applause: (t) => { for (let i = 0; i < 40; i++) noise(t + Math.random() * 1.6, 0.05, { freq: 1500 + Math.random() * 2500, q: 1.2, gain: 0.12 }); },
+  beep: (t) => tone(1760, t, 0.12, { type: 'square', gain: 0.07 }),
+  ding: (t) => { tone(1319, t, 0.5, { type: 'sine', gain: 0.2 }); tone(1047, t + 0.25, 0.7, { type: 'sine', gain: 0.18 }); },
+  heart: (t) => [0, 0.18, 0.8, 0.98].forEach((d, i) => tone(i % 2 ? 70 : 90, t + d, 0.16, { type: 'sine', to: 45, gain: 0.55 })),
+  note: (t) => tone([523, 587, 659, 784, 880, 1047][Math.floor(Math.random() * 6)], t, 0.35, { type: 'triangle', gain: 0.22 }),
+  coin: (t) => { tone(988, t, 0.08, { type: 'square', gain: 0.08 }); tone(1319, t + 0.08, 0.25, { type: 'square', gain: 0.08 }); },
+  squeak: (t) => tone(1200, t, 0.18, { type: 'sine', to: 1800, gain: 0.15 }),
 };
 
 export function sfx(name) {
@@ -283,6 +294,32 @@ const TRACKS = {
     melody: seq('C5 . . . E5 . . . D5 . . . G4 . . .  A4 . . . C5 . . . B4 . . . . . . .'),
     bass: seq('C3 . . . . . . . G2 . . . . . . .  F2 . . . . . . . G2 . . . . . . .'),
   },
+  // ---- 明星劇場、診所、超市、洗澡 ----
+  stage: {
+    style: 'bg', bpm: 104, lead: 'triangle', leadGain: 0.19,
+    melody: seq('C5 . E5 G5 C6 . G5 . A5 . F5 . G5 . . .  E5 . G5 C6 E6 . D6 . C6 . A5 . G5 . . .  F5 . A5 . G5 . E5 . D5 . G5 . C5 . . .'),
+    bass: seq('C3 . G2 . C3 . E3 . F2 . C3 . G2 . D3 .  C3 . G2 . A2 . E3 . F2 . C3 . G2 . . .  F2 . C3 . C3 . G2 . G2 . D3 . C3 . . .'),
+  },
+  concert: {
+    style: 'song', bpm: 120, lead: 'square', leadGain: 0.13,
+    melody: seq('E5 . E5 . G5 . E5 . D5 . C5 . D5 . G4 .  E5 . E5 . G5 . A5 . G5 . E5 . D5 . . .  C5 . C5 . E5 . C5 . B4 . A4 . B4 . G4 .  C5 . D5 . E5 . G5 . A5 . G5 . C6 . . .'),
+    bass: seq('C3 . G2 . C3 . G2 . G2 . D3 . G2 . D3 .  C3 . G2 . A2 . E3 . F2 . C3 . G2 . . .  A2 . E3 . A2 . E3 . E2 . B2 . E2 . B2 .  F2 . C3 . G2 . D3 . F2 . G2 . C3 . . .'),
+  },
+  clinic: {
+    style: 'quiet', bpm: 84, lead: 'sine', leadGain: 0.16,
+    melody: seq('G4 . C5 . E5 . D5 . C5 . . . A4 . . .  F4 . A4 . C5 . B4 . G4 . . . . . . .'),
+    bass: seq('C3 . . . G2 . . . A2 . . . F2 . . .  F2 . . . C3 . . . G2 . . . G2 . . .'),
+  },
+  market: {
+    style: 'bg', bpm: 118, lead: 'triangle', leadGain: 0.2,
+    melody: seq('C5 D5 E5 . C5 . G5 . F5 . E5 . D5 . . .  E5 F5 G5 . E5 . C6 . A5 . G5 . E5 . . .  F5 . A5 . E5 . G5 . D5 . F5 . C5 . . .'),
+    bass: seq('C3 . G2 . C3 . G2 . G2 . D3 . G2 . D3 .  C3 . G2 . A2 . E3 . F2 . C3 . F2 . C3 .  F2 . C3 . C3 . G2 . G2 . D3 . C3 . . .'),
+  },
+  bath: {
+    style: 'song', bpm: 112, lead: 'triangle', leadGain: 0.2,
+    melody: seq('G4 . B4 D5 G5 . D5 . E5 . C5 . B4 . . .  A4 . C5 E5 A5 . E5 . D5 . B4 . G4 . . .'),
+    bass: seq('G2 . D3 . G2 . D3 . C3 . G2 . G2 . D3 .  A2 . E3 . A2 . E3 . D3 . A2 . G2 . . .'),
+  },
 };
 
 let music = null;
@@ -393,7 +430,7 @@ export function playMusic(name) {
   bus.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.8);
   bus.connect(musicBus);
   const stepDur = 60 / tr.bpm / 2;
-  const m = { name, bus, step: 0, next: ctx.currentTime + 0.1, timer: null };
+  const m = { name, bus, step: 0, next: ctx.currentTime + 0.1, start: ctx.currentTime + 0.1, beat: 60 / tr.bpm, timer: null };
   const tick = () => {
     // 背景分頁或休眠回來時，不要一口氣補排一堆音
     if (m.next < ctx.currentTime - 0.2) m.next = ctx.currentTime + 0.05;
@@ -407,6 +444,12 @@ export function playMusic(name) {
   tick();
   music = m;
   if (ducked) duck(true);
+}
+
+// 目前音樂播到第幾拍（演唱會對拍子用）
+export function musicBeat() {
+  if (!ctx || !music) return null;
+  return { beat: (ctx.currentTime - music.start) / music.beat, beatSec: music.beat, name: music.name };
 }
 
 // 離線算出一段音樂（試聽、測音量用）：回傳 Float32Array

@@ -4,6 +4,7 @@ import { weatherLayer, skyColors } from './bathroom.js';
 import { ANIMALS } from './farm.js';
 import { LANTERN, FU } from './newyear.js';
 export { parkExt } from './park.js';
+export { TOWN_SIGN } from './town.js';
 
 // 每個可以點的地方（舞台座標）
 export const SPOTS = {
@@ -15,6 +16,7 @@ export const SPOTS = {
   school: [30, 250, 290, 235],
   farm: [930, 268, 250, 240],
   park: [22, 496, 300, 200],
+  town: [890, 790, 290, 110],
 };
 // 前院放節慶帳篷、聖誕樹的位置
 // 公園的草地上放節慶帳篷、聖誕樹（11/14 起前院改成公園）

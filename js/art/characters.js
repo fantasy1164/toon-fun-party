@@ -254,12 +254,68 @@ function tiaotiao(extra = '') {
   </g>`;
 }
 
+// 大象醫生 圓圓：白袍、聽診器、額鏡
+function yuanyuan(extra = '') {
+  return `
+  <g class="char yuanyuan">
+    <ellipse cx="120" cy="312" rx="96" ry="10" fill="#000" opacity=".12"/>
+    <ellipse cx="90" cy="304" rx="28" ry="14" fill="#8ea6c8"/><ellipse cx="150" cy="304" rx="28" ry="14" fill="#8ea6c8"/>
+    <g class="arm arm-l"><ellipse cx="50" cy="226" rx="18" ry="46" fill="#fff" transform="rotate(18 50 226)"/><circle cx="38" cy="266" r="15" fill="#9fb6d6"/></g>
+    <g class="arm arm-r"><ellipse cx="190" cy="226" rx="18" ry="46" fill="#fff" transform="rotate(-18 190 226)"/><circle cx="202" cy="266" r="15" fill="#9fb6d6"/></g>
+    <path d="M60 196Q120 172 180 196L188 298H52Z" fill="#fff"/>
+    <path d="M120 180L98 196L120 290L142 196Z" fill="#cfe3f7"/>
+    <path d="M120 186L104 206M120 186L136 206" stroke="#e6edf5" stroke-width="5"/>
+    <rect x="146" y="236" width="26" height="22" rx="4" fill="#e6edf5"/><rect x="152" y="230" width="4" height="14" rx="2" fill="#5fa8e8"/>
+    <ellipse cx="34" cy="112" rx="46" ry="58" fill="#9fb6d6"/><ellipse cx="38" cy="114" rx="28" ry="38" fill="#f4b8c6"/>
+    <ellipse cx="206" cy="112" rx="46" ry="58" fill="#9fb6d6"/><ellipse cx="202" cy="114" rx="28" ry="38" fill="#f4b8c6"/>
+    <ellipse cx="120" cy="108" rx="74" ry="70" fill="#a9bfdd"/>
+    ${eyes(92, 148, 98, '#a9bfdd')}
+    <circle cx="70" cy="132" r="11" fill="#ff9fb0" opacity=".7"/><circle cx="170" cy="132" r="11" fill="#ff9fb0" opacity=".7"/>
+    <ellipse class="mouth" cx="92" cy="160" rx="11" ry="9" fill="#b8412f"/>
+    <path class="trunk" d="M120 120Q118 168 134 186Q148 198 160 184" stroke="#a9bfdd" stroke-width="28" fill="none" stroke-linecap="round"/>
+    <path d="M112 136h16M114 152h16M120 168h14" stroke="#8ea6c8" stroke-width="3" stroke-linecap="round"/>
+    <path d="M84 184Q120 236 156 184" stroke="#4a5568" stroke-width="5" fill="none"/>
+    <circle cx="120" cy="214" r="10" fill="#c0c8d4" stroke="#4a5568" stroke-width="4"/>
+    <path d="M70 52Q120 30 170 52" stroke="#6b7a90" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="120" cy="44" r="16" fill="#e6f2ff" stroke="#8a9ab0" stroke-width="4"/><circle cx="114" cy="40" r="5" fill="#fff"/>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
+// 小松鼠 栗栗：超市店員，綠色圍裙、大尾巴
+function lili(extra = '') {
+  return `
+  <g class="char lili">
+    <ellipse cx="120" cy="312" rx="88" ry="10" fill="#000" opacity=".12"/>
+    <g class="tail"><path d="M150 286Q244 292 236 196Q232 120 182 108Q150 106 156 140Q206 140 204 196Q200 246 148 250Z" fill="#c8783a"/>
+      <path d="M190 132Q222 150 222 196" stroke="#e8a868" stroke-width="10" fill="none" stroke-linecap="round"/></g>
+    <ellipse cx="96" cy="306" rx="22" ry="10" fill="#8a4f22"/><ellipse cx="144" cy="306" rx="22" ry="10" fill="#8a4f22"/>
+    <g class="arm arm-l"><ellipse cx="70" cy="226" rx="14" ry="38" fill="#c8783a" transform="rotate(22 70 226)"/><circle cx="58" cy="258" r="12" fill="#8a4f22"/></g>
+    <g class="arm arm-r"><ellipse cx="170" cy="226" rx="14" ry="38" fill="#c8783a" transform="rotate(-22 170 226)"/><circle cx="182" cy="258" r="12" fill="#8a4f22"/></g>
+    <ellipse cx="120" cy="246" rx="54" ry="62" fill="#c8783a"/>
+    <path d="M78 214H162L156 300H84Z" fill="#3fae6a"/><path d="M84 214Q120 200 156 214" stroke="#2f8f55" stroke-width="5" fill="none"/>
+    <rect x="102" y="246" width="36" height="26" rx="6" fill="#2f8f55"/><path d="M110 254h20" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M58 54L52 6L96 34Z" fill="#c8783a"/><path d="M60 44L58 18L84 34Z" fill="#f2c79a"/><path d="M54 10l-6 -10M56 10l2 -12" stroke="#8a4f22" stroke-width="4" stroke-linecap="round"/>
+    <path d="M182 54L188 6L144 34Z" fill="#c8783a"/><path d="M180 44L182 18L156 34Z" fill="#f2c79a"/><path d="M186 10l6 -10M184 10l-2 -12" stroke="#8a4f22" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="120" cy="108" rx="80" ry="72" fill="#c8783a"/>
+    <path d="M60 116C66 164 100 178 120 178C140 178 174 164 180 116C164 140 140 130 120 124C100 130 76 140 60 116Z" fill="#f6dcc0"/>
+    ${eyes(88, 152, 100, '#c8783a')}
+    <ellipse cx="120" cy="132" rx="10" ry="7" fill="#5a3010"/>
+    <circle cx="66" cy="136" r="10" fill="#ff9fb0" opacity=".7"/><circle cx="174" cy="136" r="10" fill="#ff9fb0" opacity=".7"/>
+    <ellipse class="mouth" cx="120" cy="154" rx="11" ry="9" fill="#b8412f"/>
+    <rect x="112" y="152" width="16" height="10" rx="2" fill="#fff"/>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
 export const NIGHTCAP = {
   dudu: `<g class="cap"><path d="M64 60Q96 -14 176 44L180 60Q120 40 62 74Z" fill="#7a8cff"/><path d="M62 66Q120 44 182 62" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/><circle cx="182" cy="40" r="13" fill="#fff"/></g>`,
   kiki: `<g class="cap"><path d="M70 56Q100 -4 168 34L170 50Q120 36 70 66Z" fill="#7a8cff"/><path d="M70 60Q120 40 172 52" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="174" cy="32" r="12" fill="#fff"/></g>`,
 };
 
-const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao };
+const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao, yuanyuan, lili };
 
 // 回傳可放進 <svg> 的角色群組，x、y 為左上角，s 為縮放。
 export function characterSvg(id, { x = 0, y = 0, s = 1, extra = '' } = {}) {

@@ -81,6 +81,20 @@ export const ITEMS = {
   tiao_ball: `<circle cx="50" cy="52" r="38" fill="#ffd34d"/><path d="M14 46Q50 64 86 46M50 14Q34 52 50 90" stroke="#e5484d" stroke-width="6" fill="none"/>`,
   tiao_disc: `<ellipse cx="50" cy="54" rx="42" ry="22" fill="#5ed17a"/><ellipse cx="50" cy="48" rx="34" ry="14" fill="#7ee39a"/><ellipse cx="50" cy="48" rx="16" ry="6" fill="#5ed17a"/>`,
   tiao_rope: `<rect x="10" y="12" width="12" height="28" rx="5" fill="#ff6b8a"/><rect x="78" y="12" width="12" height="28" rx="5" fill="#ff6b8a"/><path d="M16 40Q14 96 50 92Q86 96 84 40" stroke="#9b85f0" stroke-width="5" fill="none"/>`,
+  // 圓圓醫生的診所系列
+  yuan_steth: `<path d="M30 12V40Q30 62 50 62Q70 62 70 40V12" stroke="#4a5568" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="30" cy="12" r="5" fill="#4a5568"/><circle cx="70" cy="12" r="5" fill="#4a5568"/><path d="M50 62V72Q50 86 66 86" stroke="#4a5568" stroke-width="6" fill="none"/><circle cx="74" cy="84" r="12" fill="#c0c8d4" stroke="#4a5568" stroke-width="5"/>`,
+  yuan_thermo: `<g transform="rotate(-30 50 50)"><rect x="40" y="8" width="20" height="66" rx="10" fill="#fff" stroke="#9aa8b8" stroke-width="4"/><rect x="46" y="38" width="8" height="38" rx="4" fill="#e5484d"/><circle cx="50" cy="80" r="14" fill="#e5484d" stroke="#9aa8b8" stroke-width="4"/></g>`,
+  yuan_bandage: `<g transform="rotate(-30 50 50)"><rect x="8" y="34" width="84" height="32" rx="16" fill="#f3c08e"/><rect x="34" y="34" width="32" height="32" fill="#f8dcbc"/>${[[40, 42], [50, 42], [60, 42], [40, 52], [50, 52], [60, 52]].map(([x, y]) => `<circle cx="${x}" cy="${y + 4}" r="2" fill="#d9a066"/>`).join('')}</g>`,
+  yuan_mask: `<path d="M22 36Q50 28 78 36V64Q50 78 22 64Z" fill="#9fd8ee" stroke="#6cb8d6" stroke-width="4"/><path d="M28 46H72M28 56H72" stroke="#6cb8d6" stroke-width="3"/><path d="M22 40Q8 44 10 52Q12 60 22 60M78 40Q92 44 90 52Q88 60 78 60" stroke="#fff" stroke-width="4" fill="none"/>`,
+  yuan_bag: `<path d="M38 30V20Q38 14 44 14H56Q62 14 62 20V30" stroke="#6b3a1e" stroke-width="6" fill="none"/><rect x="12" y="30" width="76" height="56" rx="12" fill="#8a4a2a"/><rect x="40" y="46" width="20" height="24" fill="#fff"/><rect x="32" y="54" width="36" height="8" fill="#fff"/>`,
+  yuan_sticker: `<circle cx="50" cy="50" r="38" fill="#ffd34d" stroke="#ff9f1c" stroke-width="5"/><path d="M50 72C30 58 24 48 24 40C24 32 30 28 36 28C42 28 47 32 50 36C53 32 58 28 64 28C70 28 76 32 76 40C76 48 70 58 50 72Z" fill="#ff5c8a"/>`,
+  // 栗栗的超市系列
+  lili_cart: `<path d="M8 22H22L32 66H80L88 34H26" stroke="#3a7bd5" stroke-width="6" fill="none" stroke-linejoin="round"/><path d="M30 44H84M32 56H80" stroke="#3a7bd5" stroke-width="4"/><circle cx="38" cy="80" r="8" fill="#333"/><circle cx="74" cy="80" r="8" fill="#333"/>`,
+  lili_ecobag: `<path d="M34 34Q34 12 50 12Q66 12 66 34" stroke="#2f8f55" stroke-width="6" fill="none"/><path d="M18 32H82L76 90H24Z" fill="#7bd39a"/><path d="M50 50Q38 58 50 74Q62 58 50 50Z" fill="#2f8f55"/>`,
+  lili_coin: `<circle cx="42" cy="54" r="30" fill="#ffd34d" stroke="#e0a800" stroke-width="5"/><text x="42" y="66" font-size="30" font-weight="900" text-anchor="middle" fill="#b8860b">10</text><circle cx="72" cy="30" r="18" fill="#d9d9d9" stroke="#a8a8a8" stroke-width="4"/><text x="72" y="38" font-size="20" font-weight="900" text-anchor="middle" fill="#888">5</text>`,
+  lili_milk: `<path d="M30 30L40 14H60L70 30V88H30Z" fill="#fff" stroke="#9fd8ee" stroke-width="4" stroke-linejoin="round"/><path d="M30 30H70" stroke="#9fd8ee" stroke-width="4"/><path d="M30 52Q50 44 70 52V70Q50 62 30 70Z" fill="#5fa8e8"/><circle cx="50" cy="40" r="5" fill="#ff9fb0"/>`,
+  lili_acorn: `<path d="M24 44Q50 26 76 44Q76 56 50 56Q24 56 24 44Z" fill="#8a4f22"/><path d="M50 24V34" stroke="#6b3a1e" stroke-width="6" stroke-linecap="round"/><path d="M30 54Q30 88 50 92Q70 88 70 54Z" fill="#d9944a"/><ellipse cx="40" cy="66" rx="5" ry="10" fill="#fff" opacity=".35"/>`,
+  lili_register: `<rect x="14" y="44" width="72" height="42" rx="8" fill="#ff8a5c"/><rect x="24" y="16" width="46" height="26" rx="5" fill="#3a3a4a"/><rect x="30" y="22" width="34" height="14" rx="3" fill="#7be0a0"/>${[0, 1, 2].map((r) => [0, 1, 2].map((c) => `<rect x="${26 + c * 16}" y="${52 + r * 10}" width="12" height="7" rx="2" fill="#fff"/>`).join('')).join('')}<rect x="72" y="52" width="8" height="26" rx="3" fill="#ffd34d"/>`,
 };
 
 export const SERIES = {
@@ -93,6 +107,8 @@ export const SERIES = {
   pupu: ['pupu_wheel', 'pupu_light', 'pupu_bus', 'pupu_cap', 'pupu_seat', 'pupu_cone'],
   doudou: ['doudou_bone', 'doudou_milk', 'doudou_hay', 'doudou_carrot', 'doudou_bucket', 'doudou_hat'],
   tiaotiao: ['tiao_kite', 'tiao_bubble', 'tiao_sand', 'tiao_ball', 'tiao_disc', 'tiao_rope'],
+  yuanyuan: ['yuan_steth', 'yuan_thermo', 'yuan_bandage', 'yuan_mask', 'yuan_bag', 'yuan_sticker'],
+  lili: ['lili_cart', 'lili_ecobag', 'lili_coin', 'lili_milk', 'lili_acorn', 'lili_register'],
   kiki: ['kiki_leaf', 'kiki_ball', 'kiki_kite', 'kiki_car', 'kiki_star', 'kiki_mush'],
 };
 

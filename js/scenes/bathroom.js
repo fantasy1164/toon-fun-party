@@ -5,13 +5,14 @@ import { sfx, playMusic, waterOn, waterOff, rainOn, rainOff } from '../core/audi
 import * as weather from '../core/weather.js';
 import { speak, hush } from '../core/voice.js';
 import { phase, hour, currentSlot } from '../core/clock.js';
-import { state, save, hasClaimed, claim, addItem } from '../core/store.js';
+import { state, save, hasClaimed, claim, addItem, recordHabit } from '../core/store.js';
 import { mainView, mouthView, handsView, togetherView, ZONES, BRUSH_CURSOR, TOOTH_COUNT } from '../art/bathroom.js';
 import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
 import { nextCharacter } from './together.js';
-import { turnsOn, turnCall, passTurn } from '../core/turns.js';
+import { turnsOn, turnCall, passTurn, turnsScene } from '../core/turns.js';
+import { mountBath } from './bath.js';
 
 const BRUSH_PROPS = ['brush', 'paste', 'cup'];
 const WASH_PROPS = ['soap', 'faucet', 'towel'];
@@ -113,7 +114,8 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
   function onProp(name, node) {
     if (!alive) return;
     if (mode === 'idle') {
-      if (turnsOn() && ['together', ...BRUSH_PROPS, ...WASH_PROPS].includes(name)) passTurn();
+      if (turnsOn() && ['together', 'tub', ...BRUSH_PROPS, ...WASH_PROPS].includes(name)) passTurn();
+      if (name === 'tub') { enterBath(); return; }
       if (name === 'together') run(runTogether);
       else if (BRUSH_PROPS.includes(name)) run(runBrush);
       else if (WASH_PROPS.includes(name)) run(runWash);
@@ -529,6 +531,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
       guard();
       // 從「一起做」進來的陪刷：做完回到房子
       if (together) {
+        recordHabit(profile.members, 'brush', charId);
         mode = 'end';
         await pause(1200);
         destroy();
@@ -545,7 +548,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
   function idle() {
     mode = 'idle';
     expect = null;
-    glow(['brush', 'soap', 'together']);
+    glow(['brush', 'soap', 'together', 'tub']);
     say('bath_pick').then(() => { if (mode === 'idle') turnCall(charId, charBox); });
   }
 
@@ -563,6 +566,15 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
     save();
     destroy();
     onExit('rest');
+  }
+
+  // 洗澎澎：換到洗澡畫面（之後的關閉、時間到都交給洗澡畫面）
+  let sub = null;
+  function enterBath() {
+    sfx('tap');
+    destroy();
+    sub = mountBath(stage, { profile, onExit });
+    turnsScene(stage.querySelector('.screen'));
   }
 
   function destroy() {
@@ -618,11 +630,12 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
   })();
 
   return {
-    destroy,
+    destroy() { if (sub) sub.destroy(); else destroy(); },
     hostChar: charId,
     noClock: together,
     // 時間到：正在活動就等做完，閒著就直接道別
     requestEnd() {
+      if (sub) { sub.requestEnd(); return; }
       if (timeUp || !alive) return;
       timeUp = true;
       if (mode === 'idle') goodbye();

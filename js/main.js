@@ -17,6 +17,10 @@ import { mountPark } from './scenes/park.js';
 import { mountParty } from './scenes/party.js';
 import { mountNewYear } from './scenes/newyear.js';
 import { showHub } from './ui/hub.js';
+import { showTown, TOWN_ROOMS } from './ui/town.js';
+import { mountHall } from './scenes/hall.js';
+import { mountClinic } from './scenes/clinic.js';
+import { mountMarket } from './scenes/market.js';
 import { chooseMode, mountTogether } from './scenes/together.js';
 import { setupTurns, turnsScene } from './core/turns.js';
 import { treeScreen, christmasMorning } from './ui/xmas.js';
@@ -105,27 +109,34 @@ async function route() {
 }
 
 // 選房間，再進場景；從場景按回家會回到選房間
-async function goHub() {
+async function goHub(inTown = false) {
   if (!profile) { route(); return; }
   if (closedReason()) { route(); return; }
   // 聖誕節當天：還沒拆禮物的先拆禮物
   if (fest.isChristmas() && profile.members.some((id) => !fest.xmas().gift[id])) {
     await christmasMorning(stage, profile);
   }
-  const room = await showHub(stage, profile);
+  let room = inTown ? 'town' : await showHub(stage, profile);
   if (room === 'back') { profile = null; route(); return; }
+  // 街上：診所、明星劇場、超市
+  if (room === 'town') {
+    if (closedReason()) { route(); return; }
+    room = await showTown(stage, profile);
+    if (room === 'hub') { goHub(); return; }
+  }
   if (room === 'tree') { await treeScreen(stage, profile); goHub(); return; }
   if (closedReason()) { route(); return; }
   // 先選：玩遊戲，還是跟角色一起做
   const choice = await chooseMode(stage, room, profile);
-  if (choice.mode === 'home') { goHub(); return; }
+  const town = TOWN_ROOMS.includes(room);
+  if (choice.mode === 'home') { goHub(town); return; }
   if (closedReason()) { route(); return; }
-  const mount = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear }[room] || mountBathroom;
+  const mount = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear, theater: mountHall, clinic: mountClinic, market: mountMarket }[room] || mountBathroom;
   if (state.session.usedMs === 0) warned = false;
   const onExit = (why) => {
     scene = null;
     stage.querySelector('.playclock')?.remove();
-    if (why === 'home') goHub(); else route();
+    if (why === 'home') goHub(town); else route();
   };
   if (choice.mode === 'together' && choice.kind !== 'brush') {
     scene = mountTogether(stage, { profile, onExit, kind: choice.kind, host: choice.host });

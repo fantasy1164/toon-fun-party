@@ -168,6 +168,16 @@ function midLayer() {
       ${hit(650, 410, 100, 100)}
     </g>
 
+    <g class="prop" data-prop="tub">
+      ${halo(995, 760, 140)}
+      <path d="M806 686H1186V760Q1186 850 1096 850H896Q806 850 806 760Z" fill="#7cc4d8"/>
+      <rect x="792" y="668" width="408" height="30" rx="15" fill="#fff"/>
+      ${[[860, 664, 18], [900, 650, 22], [946, 660, 16], [1040, 656, 20], [1080, 644, 14], [1120, 662, 17]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="#bfe6f5" stroke-width="3"/>`).join('')}
+      <g transform="translate(980 612) scale(.55)"><ellipse cx="54" cy="66" rx="32" ry="20" fill="#ffd34d"/><circle cx="34" cy="40" r="18" fill="#ffd34d"/><path d="M14 42L2 46L14 50Z" fill="#ff8a2a"/><circle cx="30" cy="36" r="3.5" fill="#1d2433"/></g>
+      <path d="M840 850L830 880M1150 850L1160 880" stroke="#7cc4d8" stroke-width="12" stroke-linecap="round"/>
+      ${hit(790, 600, 410, 290)}
+    </g>
+
     <g class="prop" data-prop="towel">
       ${halo(940, 540, 100)}
       <circle cx="940" cy="440" r="26" fill="none" stroke="#b9c6d2" stroke-width="10"/>

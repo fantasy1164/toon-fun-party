@@ -7,6 +7,9 @@ import { farmBack } from './farm.js';
 import { roadSvg, CABIN, MIRROR } from './car.js';
 import { bathBack } from './bathroom.js';
 import { parkBack } from './park.js';
+import { PRODUCTS, marketBack } from './market.js';
+import { clinicBack } from './clinic.js';
+import { bathRoomBack } from './bath.js';
 
 const I = {
   // 玩遊戲：遊戲手把
@@ -87,6 +90,22 @@ const I = {
     <rect x="10" y="24" width="44" height="10" rx="4" fill="#e5484d"/><path d="M52 28Q76 30 82 60Q88 84 98 86V94Q80 92 74 66Q68 40 52 38Z" fill="#ffd34d"/><circle cx="70" cy="14" r="10" fill="#ffd34d"/>`,
   sandtoys: `<path d="M18 44H60L55 90H23Z" fill="#ff6b5c"/><path d="M18 44Q39 24 60 44" stroke="#e5484d" stroke-width="4" fill="none"/><path d="M70 12L80 64" stroke="#3fb5e8" stroke-width="7" stroke-linecap="round"/><path d="M74 60Q92 64 84 86Q72 82 74 60Z" fill="#3fb5e8"/>`,
   sunscreen: `<rect x="34" y="26" width="32" height="64" rx="10" fill="#ffb300"/><rect x="40" y="12" width="20" height="16" rx="4" fill="#fff"/><circle cx="50" cy="58" r="12" fill="#fff"/><g stroke="#fff" stroke-width="3">${[0, 45, 90, 135, 180, 225, 270, 315].map((a) => `<path d="M50 58L${50 + 18 * Math.cos(a * Math.PI / 180)} ${58 + 18 * Math.sin(a * Math.PI / 180)}"/>`).join('')}</g>`,
+  // ---- 診所、超市、洗澡、地震、劇場 ----
+  mask: `<path d="M22 36Q50 28 78 36V64Q50 78 22 64Z" fill="#9fd8ee" stroke="#6cb8d6" stroke-width="4"/><path d="M28 46H72M28 56H72" stroke="#6cb8d6" stroke-width="3"/><path d="M22 40Q8 44 10 52Q12 60 22 60M78 40Q92 44 90 52Q88 60 78 60" stroke="#6cb8d6" stroke-width="4" fill="none"/>`,
+  nhicard: `<rect x="10" y="24" width="80" height="52" rx="8" fill="#7cc8b4"/><rect x="18" y="34" width="22" height="26" rx="4" fill="#fff"/><circle cx="29" cy="44" r="6" fill="#ffd9b8"/><rect x="48" y="36" width="34" height="6" rx="3" fill="#fff"/><rect x="48" y="48" width="26" height="6" rx="3" fill="#fff"/><rect x="62" y="60" width="20" height="10" rx="2" fill="#ffd34d"/>`,
+  chair: `<rect x="26" y="10" width="48" height="44" rx="10" fill="#5fa8e8"/><rect x="20" y="50" width="60" height="14" rx="6" fill="#3a7bd5"/><path d="M28 64V92M72 64V92" stroke="#3a7bd5" stroke-width="7" stroke-linecap="round"/><path d="M40 26Q50 18 60 26" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  steth: `<path d="M30 12V40Q30 62 50 62Q70 62 70 40V12" stroke="#4a5568" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="30" cy="12" r="5" fill="#4a5568"/><circle cx="70" cy="12" r="5" fill="#4a5568"/><path d="M50 62V72Q50 86 66 86" stroke="#4a5568" stroke-width="6" fill="none"/><circle cx="74" cy="84" r="12" fill="#c0c8d4" stroke="#4a5568" stroke-width="5"/>`,
+  sticker: `<circle cx="50" cy="50" r="40" fill="#ffd34d" stroke="#ff9f1c" stroke-width="5"/><path d="M50 74C30 60 24 50 24 42C24 34 30 30 36 30C42 30 47 34 50 38C53 34 58 30 64 30C70 30 76 34 76 42C76 50 70 60 50 74Z" fill="#ff5c8a"/>`,
+  list: `<rect x="18" y="8" width="64" height="84" rx="8" fill="#fffdf4" stroke="#e8d6b8" stroke-width="4"/>${[0, 1, 2].map((i) => `<circle cx="34" cy="${30 + i * 22}" r="7" fill="${['#e5484d', '#ffd34d', '#5fa8e8'][i]}"/><path d="M48 ${30 + i * 22}H70" stroke="#c8b898" stroke-width="5" stroke-linecap="round"/>`).join('')}`,
+  ecobag: `<path d="M34 34Q34 12 50 12Q66 12 66 34" stroke="#2f8f55" stroke-width="6" fill="none"/><path d="M18 32H82L76 90H24Z" fill="#7bd39a"/><path d="M50 50Q38 58 50 74Q62 58 50 50Z" fill="#2f8f55"/>`,
+  cart: `<path d="M8 22H22L32 66H80L88 34H26" stroke="#3a7bd5" stroke-width="7" fill="none" stroke-linejoin="round"/><path d="M30 44H84M32 56H80" stroke="#3a7bd5" stroke-width="4"/><circle cx="38" cy="80" r="8" fill="#333"/><circle cx="74" cy="80" r="8" fill="#333"/>`,
+  cashier: `<rect x="14" y="44" width="72" height="42" rx="8" fill="#ff8a5c"/><rect x="24" y="16" width="46" height="26" rx="5" fill="#3a3a4a"/><rect x="30" y="22" width="34" height="14" rx="3" fill="#7be0a0"/>${[0, 1].map((r) => [0, 1, 2].map((c) => `<rect x="${26 + c * 16}" y="${54 + r * 12}" width="12" height="8" rx="2" fill="#fff"/>`).join('')).join('')}`,
+  bathtub: `<path d="M8 50H92V62Q92 84 70 84H30Q8 84 8 62Z" fill="#7cc4d8"/><rect x="4" y="44" width="92" height="10" rx="5" fill="#fff"/><path d="M20 84L16 94M80 84L84 94" stroke="#7cc4d8" stroke-width="6" stroke-linecap="round"/>${[[30, 36, 9], [46, 30, 11], [64, 36, 8], [76, 28, 6]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="#bfe6f5" stroke-width="2"/>`).join('')}<path d="M80 44V16Q80 8 72 8H66" stroke="#a9b6c4" stroke-width="6" fill="none" stroke-linecap="round"/>`,
+  shower: `<path d="M20 20Q20 8 32 8H60" stroke="#a9b6c4" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M50 8V20" stroke="#a9b6c4" stroke-width="7"/><path d="M30 20H70L64 32H36Z" fill="#a9b6c4"/>${[36, 44, 52, 60].map((x, i) => `<path d="M${x + 2} 40L${x - 4 + i * 2} 86" stroke="#5fc3e8" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>`).join('')}`,
+  shampoo: `<circle cx="50" cy="56" r="30" fill="#ffd9b8"/><path d="M22 50Q24 20 50 20Q76 20 78 50Q66 34 50 36Q34 34 22 50Z" fill="#5a3a22"/>${[[30, 22, 10], [50, 14, 12], [70, 22, 10], [40, 6, 7], [62, 6, 7]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="#bfe6f5" stroke-width="2"/>`).join('')}<path d="M36 58Q42 64 48 58M52 58Q58 64 64 58" stroke="#1d2433" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M42 72Q50 78 58 72" stroke="#c9462c" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  quake: `<path d="M20 50L50 26L80 50V86H20Z" fill="#fff4e0" stroke="#e5734f" stroke-width="6" stroke-linejoin="round"/><path d="M6 40l8 6l-8 6l8 6M94 40l-8 6l8 6l-8 6" stroke="#ff8a5c" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="40" y="62" width="20" height="24" fill="#d96c4a"/>`,
+  mic: `<rect x="38" y="8" width="24" height="44" rx="12" fill="#5a6b80"/><path d="M42 18h16M42 26h16M42 34h16" stroke="#8a9ab0" stroke-width="3"/><path d="M28 40Q28 64 50 64Q72 64 72 40" stroke="#ffd34d" stroke-width="6" fill="none"/><path d="M50 64V84M36 88H64" stroke="#ffd34d" stroke-width="6" stroke-linecap="round"/><path d="M80 20q8 -6 10 4q-2 8 -10 4ZM84 24V6l8 -2" fill="#ff5c8a" stroke="#ff5c8a" stroke-width="3"/><path d="M10 30q8 -6 10 4q-2 8 -10 4ZM14 34V16l8 -2" fill="#5fa8e8" stroke="#5fa8e8" stroke-width="3"/>`,
+  breath: `<circle cx="50" cy="50" r="40" fill="#cfefff" stroke="#7cc8e8" stroke-width="5"/><path d="M30 50Q50 30 70 50Q50 70 30 50Z" fill="#7cc8e8"/>`,
   go: `<circle cx="50" cy="50" r="40" fill="#5ed17a"/><path d="M38 28L72 50L38 72Z" fill="#fff"/>`,
 };
 // 出門用的衣物沿用大門場景的圖
@@ -95,6 +114,7 @@ const DOOR_ITEMS = ['sneakers', 'boots', 'raincoat', 'umbrella', 'jacket', 'scar
 export function tgIcon(id, size = 100) {
   if (DOOR_ITEMS.includes(id)) return itemIcon(id, size);
   if (id === 'spoon') return wareSvg('spoon', '#ffb300', size);
+  if (PRODUCTS[id]) return `<svg viewBox="0 0 100 100" width="${size}" height="${size}">${PRODUCTS[id]}</svg>`;
   return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" overflow="visible">${I[id] || ''}</svg>`;
 }
 
@@ -108,6 +128,9 @@ export function backFor(kind, ph, wx) {
     case 'bag': case 'homework': return classroomBack(ph, wx);
     case 'gym': return farmBack(ph, wx);
     case 'outing': return parkBack(ph, wx, { night: false });
+    case 'doctor': return clinicBack(ph);
+    case 'shop': return marketBack(ph);
+    case 'bath': return bathRoomBack(ph, { tub: true });
     case 'ride': return `<svg viewBox="0 0 1200 900">${CABIN}<g>${roadSvg(ph, wx)}</g>${MIRROR}</svg>`;
     default: return '';
   }

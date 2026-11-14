@@ -12,7 +12,7 @@ const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
   brush_morning: '早上刷牙', brush_evening: '睡前刷牙',
   wash_morning: '早上洗手', door_morning: '早上出門準備',
-  kitchen_breakfast: '早餐', kitchen_lunch: '午餐', kitchen_dinner: '晚餐', bedroom_evening: '睡前準備', car_day: '坐車安全', school_day: '上課', farm_day: '農場', park_day: '公園', party_day: '生日派對', ny_day: '過年', wash_noon: '中午洗手', wash_evening: '傍晚洗手',
+  kitchen_breakfast: '早餐', kitchen_lunch: '午餐', kitchen_dinner: '晚餐', bedroom_evening: '睡前準備', car_day: '坐車安全', school_day: '上課', farm_day: '農場', park_day: '公園', clinic_day: '診所', market_day: '超市', bath_evening: '洗澎澎', party_day: '生日派對', ny_day: '過年', wash_noon: '中午洗手', wash_evening: '傍晚洗手',
 };
 
 function stampSection(id) {
@@ -74,6 +74,7 @@ function testSection() {
     <label><input type="checkbox" data-t="nolimit" ${t.nolimit ? 'checked' : ''}> 不限制每次遊玩時間（測試時角色不會下班）</label><br>
     <button data-act="t-apply">套用並重新開始</button>
     <button class="quiet" data-act="t-real">恢復真實時間與天氣</button><br>
+    <button class="quiet small" data-act="t-quake">${state.quakeForce ? '已設定：下次進選房間會地震演習' : '下次進選房間就地震演習'}</button><br>
     <span class="note">快速設定：</span>
     <button class="quiet small" data-act="t-preset" data-d="12-01" data-h="9">12/1 早上</button>
     <button class="quiet small" data-act="t-preset" data-d="12-24" data-h="19.5">平安夜晚上</button>
@@ -212,6 +213,12 @@ export function openParent(onClose, { onStamp } = {}) {
       if (t.nolimit) { state.session.usedMs = 0; state.session.restUntil = 0; save(); }
       localStorage.setItem(TEST_KEY, JSON.stringify(t));
       location.reload();
+      return;
+    }
+    if (act === 't-quake') {
+      state.quakeForce = true;
+      save();
+      e.target.textContent = '已設定：下次進選房間會地震演習';
       return;
     }
     if (act === 't-real') {
