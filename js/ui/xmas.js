@@ -10,6 +10,7 @@ import { itemSvg } from '../art/items.js';
 import { ensureInkFilter } from '../art/stamps.js';
 import { treeSvg, adventDoor, GIFT, COOKIES, FOOTPRINTS, stampBook } from '../art/xmas.js';
 import { ICON } from './screens.js';
+import { turnsOn, turnsScene, turnCall, passTurn } from '../core/turns.js';
 
 const ROOM_BG = `<rect width="1200" height="900" fill="#f7dcc0"/><rect y="700" width="1200" height="200" fill="#b9824f"/>
   <path d="M0 700H1200" stroke="#9a6a3c" stroke-width="8"/>
@@ -49,6 +50,10 @@ export function treeScreen(stage, profile) {
     playMusic('xmas');
     const hostNode = $('.hostg', node);
     const say = (line) => speak(host, line, { name: profile.name, who: profile.id, node: hostNode });
+    // 一起玩：輪流開降臨月曆
+    turnsScene(node);
+    let calling = false;
+    const next = async () => { if (!turnsOn()) return; calling = true; await turnCall(host, hostNode); calling = false; };
 
     function redrawTree(withStar) {
       $('.treeg', node).innerHTML = treeSvg(fest.xmas().opened, { star: withStar, x: 120, y: 30, s: 0.95 });
@@ -56,12 +61,13 @@ export function treeScreen(stage, profile) {
 
     let busy = false;
     $$('.adv', node).forEach((b) => onTap(b, async () => {
-      if (busy) return;
+      if (busy || calling) return;
       const d = +b.dataset.d;
       const st = b.classList.contains('open') ? 'open' : b.classList.contains('locked') ? 'locked' : 'go';
       if (st === 'locked') { sfx('wrong'); say('a_wait'); return; }
       if (st === 'open') { sfx('tap'); return; }
       busy = true;
+      passTurn();
       sfx('sparkle');
       b.classList.add('opening');
       await wait(450);
@@ -74,12 +80,15 @@ export function treeScreen(stage, profile) {
       sfx('pop');
       if (d === 24) await say('a_star'); else await say('a_hang');
       const more = $$('.adv.past, .adv.today', node).length;
-      say(more ? 'a_more' : 'a_done');
+      await say(more ? 'a_more' : 'a_done');
+      if (more) await next();
       busy = false;
     }));
 
     const tray = $('.tray', node);
     if (tray) onTap(tray, async () => {
+      if (calling) return;
+      passTurn();
       tray.remove();
       fest.placeCookies();
       $('.plate', node).classList.add('on');
@@ -91,8 +100,8 @@ export function treeScreen(stage, profile) {
 
     onTap($('.home', node), () => { hush(); sfx('tap'); resolve(); });
 
-    if (eve) say(x.cookies ? 'e_ready' : 'e_cookie');
-    else if ($$('.adv.today, .adv.past', node).length) say('a_open');
+    if (eve) say(x.cookies ? 'e_ready' : 'e_cookie').then(() => { if (!x.cookies) next(); });
+    else if ($$('.adv.today, .adv.past', node).length) say('a_open').then(next);
     else say('tree_hi');
   });
 }
@@ -140,19 +149,27 @@ export function christmasMorning(stage, profile) {
 
     let taps = 0;
     let started = false;
+    // 一起玩：輪流拍禮物盒，一人兩下
+    turnsScene(node);
+    const need = turnsOn() ? 4 : 3;
     (async () => {
       await sayHost('m_look');
       await sayHost('m_gift');
+      await turnCall(host, hostNode);
       started = true;
       box.classList.add('glow');
     })();
 
     onTap(box, async () => {
-      if (!started || taps >= 3) return;
+      if (!started || taps >= need) return;
       taps++;
       box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
-      sfx(taps < 3 ? 'pop' : 'fanfare');
-      if (taps < 3) return;
+      sfx(taps < need ? 'pop' : 'fanfare');
+      passTurn();
+      if (taps < need) {
+        if (turnsOn()) { started = false; await turnCall(host, hostNode); started = true; }
+        return;
+      }
       box.classList.remove('glow');
       box.classList.add('open');
       const c = centerOf(box);

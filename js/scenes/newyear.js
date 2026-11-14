@@ -14,6 +14,7 @@ import {
 } from '../art/newyear.js';
 import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
+import { turnsOn, turnCall, passTurn, freeTurns, setTurn, callTurn, whoseTurn, otherKid, evenCount } from '../core/turns.js';
 
 const shuffle = (a) => a.map((x) => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map((p) => p[1]);
 const nest = (svg, x, y) => svg.replace('<svg ', `<svg x="${x}" y="${y}" `);
@@ -55,7 +56,13 @@ async function nyGift(ctl, profile, host, say, first = null) {
 }
 
 // 共用：圖卡選擇（3 歲版對的會亮）
-function chooseCards(ctl, box, right, wrongs, hard, onWrong) {
+// 一起玩：先唱名，選對了換人
+async function chooseCards(ctl, box, right, wrongs, hard, onWrong) {
+  await ctl.call();
+  await chooseCardsRaw(ctl, box, right, wrongs, hard, onWrong);
+  passTurn();
+}
+function chooseCardsRaw(ctl, box, right, wrongs, hard, onWrong) {
   const items = shuffle([{ ok: true, svg: right }, ...wrongs.map((svg) => ({ ok: false, svg }))]);
   box.innerHTML = items.map((c, i) => `<button class="tbtn ncard${!hard && c.ok ? ' glow' : ''}" data-i="${i}">${c.svg}</button>`).join('');
   box.classList.remove('hidden');
@@ -108,6 +115,8 @@ function mountPrep(stage, { profile, onExit }) {
   async function rubWindow() {
     const win = $('.dustwin', root);
     win.classList.add('glow');
+    freeTurns(true);   // 擦窗戶：兩個人可以一起擦
+    ctl.cleanups.push(() => freeTurns(false));
     const need = hard ? 3200 : 1600;
     let dist = 0;
     let last = null;
@@ -132,27 +141,35 @@ function mountPrep(stage, { profile, onExit }) {
       ctl.cleanups.push(() => { off(); resolve(); });
     });
     guard();
+    freeTurns(false);
     win.classList.remove('glow');
     win.classList.add('hidden');
     sfx('sparkle');
     burst(...Object.values(centerOf(win)), { n: 14, kind: 'star', spread: 160 });
   }
-  async function tapAll(sel, onEach) {
+  // free：兩個人可以一起點（掃灰塵）；不然輪流，一人一個
+  async function tapAll(sel, onEach, { free = false } = {}) {
     const nodes = $$(sel, root);
     if (!hard) nodes.forEach((n) => n.classList.add('glow'));
     else nodes.forEach((n) => n.classList.add('live'));
     let left = nodes.length;
+    let calling = false;
+    if (free) freeTurns(true);
+    else if (turnsOn()) { calling = true; await ctl.call(); calling = false; }
     await new Promise((resolve) => {
       nodes.forEach((n) => onTap(n, async () => {
-        if (n.classList.contains('done')) return;
+        if (n.classList.contains('done') || calling) return;
         n.classList.add('done');
         n.classList.remove('glow');
+        if (!free) { passTurn(); calling = turnsOn(); }
         await onEach(n);
         left -= 1;
-        if (left === 0) resolve();
+        if (left === 0) { calling = false; resolve(); return; }
+        if (calling) { await ctl.call().catch(() => {}); calling = false; }
       }));
       ctl.cleanups.push(() => resolve());
     });
+    if (free) freeTurns(false);
     guard();
   }
 
@@ -176,7 +193,7 @@ function mountPrep(stage, { profile, onExit }) {
     });
     await say('dudu', 'ny_sweep');
     guard();
-    await tapAll('.pile', async (n) => { sfx('scrub'); n.classList.add('gone'); await wait(300); });
+    await tapAll('.pile', async (n) => { sfx('scrub'); n.classList.add('gone'); await wait(300); }, { free: true });
     sfx('fanfare');
     await say('dudu', 'ny_clean_done');
     guard();
@@ -410,6 +427,7 @@ function mountDays(stage, { profile, onExit }, ny) {
     const left = new Set(order);
     order.forEach((id) => $(`.p-char[data-who="${id}"]`, root).classList.add('glow-c'));
     while (left.size) {
+      await ctl.call();
       const id = await new Promise((resolve) => {
         const hs = [];
         for (const c of left) {
@@ -421,6 +439,7 @@ function mountDays(stage, { profile, onExit }, ny) {
         ctl.cleanups.push(() => { hs.forEach(([nd, fn]) => nd.removeEventListener('pointerdown', fn)); resolve(null); });
       });
       guard();
+      passTurn();
       left.delete(id);
       const node = $(`.p-char[data-who="${id}"]`, root);
       node.classList.remove('glow-c');
@@ -454,13 +473,18 @@ function mountDays(stage, { profile, onExit }, ny) {
       guard();
       // 每個小孩打開自己的最後一個紅包
       const kids = profile.members.length > 1 ? profile.members : ['solo'];
-      await Promise.all(kids.map(async (k) => {
+      // 一起玩：輪流，各打開自己的
+      const seq = turnsOn() ? [whoseTurn(), otherKid()] : kids;
+      for (const k of seq) {
         const last = $$(`.env[data-k="${k}"]`, envs).pop();
         last.classList.add('glow');
-        await ctl.tapOnce(last);
+        if (turnsOn()) { setTurn(k); await callTurn(ctl.host, ctl.hostNode()); guard(); }
+        await ctl.tapOnce(last, { free: true });
+        guard();
+        passTurn();
         last.remove();
         sfx('pop');
-      }));
+      }
       guard();
       await nyGift(ctl, profile, 'gugu', say);
       guard();
@@ -500,6 +524,7 @@ function mountDays(stage, { profile, onExit }, ny) {
     root.classList.add('ears');
     await say('kiki', 'ny_fw_tap');
     guard();
+    freeTurns(true);   // 放煙火：兩個人一起點
     let n = 0;
     await new Promise((resolve) => {
       const h = (e) => {
@@ -518,6 +543,7 @@ function mountDays(stage, { profile, onExit }, ny) {
       fw.addEventListener('pointerdown', h);
       ctl.cleanups.push(() => { fw.removeEventListener('pointerdown', h); resolve(); });
     });
+    freeTurns(false);
     guard();
     await say('kiki', 'ny_fw_wow');
     guard();
@@ -588,15 +614,18 @@ function mountLantern(stage, { profile, onExit }) {
     await say('kiki', 'ny_walk');
     guard();
     const street = $('.p-layer .street', root);
-    for (let i = 1; i <= 5; i++) {
+    const steps = evenCount(5);   // 一起玩：一人走三步
+    for (let i = 1; i <= steps; i++) {
       root.classList.add('tapwalk');
+      await ctl.call();
       await new Promise((resolve) => {
         const h = (e) => { if (e.target.closest('.hud')) return; e.preventDefault(); root.removeEventListener('pointerdown', h); resolve(); };
         root.addEventListener('pointerdown', h);
         ctl.cleanups.push(() => { root.removeEventListener('pointerdown', h); resolve(); });
       });
       guard();
-      street.style.transform = `translateX(${-i * 120}px)`;
+      passTurn();
+      street.style.transform = `translateX(${-i * (600 / steps)}px)`;
       my.classList.remove('swing'); void my.offsetWidth; my.classList.add('swing');
       sfx('tap');
     }
@@ -614,16 +643,20 @@ function mountLantern(stage, { profile, onExit }) {
     const bowl = $('.bowl', root);
     bowl.classList.remove('hidden');
     const balls = $$('.tball', bowl);
-    const need = hard ? balls.length : 3;
+    const need = hard ? balls.length : Math.min(balls.length, evenCount(3));
     let eaten = 0;
     balls.forEach((x) => x.classList.add('glow'));
+    let calling = turnsOn();
+    if (calling) ctl.call().catch(() => {}).then(() => { calling = false; });
     await new Promise((resolve) => {
-      balls.forEach((x) => onTap(x, () => {
-        if (x.classList.contains('eaten')) return;
+      balls.forEach((x) => onTap(x, async () => {
+        if (x.classList.contains('eaten') || calling) return;
         x.classList.add('eaten');
         sfx('munch');
         eaten += 1;
-        if (eaten >= need) resolve();
+        passTurn();
+        if (eaten >= need) { resolve(); return; }
+        if (turnsOn()) { calling = true; await ctl.call().catch(() => {}); calling = false; }
       }));
       ctl.cleanups.push(() => resolve());
     });

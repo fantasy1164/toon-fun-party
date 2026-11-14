@@ -16,6 +16,7 @@ import {
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import { itemSvg, CARD_COLORS, STICKERS, CARD_SPOTS } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
+import { turnsOn, turnCall, passTurn, freeTurns, setTurn, callTurn, whoseTurn, otherKid, evenCount } from '../core/turns.js';
 
 const shuffle = (a) => a.map((x) => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map((p) => p[1]);
 export const charDiv = (id, x, y, s = 0.62) => `<div class="p-char" data-who="${id}" style="left:${x}px;top:${y}px;width:${240 * s}px;height:${320 * s}px">
@@ -43,7 +44,10 @@ export function makeScene(stage, profile, onExit, inner, hostId, { cls = '', bac
       <div class="fade"></div>
     </div>`);
   stage.replaceChildren(root);
-  const ctl = { root, alive: true, mode: 'intro', timeUp: false, cleanups: [] };
+  const ctl = { root, alive: true, mode: 'intro', timeUp: false, cleanups: [], host: hostId };
+  // 一起玩：唱名（用主持的角色）
+  ctl.hostNode = () => $(`.p-char[data-who="${hostId}"]`, root);
+  ctl.call = async () => { await turnCall(hostId, ctl.hostNode()); ctl.guard(); };
   ctl.guard = () => { if (!ctl.alive) throw new Error('scene-closed'); };
   ctl.pause = async (ms) => { await wait(ms); ctl.guard(); };
   ctl.rectOf = (node) => {
@@ -61,13 +65,25 @@ export function makeScene(stage, profile, onExit, inner, hostId, { cls = '', bac
     await wait(ms + 20);
     f.remove();
   };
-  ctl.tapOnce = (node) => new Promise((resolve) => {
+  // 一起玩：先唱名，點了換人（free：兩個人都可以點）
+  const tapRaw = (node) => new Promise((resolve) => {
     const h = (e) => { e.preventDefault(); node.removeEventListener('pointerdown', h); resolve(); };
     node.addEventListener('pointerdown', h);
     ctl.cleanups.push(() => { node.removeEventListener('pointerdown', h); resolve(); });
   });
+  ctl.tapOnce = async (node, { free = false } = {}) => {
+    if (!free) await ctl.call();
+    await tapRaw(node);
+    if (!free) passTurn();
+  };
   // 托盤：點一下（3 歲）或拖到目標區（6 歲）；accept(x, y) 判斷放下的位置（舞台座標）。回傳被選到的按鈕
-  ctl.pickFromTray = (tray, { drag, accept }) => new Promise((resolve) => {
+  ctl.pickFromTray = async (tray, opts) => {
+    await ctl.call();
+    const b = await trayRaw(tray, opts);
+    passTurn();
+    return b;
+  };
+  const trayRaw = (tray, { drag, accept }) => new Promise((resolve) => {
     let ghost = null;
     let src = null;
     const toStage = (e) => {
@@ -225,7 +241,8 @@ function mountCelebrate(stage, { profile, onExit }, bid) {
     guard();
     await say('bobo', hard ? 'bd_top_hard' : 'bd_top_easy');
     guard();
-    const keys = hard ? ['berry', 'cherry', 'cookie', 'blueberry', 'kiwi'] : ['berry', 'cherry', 'cookie'];
+    // 一起玩：兩人一樣多（3 歲版多放一個奇異果）
+    const keys = hard ? ['berry', 'cherry', 'cookie', 'blueberry', 'kiwi'] : sib ? ['berry', 'cherry', 'cookie', 'kiwi'] : ['berry', 'cherry', 'cookie'];
     showTray(shuffle(keys).map((k) => `<button class="tbtn glow" data-k="${k}">${topSvg(k, 100)}</button>`).join(''));
     const cr = () => ctl.rectOf(cake);
     for (let i = 0; i < keys.length; i++) {
@@ -286,6 +303,7 @@ function mountCelebrate(stage, { profile, onExit }, bid) {
       guard();
     }
     await blowOut(cs);
+    freeTurns(false);
     root.classList.remove('dark');
     sfx('fanfare');
     confetti(cake, 30);
@@ -295,6 +313,8 @@ function mountCelebrate(stage, { profile, onExit }, bid) {
   }
 
   async function blowOut(cs) {
+    freeTurns(true);   // 吹蠟燭：兩個人一起吹、一起點
+    ctl.cleanups.push(() => freeTurns(false));
     let left = cs.length;
     let resolveAll;
     const allOut = new Promise((r) => { resolveAll = r; });
@@ -370,11 +390,16 @@ function mountCelebrate(stage, { profile, onExit }, bid) {
     box.innerHTML = order.map((id, i) => `<button class="gbox${!sib || i === 0 ? ' glow' : ' wait'}" data-who="${id}">${boxSvg(id)}${sib && i === 0 ? `<span class="bd-first">${avatarSvg(bid, 70)}</span>` : ''}</button>`).join('');
     box.classList.remove('hidden');
     let opened = 0;
+    // 一起玩：壽星先拆第一個，之後輪流
+    let calling = false;
+    if (sib) { setTurn(bid); calling = true; callTurn(ctl.host, ctl.hostNode()).then(() => { calling = false; }); }
+    else if (turnsOn()) { calling = true; ctl.call().catch(() => {}).then(() => { calling = false; }); }
     await new Promise((resolve) => {
       let busy = false;
       $$('.gbox', box).forEach((b) => onTap(b, async () => {
-        if (busy || b.classList.contains('open') || b.classList.contains('wait')) return;
+        if (busy || calling || b.classList.contains('open') || b.classList.contains('wait')) return;
         busy = true;
+        passTurn();
         // 壽星拆完第一個，其他的兩個人都可以拆
         $$('.gbox.wait', box).forEach((x) => { x.classList.remove('wait'); x.classList.add('glow'); });
         b.classList.remove('glow');
@@ -388,9 +413,10 @@ function mountCelebrate(stage, { profile, onExit }, bid) {
         const c = centerOf(b);
         burst(c.x, c.y - 60, { n: 12, kind: 'star', spread: 120 });
         await say(id, 'bd_gift');
-        busy = false;
         opened += 1;
-        if (opened === order.length) resolve();
+        if (opened === order.length) { busy = false; resolve(); return; }
+        if (turnsOn()) { calling = true; await ctl.call().catch(() => {}); calling = false; }
+        busy = false;
       }));
       ctl.cleanups.push(() => resolve());
     });

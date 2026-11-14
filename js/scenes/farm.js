@@ -13,6 +13,7 @@ import {
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
+import { turnsOn, turnCall, callTurn, passTurn, setTurn, freeTurns } from '../core/turns.js';
 
 const shuffle = (a) => a.map((x) => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map((p) => p[1]);
 const host = (x, y, s, cls = '') => `<div class="f-host ${cls}" style="left:${x}px;top:${y}px;width:${240 * s}px;height:${320 * s}px">
@@ -38,9 +39,11 @@ function mountDay(stage, { profile, onExit }) {
   const ph = phase();
   const wx = weather.current();
   const wet = wx.kind === 'rain' || wx.kind === 'storm';
-  const animals = hard ? [['chick', 300], ['cow', 560], ['rabbit', 820], ['pig', 1060]] : [['chick', 330], ['cow', 650], ['rabbit', 960]];
-  const as = hard ? 0.8 : 1;
-  const foods = hard ? ['corn', 'grass', 'carrot', 'potato'] : ['corn', 'grass', 'carrot'];
+  // 一起玩：次數要雙數（兩人一樣多），所以加小豬、多一顆蛋
+  const two = profile.members.length > 1;
+  const animals = hard || two ? [['chick', 300], ['cow', 560], ['rabbit', 820], ['pig', 1060]] : [['chick', 330], ['cow', 650], ['rabbit', 960]];
+  const as = hard || two ? 0.8 : 1;
+  const foods = hard || two ? ['corn', 'grass', 'carrot', 'potato'] : ['corn', 'grass', 'carrot'];
   const plots = profile.members.length > 1 ? [[profile.members[0], 560], [profile.members[1], 900]] : [[profile.members[0], 730]];
 
   const root = el(`
@@ -52,7 +55,7 @@ function mountDay(stage, { profile, onExit }) {
       </div>
       <div class="view barn off">
         <div class="nest">${NEST}</div>
-        <div class="eggs">${[...Array(hard ? 5 : 3)].map((_, i, arr) => `<button class="egg" data-i="${i}" style="left:${370 - (arr.length - 1) * 34 + i * 68 - 30}px">${EGG}</button>`).join('')}</div>
+        <div class="eggs">${[...Array(hard ? 5 : two ? 4 : 3)].map((_, i, arr) => `<button class="egg" data-i="${i}" style="left:${370 - (arr.length - 1) * 34 + i * 68 - 30}px">${EGG}</button>`).join('')}</div>
         <div class="animal hen" data-a="chick" style="left:${370 - 120}px;top:${612 - 216}px">${animalSvg('chick', 0.8)}</div>
         <div class="animal cowb" data-a="cow" style="left:${900 - 150 * 0.9}px;top:${660 - 260 * 0.9}px">${animalSvg('cow', 0.9)}</div>
         <div class="bucket">${BUCKET}</div>
@@ -128,6 +131,8 @@ function mountDay(stage, { profile, onExit }) {
       sfx(d.sound);
       await say(d.ask);
       guard();
+      await turnCall('mian', mian);
+      guard();
       if (!hard) $$('.food', tray).forEach((b) => b.classList.toggle('glow', b.dataset.f === d.food));
       tray.classList.add('active');
       const chosen = await new Promise((resolve) => {
@@ -147,6 +152,7 @@ function mountDay(stage, { profile, onExit }) {
             return;
           }
           tray.removeEventListener('pointerdown', h);
+          passTurn();
           resolve(b);
         };
         tray.addEventListener('pointerdown', h);
@@ -186,8 +192,11 @@ function mountDay(stage, { profile, onExit }) {
     await say('f_barn');
     guard();
     hen.classList.add('glow-a');
+    await turnCall('mian', mian);
+    guard();
     await tapOnce(hen);
     guard();
+    passTurn();
     hen.classList.remove('glow-a');
     hen.classList.add('hop');
     sfx('cluck');
@@ -198,10 +207,13 @@ function mountDay(stage, { profile, onExit }) {
     const eggs = $$('.egg', root);
     eggs.forEach((e) => e.classList.add('glow'));
     let n = 0;
+    let calling = turnsOn();
+    if (calling) turnCall('mian', mian).then(() => { calling = false; });
     await new Promise((resolve) => {
       eggs.forEach((e) => onTap(e, async () => {
-        if (e.classList.contains('taken')) return;
+        if (e.classList.contains('taken') || calling) return;
         e.classList.add('taken');
+        e.classList.remove('glow');
         n += 1;
         const from = rectOf(e);
         sfx('pop');
@@ -209,8 +221,9 @@ function mountDay(stage, { profile, onExit }) {
         fly(EGG, from, { x: br.x + 40 + (n % 3) * 40, y: br.y + 30, w: 40, h: 46 }, 480).then(() => {
           $('.in', basket).insertAdjacentHTML('beforeend', `<ellipse cx="${50 + (n * 37) % 130}" cy="${66 - (n % 2) * 8}" rx="18" ry="22" fill="#fff6e6" stroke="#e8d8b8" stroke-width="3"/>`);
         });
-        say(`m_n${n}`);
-        if (n === eggs.length) resolve();
+        passTurn();
+        if (n === eggs.length) { say(`m_n${n}`); resolve(); return; }
+        if (turnsOn()) { calling = true; await say(`m_n${n}`); await turnCall('mian', mian); calling = false; } else say(`m_n${n}`);
       }));
       cleanups.push(() => resolve());
     });
@@ -223,6 +236,7 @@ function mountDay(stage, { profile, onExit }) {
     const cow = $('.barn .cowb', root);
     const milk = $('.bucket .milk', root);
     hit.classList.add('glow');
+    freeTurns(true);   // 擠牛奶：兩個人可以一起點
     let fill = 0;
     await new Promise((resolve) => {
       let timer = null;
@@ -245,6 +259,7 @@ function mountDay(stage, { profile, onExit }) {
       cleanups.push(() => { stop(); resolve(); });
     });
     guard();
+    freeTurns(false);
     hit.classList.remove('glow');
     hit.classList.add('hidden');
     sfx('moo');
@@ -276,6 +291,7 @@ function mountDay(stage, { profile, onExit }) {
     plot.classList.add('glow-p');
     await say('f_plant_pick');
     guard();
+    if (turnsOn()) { setTurn(id); await callTurn('mian', mian); guard(); }   // 自己的菜園自己種
     const seeds = $('.seeds', root);
     seeds.classList.remove('hidden');
     const crop = await new Promise((resolve) => {
@@ -310,8 +326,10 @@ function mountDay(stage, { profile, onExit }) {
       plot.classList.add('glow-p');
       await say('f_ripe');
       guard();
+      if (turnsOn()) { setTurn(id); await callTurn('mian', mian); guard(); }   // 自己的菜自己採
       await tapOnce(plot);
       guard();
+      passTurn();
       plot.classList.remove('glow-p');
       plot.classList.add('pull');
       sfx('boing');
@@ -357,8 +375,11 @@ function mountDay(stage, { profile, onExit }) {
     const can = $('.canbtn', root);
     can.classList.remove('hidden');
     can.classList.add('glow');
+    await turnCall('mian', mian);
+    guard();
     await tapOnce(can);
     guard();
+    passTurn();
     can.classList.remove('glow');
     root.classList.add('watering');
     waterOn();
@@ -465,7 +486,9 @@ function mountNight(stage, { profile, onExit }) {
   const ph = phase();
   const wx = weather.current();
   const wet = wx.kind === 'rain' || wx.kind === 'storm';
-  const total = hard ? 10 : 5;
+  // 一起玩：數到 10，一人五隻
+  const two = profile.members.length > 1;
+  const total = hard || two ? 10 : 5;
   const root = el(`
     <div class="screen scene farm night-farm">
       <div class="f-layer">${nightField(ph, wx)}</div>
@@ -504,7 +527,10 @@ function mountNight(stage, { profile, onExit }) {
     flock.insertAdjacentHTML('beforeend', `<div class="fsheep" style="left:${650 + (i % 5) * 76}px;top:${400 + Math.floor(i / 5) * 60}px">${SHEEP}</div>`);
     await say(`m_n${count}`);
     if (!alive) return;
+    passTurn();
     if (count < total) {
+      await turnCall('mian', mian);
+      if (!alive) return;
       btn.classList.add('glow');
       busy = false;
       return;
@@ -512,7 +538,7 @@ function mountNight(stage, { profile, onExit }) {
     btn.classList.add('hidden');
     sfx('fanfare');
     await say('f_count_en');
-    await say(hard ? 'f_en_count10' : 'f_en_count5');
+    await say(hard || two ? 'f_en_count10' : 'f_en_count5');
     if (!alive) return;
     await say('f_sleepy');
     if (!alive) return;
@@ -525,6 +551,8 @@ function mountNight(stage, { profile, onExit }) {
 
   async function intro() {
     await say(wet ? 'f_night_rain' : 'f_night');
+    if (!alive) return;
+    await turnCall('mian', mian);
     if (!alive) return;
     busy = false;
     mode = 'act';

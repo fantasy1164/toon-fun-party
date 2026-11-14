@@ -8,6 +8,7 @@ import { state, save, hasClaimed, claim, addItem } from '../core/store.js';
 import * as weather from '../core/weather.js';
 import { roadSvg, CABIN, MIRROR, backSeat, beltsSvg, seatLayout, BTN, DOORS } from '../art/car.js';
 import { PROFILES } from '../config.js';
+import { turnsOn, turnCall, passTurn, whoseTurn, otherKid } from '../core/turns.js';
 import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
@@ -61,7 +62,9 @@ export function mountCar(stage, { profile, onExit }) {
   function show(cls, on) { root.classList.toggle(cls, on); }
 
   // 等小孩按某個駕駛按鈕；按錯會提醒
-  function waitBtn(correct, hintLine) {
+  async function waitBtn(correct, hintLine) {
+    await turnCall('dudu', rider('dudu'));
+    guard();
     return new Promise((resolve) => {
       drive.classList.add('active');
       if (!hard) $$('.dbtn', drive).forEach((b) => b.classList.toggle('glow', correct.includes(b.dataset.k)));
@@ -80,6 +83,7 @@ export function mountCar(stage, { profile, onExit }) {
         drive.classList.remove('active');
         $$('.dbtn', drive).forEach((x) => x.classList.remove('glow'));
         sfx('tap');
+        passTurn();
         resolve(b.dataset.k);
       };
       drive.addEventListener('pointerdown', h);
@@ -92,7 +96,10 @@ export function mountCar(stage, { profile, onExit }) {
     await say('dudu', 'c_belt');
     if (!hard) await say('dudu', 'c_belt_easy');
     guard();
-    const order = ['kiki', 'dudu', ...kidKeys];
+    // 一起玩：輪流扣，先幫奇奇、嘟嘟，最後各自扣自己的
+    const first = whoseTurn();
+    const mine = turnsOn() ? [`kid-${first}`, `kid-${otherKid(first)}`] : kidKeys;
+    const order = ['kiki', 'dudu', ...mine];
     if (kidKeys.length > 1) await say('dudu', 'c_belt_both');
     const done = new Set();
     await new Promise((resolve) => {
@@ -101,9 +108,11 @@ export function mountCar(stage, { profile, onExit }) {
         $$('.buckle', root).forEach((b) => b.classList.toggle('glow', hard ? !done.has(b.dataset.who) : b.dataset.who === next));
       };
       glowNext();
+      let calling = turnsOn();
+      if (calling) turnCall('dudu', rider('dudu')).then(() => { calling = false; });
       $$('.buckle', root).forEach((b) => onTap(b, async () => {
         const who = b.dataset.who;
-        if (done.has(who)) return;
+        if (done.has(who) || calling) return;
         if (!hard && who !== order.find((w) => !done.has(w))) { flash(b, 'nope'); return; }
         done.add(who);
         sfx('pop');
@@ -117,7 +126,8 @@ export function mountCar(stage, { profile, onExit }) {
           await speak('dudu', 'c_kid_ok', { name: PROFILES[id].name, who: kidKeys.length > 1 ? id : profile.id, node: rider('dudu') });
         }
         else await say(who, 'c_click');
-        if (done.size === order.length && !hard) resolve();
+        if (done.size === order.length && !hard) { passTurn(); resolve(); return; }
+        if (turnsOn() && done.size < order.length) { calling = true; passTurn(); await turnCall('dudu', rider('dudu')); calling = false; }
       }));
       if (hard) {
         // 6 歲版：自己判斷，點「走」時檢查有沒有每個人都扣好
@@ -156,6 +166,8 @@ export function mountCar(stage, { profile, onExit }) {
     $('.belt.kiki', root).classList.remove('on');
     await say('kiki', 'c_naughty');
     guard();
+    await turnCall('dudu', rider('dudu'));
+    guard();
     k.classList.add('glow-char');
     await new Promise((resolve) => {
       const h = (e) => { e.preventDefault(); k.removeEventListener('pointerdown', h); resolve(); };
@@ -163,6 +175,7 @@ export function mountCar(stage, { profile, onExit }) {
       cleanups.push(() => { k.removeEventListener('pointerdown', h); resolve(); });
     });
     guard();
+    passTurn();
     k.classList.remove('glow-char');
     await say('dudu', 'c_sitdown');
     k.classList.remove('naughty');
@@ -267,15 +280,19 @@ export function mountCar(stage, { profile, onExit }) {
     await new Promise((resolve) => {
       const left = new Set(['kiki', 'dudu', ...kidKeys]);
       $$('.buckle', root).forEach((b) => { b.classList.remove('done'); b.classList.add('glow'); });
-      $$('.buckle', root).forEach((b) => onTap(b, () => {
+      let calling = turnsOn();
+      if (calling) turnCall('dudu', rider('dudu')).then(() => { calling = false; });
+      $$('.buckle', root).forEach((b) => onTap(b, async () => {
         const who = b.dataset.who;
-        if (!left.has(who)) return;
+        if (!left.has(who) || calling) return;
         left.delete(who);
         sfx('pop');
         $(`.belt.${who}`, root).classList.remove('on');
         b.classList.remove('glow');
         b.classList.add('done');
-        if (!left.size) resolve();
+        passTurn();
+        if (!left.size) { resolve(); return; }
+        if (turnsOn()) { calling = true; await turnCall('dudu', rider('dudu')); calling = false; }
       }));
       cleanups.push(() => resolve());
     });
@@ -284,6 +301,8 @@ export function mountCar(stage, { profile, onExit }) {
     doors.classList.remove('hidden');
     if (hard) await say('dudu', 'c_door');
     else { $('.cdoor[data-d="right"]', root).classList.add('glow'); await say('dudu', 'c_door_easy'); }
+    guard();
+    await turnCall('dudu', rider('dudu'));
     guard();
     await new Promise((resolve) => {
       $$('.cdoor', root).forEach((b) => onTap(b, async () => {
@@ -296,6 +315,7 @@ export function mountCar(stage, { profile, onExit }) {
           $('.cdoor[data-d="right"]', root).classList.add('glow');
           return;
         }
+        passTurn();
         resolve();
       }));
       cleanups.push(() => resolve());

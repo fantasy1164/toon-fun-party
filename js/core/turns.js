@@ -74,6 +74,7 @@ export async function callTurn(charId, node = null, { line = null } = {}) {
   free = false;
   paint();
   const id = line || (!said ? `tg_turn_${cur}` : thank ? `tg_tx_${cur}` : `tg_name_${cur}`);
+  window.__turns?.push(`call:${cur}`);
   said = true;
   thank = false;
   if (charId) await speak(charId, id, { node });
@@ -93,6 +94,7 @@ export async function turnCall(charId, node = null) {
 // 做完一個動作：換另一個人。給 charId 就馬上說「謝謝，換向澤」；不給就等下一次唱名時說
 export async function passTurn(charId = null, node = null) {
   if (!turnsOn()) return;
+  window.__turns?.push(`pass:${cur}`);
   cur = otherKid();
   free = false;
   paint();

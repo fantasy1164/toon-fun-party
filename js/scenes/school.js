@@ -11,6 +11,7 @@ import {
   TRASH, EASY_TRASH, HARD_TRASH, EASY_BINS, HARD_BINS, binSvg, nightSky, DIPPER,
 } from '../art/school.js';
 import { avatarSvg } from '../art/characters.js';
+import { turnsOn, turnCall, callTurn, passTurn, setTurn, whoseTurn, otherKid } from '../core/turns.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
 
@@ -73,23 +74,35 @@ function mountClass(stage, { profile, onExit }) {
       cleanups.push(() => { node.removeEventListener('pointerdown', h); resolve(); });
     });
   }
-  // 小孩桌上的按鈕：ids 裡每個人都按了才繼續
-  async function kidButton(svg, ids = desks.map((d) => d.id)) {
-    await Promise.all(ids.map(async (id) => {
+  // 小孩桌上的按鈕：一起玩時輪流，先叫一個人按自己的，再換另一個人
+  async function kidButton(svg) {
+    const order = turnsOn() ? [whoseTurn(), otherKid()] : desks.map((d) => d.id);
+    for (const id of order) {
+      if (turnsOn()) { setTurn(id); await turnCall('gugu', who('gugu')); guard(); }
       const b = $(`.kidbtn[data-id="${id}"]`, root);
       b.innerHTML = svg;
       b.classList.remove('hidden');
       b.classList.add('glow');
       await tapOnce(b);
+      guard();
       b.classList.add('hidden');
       b.classList.remove('glow');
       sfx('pop');
       if (svg === HAND) raisedOf(id).classList.add('up');
-    }));
+      passTurn();
+    }
+  }
+  // 點某個東西（一起玩：先唱名，點了換人）
+  async function tapTurn(node) {
+    await turnCall('gugu', who('gugu'));
     guard();
+    await tapOnce(node);
+    guard();
+    passTurn();
   }
   // 圖卡選擇題：回傳選對時結束；選錯會說 wrongLine
-  async function choose(rightSvg, wrongSvgs, wrongLine, isHard = hard) {
+  async function choose(rightSvg, wrongSvgs, wrongLine, isHard = hard, call = true) {
+    if (call) { await turnCall('gugu', who('gugu')); guard(); }
     const items = shuffle([{ ok: true, svg: rightSvg }, ...wrongSvgs.map((svg) => ({ ok: false, svg }))]);
     cardsBox.innerHTML = items.map((c, i) => `<button class="round-btn scard${!isHard && c.ok ? ' glow' : ''}" data-i="${i}">${c.svg}</button>`).join('');
     cardsBox.classList.remove('hidden');
@@ -116,6 +129,7 @@ function mountClass(stage, { profile, onExit }) {
       cleanups.push(() => resolve());
     });
     guard();
+    if (call) passTurn();
     await pause(500);
     cardsBox.classList.add('hidden');
   }
@@ -151,8 +165,7 @@ function mountClass(stage, { profile, onExit }) {
     await say('kiki', 's_shout');
     guard();
     k.classList.add('glow-char');
-    await tapOnce(k);
-    guard();
+    await tapTurn(k);
     k.classList.remove('glow-char');
     sfx('tap');
     await say('dudu', 's_raise_hand');
@@ -166,7 +179,8 @@ function mountClass(stage, { profile, onExit }) {
     root.classList.add('kid-hand');
     k.classList.remove('hand');
     // 一起玩：一人一題，妍卉先（6 歲版），再換向澤（3 歲版）
-    for (const [i, d] of desks.entries()) {
+    const qOrder = turnsOn() ? [whoseTurn(), otherKid()].map((id) => desks.find((d) => d.id === id)) : desks;
+    for (const [i, d] of qOrder.entries()) {
       const qq = QUESTIONS[keys[i]];
       const kidHard = two ? PROFILES[d.id].level === 'hard' : hard;
       if (i > 0) {
@@ -175,13 +189,15 @@ function mountClass(stage, { profile, onExit }) {
         guard();
       }
       if (two) {
+        setTurn(d.id);
         $$('.raised', root).forEach((r) => r.classList.toggle('up', r.dataset.id === d.id));
         await speak('gugu', 's_call_kid', { name: PROFILES[d.id].name, who: d.id, node: who('gugu') });
       } else {
         await say('gugu', 's_call_kid');
       }
       guard();
-      await choose(qq.right, kidHard ? qq.wrong : qq.wrong.slice(0, 1), 's_a_wrong', kidHard);
+      await choose(qq.right, kidHard ? qq.wrong : qq.wrong.slice(0, 1), 's_a_wrong', kidHard, false);
+      passTurn();
       await say('gugu', qq.a);
       guard();
     }
@@ -207,6 +223,8 @@ function mountClass(stage, { profile, onExit }) {
       const want = hard ? t.cat : t.easy;
       trash.innerHTML = `<svg viewBox="0 0 100 100" width="150" height="150">${t.svg}</svg>`;
       trash.className = 'trash pop';
+      await turnCall('gugu', who('gugu'));
+      guard();
       if (!hard) $$('.sbin', box).forEach((b) => b.classList.toggle('glow', b.dataset.b === want));
       await new Promise((resolve) => {
         let busy = false;
@@ -226,6 +244,7 @@ function mountClass(stage, { profile, onExit }) {
             return;
           }
           box.removeEventListener('pointerdown', h);
+          passTurn();
           // 垃圾飛進桶子
           const sr = stage.getBoundingClientRect();
           const k = sr.width / 1200;
@@ -294,8 +313,7 @@ function mountClass(stage, { profile, onExit }) {
     const hb = $('.hifive', root);
     hb.classList.remove('hidden');
     hb.classList.add('glow');
-    await tapOnce(hb);
-    guard();
+    await tapTurn(hb);
     hb.classList.add('hidden');
     root.classList.add('clap');
     sfx('fanfare');
@@ -441,14 +459,19 @@ function mountNight(stage, { profile, onExit }) {
     await say('s_night_bye');
   }
 
+  // 一起玩：輪流點星星，一人一顆
+  let calling = false;
+  const nextStar = async () => { if (!turnsOn()) return; calling = true; await turnCall('gugu', gugu); calling = false; };
   $$('.nstar', root).forEach((s) => onTap(s, async () => {
-    if (!alive || mode === 'end') return;
+    if (!alive || mode === 'end' || calling) return;
     const i = +s.dataset.i;
     s.classList.remove('tpop'); void s.getBoundingClientRect(); s.classList.add('tpop');
     sfx('sparkle');
     if (lit.has(i)) return;
     lit.add(i);
     s.classList.add('lit');
+    passTurn();
+    if (lit.size < DIPPER.length) nextStar();
     if (lit.size === DIPPER.length) {
       root.classList.add('dipper');
       sfx('fanfare');
@@ -470,7 +493,7 @@ function mountNight(stage, { profile, onExit }) {
     busy = false;
     if (!alive) return;
     mode = 'idle';
-    if (!wet) $$('.nstar', root).forEach((s) => s.classList.add('glow'));
+    if (!wet) { $$('.nstar', root).forEach((s) => s.classList.add('glow')); nextStar(); }
     else gugu.classList.add('glow-char');
     if (timeUp) goodbye();
   }
