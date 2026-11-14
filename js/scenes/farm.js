@@ -17,7 +17,7 @@ import { turnsOn, turnCall, callTurn, passTurn, setTurn, freeTurns } from '../co
 
 const shuffle = (a) => a.map((x) => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map((p) => p[1]);
 const host = (x, y, s, cls = '') => `<div class="f-host ${cls}" style="left:${x}px;top:${y}px;width:${240 * s}px;height:${320 * s}px">
-  <svg viewBox="0 0 240 320" width="100%" height="100%">${characterSvg('mian')}</svg></div>`;
+  <svg viewBox="0 0 240 320" width="100%" height="100%">${characterSvg('doudou')}</svg></div>`;
 
 // 從種下那天算起過了幾天（用遊戲時鐘的日期，測試時可改日期）
 function daysSince(key) {
@@ -83,7 +83,7 @@ function mountDay(stage, { profile, onExit }) {
   let mode = 'intro';
   let timeUp = false;
   const cleanups = [];
-  const say = (line) => speak('mian', line, { name: profile.name, who: profile.id, node: mian });
+  const say = (line) => speak('doudou', line, { name: profile.name, who: profile.id, node: mian });
   const guard = () => { if (!alive) throw new Error('scene-closed'); };
   const pause = async (ms) => { await wait(ms); guard(); };
   function flash(node, cls) {
@@ -131,7 +131,7 @@ function mountDay(stage, { profile, onExit }) {
       sfx(d.sound);
       await say(d.ask);
       guard();
-      await turnCall('mian', mian);
+      await turnCall('doudou', mian);
       guard();
       if (!hard) $$('.food', tray).forEach((b) => b.classList.toggle('glow', b.dataset.f === d.food));
       tray.classList.add('active');
@@ -192,7 +192,7 @@ function mountDay(stage, { profile, onExit }) {
     await say('f_barn');
     guard();
     hen.classList.add('glow-a');
-    await turnCall('mian', mian);
+    await turnCall('doudou', mian);
     guard();
     await tapOnce(hen);
     guard();
@@ -208,7 +208,7 @@ function mountDay(stage, { profile, onExit }) {
     eggs.forEach((e) => e.classList.add('glow'));
     let n = 0;
     let calling = turnsOn();
-    if (calling) turnCall('mian', mian).then(() => { calling = false; });
+    if (calling) turnCall('doudou', mian).then(() => { calling = false; });
     await new Promise((resolve) => {
       eggs.forEach((e) => onTap(e, async () => {
         if (e.classList.contains('taken') || calling) return;
@@ -222,8 +222,8 @@ function mountDay(stage, { profile, onExit }) {
           $('.in', basket).insertAdjacentHTML('beforeend', `<ellipse cx="${50 + (n * 37) % 130}" cy="${66 - (n % 2) * 8}" rx="18" ry="22" fill="#fff6e6" stroke="#e8d8b8" stroke-width="3"/>`);
         });
         passTurn();
-        if (n === eggs.length) { say(`m_n${n}`); resolve(); return; }
-        if (turnsOn()) { calling = true; await say(`m_n${n}`); await turnCall('mian', mian); calling = false; } else say(`m_n${n}`);
+        if (n === eggs.length) { say(`n_${n}`); resolve(); return; }
+        if (turnsOn()) { calling = true; await say(`n_${n}`); await turnCall('doudou', mian); calling = false; } else say(`n_${n}`);
       }));
       cleanups.push(() => resolve());
     });
@@ -291,7 +291,7 @@ function mountDay(stage, { profile, onExit }) {
     plot.classList.add('glow-p');
     await say('f_plant_pick');
     guard();
-    if (turnsOn()) { setTurn(id); await callTurn('mian', mian); guard(); }   // 自己的菜園自己種
+    if (turnsOn()) { setTurn(id); await callTurn('doudou', mian); guard(); }   // 自己的菜園自己種
     const seeds = $('.seeds', root);
     seeds.classList.remove('hidden');
     const crop = await new Promise((resolve) => {
@@ -326,7 +326,7 @@ function mountDay(stage, { profile, onExit }) {
       plot.classList.add('glow-p');
       await say('f_ripe');
       guard();
-      if (turnsOn()) { setTurn(id); await callTurn('mian', mian); guard(); }   // 自己的菜自己採
+      if (turnsOn()) { setTurn(id); await callTurn('doudou', mian); guard(); }   // 自己的菜自己採
       await tapOnce(plot);
       guard();
       passTurn();
@@ -375,7 +375,7 @@ function mountDay(stage, { profile, onExit }) {
     const can = $('.canbtn', root);
     can.classList.remove('hidden');
     can.classList.add('glow');
-    await turnCall('mian', mian);
+    await turnCall('doudou', mian);
     guard();
     await tapOnce(can);
     guard();
@@ -399,7 +399,7 @@ function mountDay(stage, { profile, onExit }) {
     const winners = slot ? profile.members.filter((id) => !hasClaimed(id, `farm_${slot}`)) : [];
     if (winners.length) {
       const gifts = winners.map((id) => {
-        const item = nextItem(state.profiles[id].collection, 'mian');
+        const item = nextItem(state.profiles[id].collection, 'doudou');
         addItem(id, item);
         claim(id, `farm_${slot}`);
         return { id, item };
@@ -471,7 +471,7 @@ function mountDay(stage, { profile, onExit }) {
   main().catch((e) => { if (e.message !== 'scene-closed') throw e; });
   return {
     destroy,
-    hostChar: 'mian',
+    hostChar: 'doudou',
     requestEnd() {
       if (timeUp || !alive) return;
       timeUp = true;
@@ -510,7 +510,7 @@ function mountNight(stage, { profile, onExit }) {
   let timeUp = false;
   let count = 0;
   let busy = true;
-  const say = (line) => speak('mian', line, { name: profile.name, who: profile.id, node: mian });
+  const say = (line) => speak('doudou', line, { name: profile.name, who: profile.id, node: mian });
 
   onTap(btn, async () => {
     if (busy || !alive || count >= total) return;
@@ -525,11 +525,11 @@ function mountNight(stage, { profile, onExit }) {
     btn.classList.remove('jump');
     const i = count - 1;
     flock.insertAdjacentHTML('beforeend', `<div class="fsheep" style="left:${650 + (i % 5) * 76}px;top:${400 + Math.floor(i / 5) * 60}px">${SHEEP}</div>`);
-    await say(`m_n${count}`);
+    await say(`n_${count}`);
     if (!alive) return;
     passTurn();
     if (count < total) {
-      await turnCall('mian', mian);
+      await turnCall('doudou', mian);
       if (!alive) return;
       btn.classList.add('glow');
       busy = false;
@@ -552,7 +552,7 @@ function mountNight(stage, { profile, onExit }) {
   async function intro() {
     await say(wet ? 'f_night_rain' : 'f_night');
     if (!alive) return;
-    await turnCall('mian', mian);
+    await turnCall('doudou', mian);
     if (!alive) return;
     busy = false;
     mode = 'act';
@@ -592,7 +592,7 @@ function mountNight(stage, { profile, onExit }) {
   intro();
   return {
     destroy,
-    hostChar: 'mian',
+    hostChar: 'doudou',
     requestEnd() {
       if (timeUp || !alive) return;
       timeUp = true;

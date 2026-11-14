@@ -12,7 +12,7 @@ const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
   brush_morning: '早上刷牙', brush_evening: '睡前刷牙',
   wash_morning: '早上洗手', door_morning: '早上出門準備',
-  kitchen_breakfast: '早餐', kitchen_lunch: '午餐', kitchen_dinner: '晚餐', bedroom_evening: '睡前準備', car_day: '坐車安全', school_day: '上課', farm_day: '農場', party_day: '生日派對', ny_day: '過年', wash_noon: '中午洗手', wash_evening: '傍晚洗手',
+  kitchen_breakfast: '早餐', kitchen_lunch: '午餐', kitchen_dinner: '晚餐', bedroom_evening: '睡前準備', car_day: '坐車安全', school_day: '上課', farm_day: '農場', park_day: '公園', party_day: '生日派對', ny_day: '過年', wash_noon: '中午洗手', wash_evening: '傍晚洗手',
 };
 
 function stampSection(id) {

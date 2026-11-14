@@ -31,6 +31,9 @@ export const GUESTS = {
   mian: { id: 'mian', name: '棉棉', tts: { pitch: 1.4, rate: 0.85 } },
   gugu: { id: 'gugu', name: '咕咕老師', tts: { pitch: 0.85, rate: 0.9 } },
   santa: { id: 'santa', name: '聖誕老公公', tts: { pitch: 0.7, rate: 0.85 } },
+  pupu: { id: 'pupu', name: '噗噗', tts: { pitch: 0.8, rate: 0.9 } },
+  doudou: { id: 'doudou', name: '豆豆', tts: { pitch: 1.3, rate: 1.0 } },
+  tiaotiao: { id: 'tiaotiao', name: '跳跳', tts: { pitch: 1.5, rate: 1.1 } },
 };
 
 // 各活動每天可領獎的時段（對應現實作息）。[開始小時, 結束小時)
@@ -43,4 +46,5 @@ export const REWARD_SLOTS = {
   car: { day: [0, 24] },
   school: { day: [8, 17] },
   farm: { day: [8, 17] },
+  park: { day: [8, 18] },
 };

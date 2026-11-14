@@ -15,22 +15,17 @@ import { ICON, openCabinet } from '../ui/screens.js';
 import { sceneWeather } from './door.js';
 import { callTurn, passTurn, turnsOn, turnsScene, freeTurns } from '../core/turns.js';
 
-// 角色輪替（廁所用）：不連續兩次同一位
+// 廁所固定由嘟嘟負責（11/14 起每個場景一位負責的角色）
 export function nextCharacter() {
-  const ids = Object.keys(CHARACTERS);
-  const last = localStorage.getItem('tfp-last-char');
-  const pool = ids.filter((id) => id !== last);
-  const id = pick(pool.length ? pool : ids);
-  localStorage.setItem('tfp-last-char', id);
-  return id;
+  return 'dudu';
 }
 
 // 每個房間有哪些「一起做」
 export const TOGETHER = {
   bedroom: ['sleep'], door: ['out'], kitchen: ['meal'], bathroom: ['brush', 'wash'],
-  school: ['bag', 'homework'], farm: ['gym'], car: ['ride'],
+  school: ['bag', 'homework'], farm: ['gym'], car: ['ride'], park: ['outing'],
 };
-const ROOM_HOST = { bedroom: 'mian', door: 'kiki', kitchen: 'bobo', school: 'gugu', farm: 'mian', car: 'dudu' };
+const ROOM_HOST = { bedroom: 'mian', door: 'kiki', kitchen: 'bobo', school: 'gugu', farm: 'doudou', car: 'pupu', park: 'tiaotiao' };
 // host：陪的角色（null＝廁所輪替）；reward：算哪個場景的每日獎勵；series：送哪一系列的禮物
 const MODES = {
   sleep: { host: 'mian', reward: 'bedroom', series: 'mian', track: 'bedroom', icon: 'moon' },
@@ -40,12 +35,15 @@ const MODES = {
   wash: { host: null, reward: 'wash', series: null, track: 'bath_day', icon: 'hands' },
   bag: { host: 'gugu', reward: 'school', series: 'gugu', track: 'school', icon: 'bag' },
   homework: { host: 'gugu', reward: 'school', series: 'gugu', track: 'study', icon: 'homework' },
-  gym: { host: 'mian', reward: 'farm', series: 'mian', track: 'farm', icon: 'bunny' },
-  ride: { host: 'dudu', reward: 'car', series: 'kiki', track: 'car', icon: 'redcar' },
+  gym: { host: 'doudou', reward: 'farm', series: 'doudou', track: 'farm', icon: 'bunny' },
+  ride: { host: 'pupu', reward: 'car', series: 'pupu', track: 'car', icon: 'redcar' },
+  outing: { host: 'tiaotiao', reward: 'park', series: 'tiaotiao', track: 'park', icon: 'park' },
 };
 export const MEAL_MIN = 25;   // 吃飯盤子時鐘幾分鐘走完
 export const LULLABY_MIN = 10;
 export const HOMEWORK_MIN = 10;
+export const PARK_MAX_MIN = 60;   // 陪去公園：最多陪 60 分鐘
+export const PARK_REMIND_MIN = 15;
 
 const CHECK = `<svg viewBox="0 0 100 100" width="120" height="120"><path d="M18 52L40 74L84 26" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const RING_C = 2 * Math.PI * 92;
@@ -651,7 +649,46 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     await finish();
   }
 
-  const RUN = { sleep: runSleep, out: runOut, meal: runMeal, wash: runWash, bag: runBag, homework: runHomework, gym: runGym, ride: runRide };
+  // ---------- 陪去公園 ----------
+  async function runOuting() {
+    const wk2 = sceneWeather(wx);
+    const sunny = wk2 === 'hot' || wx.kind === 'clear';
+    await say('pko_hello');
+    await checkLine();
+    const list = [
+      { icon: 'toilet', line: 'pko_potty' },
+      { icon: 'bottle', line: 'pko_water', per: true },
+      ...(sunny ? [{ icon: 'hat', line: 'pko_hat', per: true }] : []),
+      ...(wk2 === 'hot' ? [{ icon: 'sunscreen', line: 'pko_sun', per: true }] : []),
+      { icon: 'sandtoys', line: 'pko_toys' },
+    ];
+    await runSteps(list);
+    showIcon('go', 'pop');
+    await say('pko_go');
+    // 到公園：螢幕變暗、每 15 分鐘提醒一次；爸媽按勾勾就回家
+    card.classList.add('hidden');
+    await say('pko_end');
+    root.classList.add('dim');
+    musicLevel(0.3, 2);
+    const total = PARK_MAX_MIN * 60000;
+    const pool = ['pko_r1', 'pko_r2', 'pko_r3'];
+    let next = PARK_REMIND_MIN * 60000;
+    let n = 0;
+    const t = timer(total, (e) => {
+      if (e >= next) { next += PARK_REMIND_MIN * 60000; sfx('sparkle'); sayBg(pool[n++ % pool.length]); }
+    });
+    const ok = oneOk({ nudge: false });
+    const r = await Promise.race([t, ok.then(() => 'ok')]);
+    guard();
+    if (r === 'ok') t.stop(); else ok.cancel();
+    root.classList.remove('dim');
+    musicLevel(1, 1);
+    await say('pko_home');
+    await celebrate();
+    await finish();
+  }
+
+  const RUN = { outing: runOuting, sleep: runSleep, out: runOut, meal: runMeal, wash: runWash, bag: runBag, homework: runHomework, gym: runGym, ride: runRide };
 
   function destroy() {
     if (!alive) return;

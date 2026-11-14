@@ -13,6 +13,7 @@ import { mountBedroom } from './scenes/bedroom.js';
 import { mountCar } from './scenes/car.js';
 import { mountSchool } from './scenes/school.js';
 import { mountFarm } from './scenes/farm.js';
+import { mountPark } from './scenes/park.js';
 import { mountParty } from './scenes/party.js';
 import { mountNewYear } from './scenes/newyear.js';
 import { showHub } from './ui/hub.js';
@@ -119,7 +120,7 @@ async function goHub() {
   const choice = await chooseMode(stage, room, profile);
   if (choice.mode === 'home') { goHub(); return; }
   if (closedReason()) { route(); return; }
-  const mount = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, party: mountParty, newyear: mountNewYear }[room] || mountBathroom;
+  const mount = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear }[room] || mountBathroom;
   if (state.session.usedMs === 0) warned = false;
   const onExit = (why) => {
     scene = null;

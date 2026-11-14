@@ -9,7 +9,7 @@ export const LINES = {
   praise1: { dudu: '好棒。', kiki: '哇！超厲害！', bobo: '好棒好棒！', mian: '好棒喔……' },
   praise2: { dudu: '你做得真好。', kiki: '耶！成功了！', bobo: '你做得真好！', mian: '你好厲害……' },
   praise3: { dudu: '非常乾淨，嘟嘟喜歡。', kiki: 'Good job！太棒了！', bobo: '太厲害了，波波好開心！', mian: '謝謝你，棉棉好開心。' },
-  wrong: { dudu: '不是這個喔，再找找看。', kiki: '哎呀，不是這個，再試一次！' },
+  wrong: { dudu: '不是這個喔，再找找看。', kiki: '哎呀，不是這個，再試一次！', pupu: '不是這個喔，再想想看。', doudou: '不是這個喔，再試試看！', tiaotiao: '哎呀，不是這個，再試一次！' },
   gift: { dudu: '這個送給你。', kiki: '噹噹！禮物送給你！', bobo: '這個送給你！', mian: '這個……送給你。' },
   practice: { dudu: '練習得很好，下次再送你禮物。', kiki: '練習成功！禮物下次再給你喔！', bobo: '練習得很好，下次再送你禮物喔。', mian: '練習得很好喔，下次再送你禮物。' },
   bye: { dudu: '今天玩得很開心。我們要去休息了，明天見。', kiki: '奇奇要回家吃飯囉！{name}，明天再一起玩！掰掰！', bobo: '吃飽飽了，波波要去睡午覺囉，明天見！', mian: '棉棉好睏……要去睡覺了，明天見。' },
@@ -624,3 +624,139 @@ Object.assign(LINES, {
   c_belt_both: { dudu: '兩個人都要扣好自己的安全帶。' },
   s_both_desk: { gugu: '妍卉、向澤，一人一張桌子，坐好囉。' },
 });
+
+// ================= 新角色：噗噗（汽車）、豆豆（農場）、跳跳（公園）的共用台詞 =================
+const NEW_COMMON = {
+  praise1: { pupu: '好棒。', doudou: '汪！好棒！', tiaotiao: '哇！好厲害！' },
+  praise2: { pupu: '做得很好喔。', doudou: '你做得真好！', tiaotiao: '耶！成功了！' },
+  praise3: { pupu: '你很注意安全，噗噗好放心。', doudou: '太棒了，動物們都好開心！', tiaotiao: 'Super！你是運動小高手！' },
+  gift: { pupu: '這個送給你。', doudou: '汪汪！這個送給你！', tiaotiao: '噹噹！禮物送給你！' },
+  practice: { pupu: '練習得很好，下次再送你禮物。', doudou: '練習得很好喔，下次再送你禮物！', tiaotiao: '練習成功！下次再送你禮物！' },
+  bye: { pupu: '噗噗要把車子停好，去休息囉。{name}，明天見。', doudou: '豆豆要去巡農場囉。{name}，明天見！', tiaotiao: '跳跳要回樹上睡午覺囉！{name}，掰掰！' },
+  bye_sunny: { pupu: '外面天氣真好。{name}，跟爸爸媽媽出去走走吧，明天見。', doudou: '外面有太陽耶！{name}，去外面跑一跑吧！汪！', tiaotiao: '外面天氣好好！{name}，去真的公園玩吧！掰掰！' },
+  time_soon: { pupu: '再玩一下下，就要休息囉。', doudou: '再玩一下下就要休息囉！', tiaotiao: '再玩一下下就要休息囉！' },
+  tg_pick: { pupu: '要玩遊戲，還是跟噗噗一起做？', doudou: '要玩遊戲，還是跟豆豆一起做呢？', tiaotiao: '玩遊戲？還是跟跳跳一起做？' },
+  tg_check: { pupu: '做好了，就按大勾勾。', doudou: '做好了，就按大勾勾喔！', tiaotiao: '做好了就按大勾勾！' },
+  tg_nudge: { pupu: '慢慢來，噗噗等你。', doudou: '慢慢來，豆豆等你！', tiaotiao: '還在做嗎？加油！' },
+  tg_stamp: { pupu: '去給爸爸媽媽看，請他們幫你蓋章。', doudou: '去給爸爸媽媽看，請他們幫你蓋章喔！', tiaotiao: '快去給爸爸媽媽看，請他們蓋章！' },
+  tg_turn_yh: { pupu: '妍卉，換你囉。', doudou: '妍卉，換你囉！', tiaotiao: '妍卉！換你囉！' },
+  tg_turn_xz: { pupu: '向澤，換你囉。', doudou: '向澤，換你囉！', tiaotiao: '向澤！換你囉！' },
+  tg_name_yh: { pupu: '妍卉。', doudou: '妍卉！', tiaotiao: '妍卉！' },
+  tg_name_xz: { pupu: '向澤。', doudou: '向澤！', tiaotiao: '向澤！' },
+  tg_tx_yh: { pupu: '謝謝。換妍卉。', doudou: '謝謝！換妍卉！', tiaotiao: '謝謝！換妍卉！' },
+  tg_tx_xz: { pupu: '謝謝。換向澤。', doudou: '謝謝！換向澤！', tiaotiao: '謝謝！換向澤！' },
+  tg_both: { pupu: '你們兩個都好棒。', doudou: '你們兩個都好棒！汪！', tiaotiao: '耶！你們兩個都好棒！' },
+  tg_check2: { pupu: '做好了，就按自己的勾勾。', doudou: '做好了，就按自己的勾勾喔！', tiaotiao: '做好了就按自己的勾勾！' },
+  n_1: { doudou: '一！' }, n_2: { doudou: '二！' }, n_3: { doudou: '三！' }, n_4: { doudou: '四！' }, n_5: { doudou: '五！' },
+  n_6: { doudou: '六！' }, n_7: { doudou: '七！' }, n_8: { doudou: '八！' }, n_9: { doudou: '九！' }, n_10: { doudou: '十！' },
+};
+for (const [k, v] of Object.entries(NEW_COMMON)) LINES[k] = { ...(LINES[k] || {}), ...v };
+
+// 汽車改由噗噗負責：原本嘟嘟說的旁白改成噗噗（嘟嘟還是坐後座，扣好安全帶時說「扣好了」）
+for (const k of ['c_belt', 'c_belt_easy', 'c_kid_ok', 'c_not_yet', 'c_sitdown', 'c_red', 'c_green', 'c_yellow', 'c_walker', 'c_cross', 'c_unbuckle', 'c_door', 'c_door_easy', 'c_door_wrong', 'c_mission', 'c_belt_both']) {
+  if (LINES[k]?.dudu) { LINES[k].pupu = LINES[k].dudu; delete LINES[k].dudu; }
+}
+Object.assign(LINES, {
+  c_pupu_hi: { pupu: '大家好，我是司機噗噗。坐噗噗的車，安全第一喔。' },
+});
+
+// 一起做：坐車改噗噗、動物體操改豆豆
+for (const k of Object.keys(LINES)) {
+  if (k.startsWith('tr_') && LINES[k].dudu) { LINES[k].pupu = LINES[k].dudu.replace('嘟嘟', '噗噗'); delete LINES[k].dudu; }
+  if (k.startsWith('tx_') && LINES[k].mian) { LINES[k].doudou = LINES[k].mian.replace(/……/g, '，').replace(/，$/, '。'); delete LINES[k].mian; }
+}
+
+// 農場改由豆豆負責：原本棉棉說的農場台詞改成豆豆
+for (const k of Object.keys(LINES)) {
+  if ((k.startsWith('f_') || k.startsWith('en_')) && LINES[k].mian) {
+    LINES[k].doudou = LINES[k].mian.replace(/棉棉/g, '豆豆').replace(/……/g, '，');
+    delete LINES[k].mian;
+  }
+}
+LINES.tx_breathe = { doudou: '最後，深呼吸。吸——吐——' };
+
+// ================= 公園（跳跳） =================
+Object.assign(LINES, {
+  pk_hello: { tiaotiao: '{name}，歡迎來到公園！我是跳跳，我最喜歡爬上爬下了！' },
+  pk_dudu_hi: { dudu: '嘟嘟也來公園玩了。' },
+  pk_pick: { tiaotiao: '想玩什麼？溜滑梯、盪鞦韆，還是玩沙？' },
+  pk_more: { tiaotiao: '還想玩什麼呢？' },
+  // 溜滑梯
+  pk_slide_line: { tiaotiao: '溜滑梯要排隊，一個一個來。' },
+  pk_cut: { dudu: '我想先溜！' },
+  pk_cut_tap: { tiaotiao: '咦？嘟嘟插隊了。點一下嘟嘟，提醒他要排隊。' },
+  pk_cut_sorry: { dudu: '對不起，我排到後面。' },
+  pk_slide_me: { tiaotiao: '跳跳先溜囉！咻——' },
+  pk_slide_rule: { tiaotiao: '哪一個是安全的溜法？' },
+  pk_slide_right: { tiaotiao: '對！坐著，腳朝下，最安全。' },
+  pk_slide_wrong: { tiaotiao: '這樣很危險喔，再看看。' },
+  pk_slide_you: { tiaotiao: '輪到你了！爬上去，坐好，腳朝下。' },
+  pk_slide_exit: { tiaotiao: '溜下來了，要馬上離開出口，下一個人才不會撞到你。' },
+  pk_slide_done: { tiaotiao: '排隊溜滑梯，大家都好開心！' },
+  // 盪鞦韆
+  pk_swing: { tiaotiao: '盪鞦韆！一個人坐，一個人推，數到十就換人。' },
+  pk_swing_push: { tiaotiao: '跳跳先坐，你來推。鞦韆盪回來發亮的時候，點一下。' },
+  pk_swing_two: { tiaotiao: '你們一個坐、一個推。鞦韆盪回來發亮的時候，點一下。' },
+  pk_swing_switch: { tiaotiao: '數到十了，換人！' },
+  pk_swing_me_push: { tiaotiao: '換你坐，跳跳推你！' },
+  pk_swing_walk: { dudu: '我要走到那邊去。' },
+  pk_swing_stop: { tiaotiao: '危險！嘟嘟走到鞦韆前面了！點一下嘟嘟，叫他停下來！' },
+  pk_swing_dudu_ok: { dudu: '謝謝提醒，我從旁邊繞過去。' },
+  pk_swing_rule: { tiaotiao: '不能走在鞦韆的前面和後面，會被撞到喔。' },
+  pk_swing_done: { tiaotiao: '輪流盪鞦韆，好好玩！' },
+  // 沙坑
+  pk_sand: { tiaotiao: '來玩沙！挖一挖，看看有什麼寶藏。' },
+  pk_dig_found: { tiaotiao: '挖到寶藏了！' },
+  pk_castle: { tiaotiao: '我們來蓋沙堡！點一下水桶。' },
+  pk_castle_done: { tiaotiao: '沙堡蓋好了！好漂亮！' },
+  pk_sand_wash: { tiaotiao: '玩完沙，手髒髒的，要去洗手喔。點一下水龍頭。' },
+  pk_sand_clean: { tiaotiao: '洗乾淨了！' },
+  // 小插曲
+  pk_litter: { tiaotiao: '咦？草地上有垃圾。我們把它撿起來，丟進垃圾桶。' },
+  pk_litter_done: { tiaotiao: '公園變乾淨了！謝謝你。' },
+  pk_water: { tiaotiao: '玩得流汗了，喝口水休息一下。點一下水壺。' },
+  pk_hot: { tiaotiao: '今天好熱！要戴帽子、多喝水。' },
+  pk_shade: { tiaotiao: '我們到大樹下休息，樹下好涼快。點一下大樹。' },
+  // 安全
+  pk_stranger: { tiaotiao: '有一個不認識的人，說要給你糖果，還要帶你去看小狗。怎麼辦呢？' },
+  pk_stranger_right: { tiaotiao: '對！不拿不認識的人給的東西，大聲說不要，跑去找爸爸媽媽。' },
+  pk_stranger_wrong: { tiaotiao: '不可以喔！不認識的人給的東西不能拿，也不能跟他走。' },
+  pk_lost: { tiaotiao: '如果跟爸爸媽媽走散了，要怎麼辦呢？' },
+  pk_lost_right: { tiaotiao: '對！站在原地不要亂跑，找穿制服的人幫忙，說出爸爸媽媽的名字。' },
+  pk_lost_wrong: { tiaotiao: '自己亂跑會更找不到喔，再想想看。' },
+  // 回家
+  pk_pack: { tiaotiao: '要回家囉！把沙鏟和水桶收好。' },
+  pk_bye_dudu: { tiaotiao: '跟嘟嘟說再見，點一下嘟嘟。' },
+  pk_dudu_bye: { dudu: '掰掰！下次再一起來公園玩。' },
+  pk_mission: { tiaotiao: '{name}，去真的公園玩的時候，也要記得排隊、輪流喔！' },
+  // 下雨
+  pk_rain: { tiaotiao: '下雨了。溜滑梯濕濕的，會滑倒喔。' },
+  pk_rain_dudu: { dudu: '我想溜溜看！' },
+  pk_rain_stop: { tiaotiao: '點一下嘟嘟，提醒他溜滑梯濕濕的，很危險。' },
+  pk_rain_ok: { dudu: '好，等溜滑梯乾了再溜。' },
+  pk_boots: { tiaotiao: '我們去踩水坑！要穿什麼鞋子呢？' },
+  pk_boots_right: { tiaotiao: '對！穿雨鞋踩水坑，腳才不會濕。' },
+  pk_boots_wrong: { tiaotiao: '穿運動鞋會濕掉喔，再看看。' },
+  pk_puddle: { tiaotiao: '一起踩水坑！點一下水坑。' },
+  pk_pavilion: { tiaotiao: '雨變大了，我們到涼亭躲雨。點一下涼亭。' },
+  pk_rain_done: { tiaotiao: '在涼亭聽雨聲，滴答滴答，也很好玩。' },
+  // 晚上
+  pk_night: { tiaotiao: '天黑了，公園的燈亮了。有螢火蟲耶！我們一起數一數。點一下螢火蟲。' },
+  pk_night_home: { tiaotiao: '天黑了，要跟爸爸媽媽回家喔。晚安，{name}。' },
+  // 選房間：週末
+  hub_park: { kiki: '今天是週末！我們去公園玩吧！' },
+  // 一起做：陪去公園
+  pko_hello: { tiaotiao: '我們要去公園囉！跳跳陪你準備。' },
+  pko_potty: { tiaotiao: '出門前，先去上廁所。' },
+  pko_water: { tiaotiao: '帶水壺。' },
+  pko_hat: { tiaotiao: '太陽很大，戴帽子。' },
+  pko_sun: { tiaotiao: '請爸爸媽媽幫你擦防曬。' },
+  pko_toys: { tiaotiao: '帶沙鏟和水桶。' },
+  pko_go: { tiaotiao: '準備好了！出發去公園！到了公園，把 iPad 交給爸爸媽媽。' },
+  pko_r1: { tiaotiao: '玩累了嗎？喝口水休息一下。' },
+  pko_r2: { tiaotiao: '流汗了嗎？擦一擦汗。' },
+  pko_r3: { tiaotiao: '看看爸爸媽媽在哪裡喔。' },
+  pko_home: { tiaotiao: '要回家囉！收玩具、洗手、跟朋友說再見。' },
+  pko_end: { tiaotiao: '要回家的時候，請爸爸媽媽按大勾勾。' },
+});
+for (let i = 1; i <= 10; i++) LINES[`n_${i}`] = { ...(LINES[`n_${i}`] || {}), tiaotiao: `${'一二三四五六七八九十'[i - 1]}！` };

@@ -59,6 +59,28 @@ export const ITEMS = {
     <path d="M50 22L62 44H56L66 62H34L44 44H38Z" fill="#2e8b57"/><rect x="47" y="62" width="6" height="8" fill="#8a5a2b"/>
     <circle cx="30" cy="34" r="3" fill="#fff"/><circle cx="68" cy="30" r="3" fill="#fff"/><circle cx="62" cy="54" r="2.5" fill="#fff"/><circle cx="36" cy="56" r="2.5" fill="#fff"/>
     <path d="M36 24a20 20 0 0 1 12-8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+
+  // 噗噗的汽車系列
+  pupu_wheel: `<circle cx="50" cy="50" r="38" fill="none" stroke="#2f3e5c" stroke-width="10"/><circle cx="50" cy="50" r="10" fill="#2f6fd6"/><path d="M50 40V14M42 54L20 70M58 54L80 70" stroke="#2f3e5c" stroke-width="8" stroke-linecap="round"/>`,
+  pupu_light: `<rect x="34" y="6" width="32" height="70" rx="10" fill="#333"/><circle cx="50" cy="20" r="9" fill="#ff5252"/><circle cx="50" cy="41" r="9" fill="#ffd34d"/><circle cx="50" cy="62" r="9" fill="#5ed17a"/><rect x="46" y="76" width="8" height="20" fill="#555"/>`,
+  pupu_bus: `<rect x="8" y="22" width="84" height="52" rx="10" fill="#9d8fd0"/><rect x="14" y="30" width="16" height="16" rx="3" fill="#cfefff"/><rect x="34" y="30" width="16" height="16" rx="3" fill="#cfefff"/><rect x="54" y="30" width="16" height="16" rx="3" fill="#cfefff"/><rect x="74" y="30" width="12" height="28" rx="3" fill="#cfefff"/><circle cx="26" cy="76" r="9" fill="#333"/><circle cx="72" cy="76" r="9" fill="#333"/>`,
+  pupu_cap: `<path d="M14 58Q16 20 50 18Q84 20 86 58Z" fill="#2f6fd6"/><path d="M10 58H94Q96 70 80 70H10Z" fill="#1f4fa8"/><circle cx="50" cy="38" r="10" fill="#ffd34d"/>`,
+  pupu_seat: `<path d="M24 92V40Q24 14 50 14Q76 14 76 40V92Z" fill="#e5734f"/><path d="M32 92V44Q32 26 50 26Q68 26 68 44V92Z" fill="#f08a6a"/><path d="M38 50L62 84M62 50L38 84" stroke="#2b2f3a" stroke-width="6" stroke-linecap="round"/><rect x="42" y="62" width="16" height="12" rx="3" fill="#e5484d"/>`,
+  pupu_cone: `<path d="M50 10L76 84H24Z" fill="#ff8a3d"/><path d="M40 40H60M34 60H66" stroke="#fff" stroke-width="8"/><rect x="14" y="82" width="72" height="10" rx="4" fill="#e06a1d"/>`,
+  // 豆豆的農場系列
+  doudou_bone: `<g transform="rotate(-30 50 50)"><rect x="24" y="42" width="52" height="16" rx="8" fill="#fff4e2" stroke="#d8c8a8" stroke-width="3"/><circle cx="22" cy="42" r="11" fill="#fff4e2" stroke="#d8c8a8" stroke-width="3"/><circle cx="22" cy="58" r="11" fill="#fff4e2" stroke="#d8c8a8" stroke-width="3"/><circle cx="78" cy="42" r="11" fill="#fff4e2" stroke="#d8c8a8" stroke-width="3"/><circle cx="78" cy="58" r="11" fill="#fff4e2" stroke="#d8c8a8" stroke-width="3"/></g>`,
+  doudou_milk: `<path d="M34 24H66V34L74 48V88H26V48L34 34Z" fill="#fff" stroke="#c8d8ea" stroke-width="4" stroke-linejoin="round"/><rect x="34" y="14" width="32" height="12" rx="3" fill="#5fa8e8"/><path d="M30 56H70" stroke="#5fa8e8" stroke-width="6"/>`,
+  doudou_hay: `<rect x="14" y="40" width="72" height="44" rx="8" fill="#f2c84b"/><path d="M14 54H86M14 70H86" stroke="#c99a1e" stroke-width="4"/><path d="M26 40L30 28M44 40L42 24M60 40L64 26M74 40L78 30" stroke="#f2c84b" stroke-width="4" stroke-linecap="round"/>`,
+  doudou_carrot: `<path d="M50 30L66 40L42 92Z" fill="#ff8a3d"/><path d="M50 30Q42 12 54 6Q56 20 58 26Q68 14 78 20Q66 26 58 34Z" fill="#4caf50"/>`,
+  doudou_bucket: `<path d="M24 34H76L70 88H30Z" fill="#9fb7c9"/><ellipse cx="50" cy="34" rx="26" ry="8" fill="#c8d8ea"/><path d="M24 34Q50 -2 76 34" stroke="#6a7f91" stroke-width="4" fill="none"/><ellipse cx="50" cy="36" rx="20" ry="5" fill="#fff"/>`,
+  doudou_hat: `<ellipse cx="50" cy="62" rx="44" ry="14" fill="#e0b25a"/><path d="M26 60Q28 24 50 24Q72 24 74 60Z" fill="#f2c84b"/><path d="M26 54Q50 62 74 54" stroke="#e5484d" stroke-width="7" fill="none"/>`,
+  // 跳跳的公園系列
+  tiao_kite: `<path d="M50 6L82 40L50 74L18 40Z" fill="#ff6b8a"/><path d="M50 6V74M18 40H82" stroke="#fff" stroke-width="4"/><path d="M50 74Q40 84 52 90Q62 96 50 100" stroke="#5a6b80" stroke-width="3" fill="none"/>`,
+  tiao_bubble: `<path d="M20 90L46 54" stroke="#ffb300" stroke-width="7" stroke-linecap="round"/><circle cx="54" cy="44" r="14" fill="none" stroke="#ffb300" stroke-width="6"/><circle cx="76" cy="22" r="12" fill="#cfefff" stroke="#9cd8f2" stroke-width="3"/><circle cx="84" cy="50" r="8" fill="#cfefff" stroke="#9cd8f2" stroke-width="3"/>`,
+  tiao_sand: `<path d="M22 44H62L58 88H26Z" fill="#ff6b5c"/><path d="M22 44Q42 26 62 44" stroke="#e5484d" stroke-width="4" fill="none"/><path d="M70 20L82 70" stroke="#3fb5e8" stroke-width="8" stroke-linecap="round"/><path d="M76 66Q92 70 84 88Q74 86 76 66Z" fill="#3fb5e8"/>`,
+  tiao_ball: `<circle cx="50" cy="52" r="38" fill="#ffd34d"/><path d="M14 46Q50 64 86 46M50 14Q34 52 50 90" stroke="#e5484d" stroke-width="6" fill="none"/>`,
+  tiao_disc: `<ellipse cx="50" cy="54" rx="42" ry="22" fill="#5ed17a"/><ellipse cx="50" cy="48" rx="34" ry="14" fill="#7ee39a"/><ellipse cx="50" cy="48" rx="16" ry="6" fill="#5ed17a"/>`,
+  tiao_rope: `<rect x="10" y="12" width="12" height="28" rx="5" fill="#ff6b8a"/><rect x="78" y="12" width="12" height="28" rx="5" fill="#ff6b8a"/><path d="M16 40Q14 96 50 92Q86 96 84 40" stroke="#9b85f0" stroke-width="5" fill="none"/>`,
 };
 
 export const SERIES = {
@@ -68,6 +90,9 @@ export const SERIES = {
   bobo: ['bobo_honey', 'bobo_pot', 'bobo_donut', 'bobo_bread', 'bobo_spoon', 'bobo_apron'],
   mian: ['mian_yarn', 'mian_egg', 'mian_flower', 'mian_bell', 'mian_cloud', 'mian_pillow'],
   gugu: ['gugu_pencil', 'gugu_book', 'gugu_globe', 'gugu_apple', 'gugu_bell', 'gugu_crayon'],
+  pupu: ['pupu_wheel', 'pupu_light', 'pupu_bus', 'pupu_cap', 'pupu_seat', 'pupu_cone'],
+  doudou: ['doudou_bone', 'doudou_milk', 'doudou_hay', 'doudou_carrot', 'doudou_bucket', 'doudou_hat'],
+  tiaotiao: ['tiao_kite', 'tiao_bubble', 'tiao_sand', 'tiao_ball', 'tiao_disc', 'tiao_rope'],
   kiki: ['kiki_leaf', 'kiki_ball', 'kiki_kite', 'kiki_car', 'kiki_star', 'kiki_mush'],
 };
 

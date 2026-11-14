@@ -3,6 +3,7 @@ import { characterSvg, NIGHTCAP } from './characters.js';
 import { weatherLayer, skyColors } from './bathroom.js';
 import { ANIMALS } from './farm.js';
 import { LANTERN, FU } from './newyear.js';
+export { parkExt } from './park.js';
 
 // 每個可以點的地方（舞台座標）
 export const SPOTS = {
@@ -13,9 +14,11 @@ export const SPOTS = {
   car: [884, 596, 226, 190],
   school: [30, 250, 290, 235],
   farm: [930, 268, 250, 240],
+  park: [22, 496, 300, 200],
 };
 // 前院放節慶帳篷、聖誕樹的位置
-export const YARD = [[14, 600, 170, 175], [168, 610, 160, 165]];
+// 公園的草地上放節慶帳篷、聖誕樹（11/14 起前院改成公園）
+export const YARD = [[20, 676, 130, 134], [158, 686, 120, 124]];
 
 export function hubBack(ph, wx, { december = false, newyear = false } = {}) {
   const { grey, colors: [a, b] } = skyColors(ph, wx);
@@ -90,7 +93,7 @@ export function roomSvg(room, ph, { newyear = false } = {}) {
 
 // ---------- 車庫裡的車、學堂、農場（外觀） ----------
 export const GARAGE_CAR = `<svg viewBox="0 0 226 190"><rect width="226" height="190" fill="#5a5f6a"/><rect y="160" width="226" height="30" fill="#4a4e58"/>
-  <g class="carbody"><path d="M18 150V118Q24 88 56 82H160Q194 88 206 118V150Z" fill="#ff6b5c"/><path d="M52 118Q60 94 82 94H146Q168 94 176 118Z" fill="#d6f4ff"/>
+  <g class="carbody"><path d="M18 150V118Q24 88 56 82H160Q194 88 206 118V150Z" fill="#ff6b5c"/><path d="M52 118Q60 94 82 94H146Q168 94 176 118Z" fill="#d6f4ff"/><g class="pupu-mini"><circle cx="96" cy="108" r="13" fill="#9d8fd0"/><path d="M83 104Q85 90 96 90Q107 90 109 104Z" fill="#2f6fd6"/><circle cx="91" cy="110" r="2.5" fill="#1d2433"/><circle cx="101" cy="110" r="2.5" fill="#1d2433"/></g>
   <circle cx="60" cy="152" r="20" fill="#333"/><circle cx="168" cy="152" r="20" fill="#333"/><circle cx="60" cy="152" r="8" fill="#ddd"/><circle cx="168" cy="152" r="8" fill="#ddd"/>
   <rect x="196" y="122" width="12" height="10" rx="3" fill="#ffe680"/></g></svg>`;
 
@@ -117,6 +120,7 @@ export function farmExt(ph) {
     <g stroke="#fff" stroke-width="7" stroke-linecap="round">${[10, 46, 214, 246].map((x) => `<path d="M${x} 230V188"/>`).join('')}<path d="M6 200H60M200 200H248M6 220H60M200 220H248"/></g>
     <g transform="translate(36 232) scale(.34)" class="${night ? 'asleep' : ''}">${ANIMALS.chick}</g>
     <g transform="translate(220 236) scale(.26)">${ANIMALS.cow}</g>
+    <g class="${night ? 'asleep' : ''}">${characterSvg('doudou', { x: 150, y: 172, s: 0.2 })}</g>
   </svg>`;
 }
 

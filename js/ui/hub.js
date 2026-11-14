@@ -8,7 +8,7 @@ import { phase, dateKey } from '../core/clock.js';
 import { state, save } from '../core/store.js';
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import * as weather from '../core/weather.js';
-import { hubBack, roomSvg, SPOTS, YARD, GARAGE_CAR, schoolExt, farmExt, tentSvg } from '../art/hub.js';
+import { hubBack, roomSvg, SPOTS, YARD, GARAGE_CAR, schoolExt, farmExt, tentSvg, parkExt } from '../art/hub.js';
 import { ICON } from './screens.js';
 import * as fest from '../core/festival.js';
 import { TREE_ICON } from '../art/xmas.js';
@@ -25,6 +25,8 @@ export function showHub(stage, profile) {
     const bids = fest.birthdayKids();
     const ny = fest.newYear();
     const dec = fest.isDecember();
+    // 週末：公園發亮，奇奇說「今天是週末，去公園玩吧」
+    const weekend = [0, 6].includes(new Date(`${dateKey()}T12:00:00`).getDay());
     const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;height:${h}px`;
     // 前院：節慶帳篷、聖誕樹，依序放進空位
     const yard = [];
@@ -39,6 +41,7 @@ export function showHub(stage, profile) {
         <button class="room out garage" data-room="car" style="${pos(SPOTS.car)}">${GARAGE_CAR}</button>
         <button class="room out" data-room="school" style="${pos(SPOTS.school)}">${schoolExt(ph)}</button>
         <button class="room out" data-room="farm" style="${pos(SPOTS.farm)}">${farmExt(ph)}</button>
+        <button class="room out park-room${weekend && !night ? ' glow-park' : ''}" data-room="park" style="${pos(SPOTS.park)}">${parkExt(ph)}</button>
         ${yard.slice(0, YARD.length).map(([room, cls, svg], i) => `<button class="room out yard ${cls}" data-room="${room}" style="${pos(YARD[i])}">${svg}</button>`).join('')}
         <div class="avs">${avatars}</div>
         <button class="round-btn home">${ICON.home}</button>
@@ -82,6 +85,10 @@ export function showHub(stage, profile) {
       speak('kiki', `ny_hub_${ny.stage}`, { name: profile.name, who: profile.id }).then(() => { if (!done) callTurn('kiki'); });
     } else if (x && fest.day() <= 24 && profile.members.some((id) => !x.greeted[id])) {
       santaPop(node, profile).then(() => { if (!done) pickLine(); });
+    } else if (weekend && !night && !state.parkHint?.[profile.id + dateKey()]) {
+      state.parkHint = { [profile.id + dateKey()]: true };
+      save();
+      speak('kiki', 'hub_park', { name: profile.name, who: profile.id }).then(() => { if (!done) pickLine(); });
     } else {
       pickLine();
     }

@@ -1,4 +1,4 @@
-// 農場：小羊棉棉的家。白天三個區域（動物圍欄、雞窩與乳牛、小菜園），晚上數羊。舞台 1200x900。
+// 農場：小羊豆豆的家。白天三個區域（動物圍欄、雞窩與乳牛、小菜園），晚上數羊。舞台 1200x900。
 import { characterSvg } from './characters.js';
 import { weatherLayer, skyColors } from './bathroom.js';
 
@@ -173,6 +173,6 @@ export const FARM_ICON = `<svg viewBox="0 0 420 420" width="420" height="420">
   <rect width="420" height="420" rx="40" fill="#bfe8ff"/>
   <path d="M0 250Q200 200 420 240V420H0Z" fill="#7ccf5e"/>
   <g transform="translate(250 110) scale(.6)"><path d="M0 80L110 0L220 80V240H0Z" fill="#d9483b"/><rect x="70" y="130" width="80" height="110" fill="#a8322a"/><path d="M70 130L150 240M150 130L70 240" stroke="#fff" stroke-width="8"/></g>
-  ${characterSvg('mian', { x: 40, y: 150, s: 0.7 })}
+  ${characterSvg('doudou', { x: 40, y: 150, s: 0.7 })}
   <g transform="translate(320 380) scale(.55)">${ANIMALS.chick}</g>
 </svg>`;

@@ -171,12 +171,95 @@ function santa(extra = '') {
 }
 
 // 睡帽（平安夜用）
+
+// 小河馬噗噗：穩重、很注意安全的司機（原創造型）
+function pupu(extra = '') {
+  return `
+  <g class="char pupu">
+    <ellipse cx="120" cy="312" rx="98" ry="10" fill="#000" opacity=".12"/>
+    <ellipse cx="88" cy="304" rx="28" ry="12" fill="#7d6fb8"/><ellipse cx="152" cy="304" rx="28" ry="12" fill="#7d6fb8"/>
+    <g class="arm arm-l"><ellipse cx="44" cy="220" rx="20" ry="44" fill="#9d8fd0" transform="rotate(20 44 220)"/></g>
+    <g class="arm arm-r"><ellipse cx="196" cy="220" rx="20" ry="44" fill="#9d8fd0" transform="rotate(-20 196 220)"/></g>
+    <ellipse cx="120" cy="232" rx="84" ry="78" fill="#9d8fd0"/>
+    <ellipse cx="120" cy="246" rx="52" ry="54" fill="#c9bff0"/>
+    <circle cx="62" cy="52" r="16" fill="#9d8fd0"/><circle cx="62" cy="52" r="8" fill="#e8a0b8"/>
+    <circle cx="178" cy="52" r="16" fill="#9d8fd0"/><circle cx="178" cy="52" r="8" fill="#e8a0b8"/>
+    <ellipse cx="120" cy="96" rx="76" ry="58" fill="#9d8fd0"/>
+    ${eyes(92, 148, 86, '#9d8fd0')}
+    <ellipse cx="120" cy="140" rx="70" ry="40" fill="#c9bff0"/>
+    <ellipse cx="98" cy="126" rx="6" ry="8" fill="#6a5ca8"/><ellipse cx="142" cy="126" rx="6" ry="8" fill="#6a5ca8"/>
+    <circle cx="64" cy="128" r="10" fill="#ff9fb0" opacity=".6"/><circle cx="176" cy="128" r="10" fill="#ff9fb0" opacity=".6"/>
+    <ellipse class="mouth" cx="120" cy="156" rx="16" ry="9" fill="#b8412f"/>
+    <path d="M100 150Q120 164 140 150" fill="none" stroke="#6a5ca8" stroke-width="4" stroke-linecap="round"/>
+    <g transform="translate(120 44)"><path d="M-58 4Q-56 -34 0 -38Q56 -34 58 4Z" fill="#2f6fd6"/><path d="M-60 4H74Q76 16 60 16H-60Z" fill="#1f4fa8"/>
+      <circle cx="0" cy="-16" r="11" fill="#ffd34d"/><path d="M-6 -16h12M0 -22v12" stroke="#2f6fd6" stroke-width="3"/></g>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
+// 小狗豆豆：勤勞的牧羊犬，照顧農場動物（原創造型）
+function doudou(extra = '') {
+  return `
+  <g class="char doudou">
+    <ellipse cx="120" cy="312" rx="88" ry="10" fill="#000" opacity=".12"/>
+    <g class="tail"><path d="M168 258Q226 236 214 186Q206 216 166 236Z" fill="#c98b4f"/><path d="M214 186Q222 198 216 212Q210 200 206 196Z" fill="#fff4e2"/></g>
+    <ellipse cx="92" cy="306" rx="24" ry="11" fill="#fff4e2"/><ellipse cx="148" cy="306" rx="24" ry="11" fill="#fff4e2"/>
+    <g class="arm arm-l"><ellipse cx="64" cy="226" rx="15" ry="40" fill="#c98b4f" transform="rotate(18 64 226)"/><circle cx="54" cy="260" r="13" fill="#fff4e2"/></g>
+    <g class="arm arm-r"><ellipse cx="176" cy="226" rx="15" ry="40" fill="#c98b4f" transform="rotate(-18 176 226)"/><circle cx="186" cy="260" r="13" fill="#fff4e2"/></g>
+    <ellipse cx="120" cy="240" rx="58" ry="66" fill="#c98b4f"/>
+    <ellipse cx="120" cy="252" rx="34" ry="46" fill="#fff4e2"/>
+    <path d="M70 178Q120 200 170 178L176 196Q120 222 64 196Z" fill="#e5484d"/>
+    <circle cx="120" cy="206" r="10" fill="#ffd34d"/>
+    <path d="M36 66Q14 120 40 156Q60 140 64 92Z" fill="#8a5a2b"/>
+    <path d="M204 66Q226 120 200 156Q180 140 176 92Z" fill="#8a5a2b"/>
+    <ellipse cx="120" cy="104" rx="80" ry="70" fill="#c98b4f"/>
+    <path d="M150 50Q186 60 190 104Q172 84 146 86Z" fill="#fff4e2"/>
+    ${eyes(88, 152, 96, '#c98b4f')}
+    <ellipse cx="120" cy="142" rx="44" ry="32" fill="#fff4e2"/>
+    <ellipse cx="120" cy="124" rx="14" ry="10" fill="#3a2a22"/>
+    <circle cx="70" cy="132" r="10" fill="#ff9fb0" opacity=".6"/><circle cx="170" cy="132" r="10" fill="#ff9fb0" opacity=".6"/>
+    <ellipse class="mouth" cx="120" cy="152" rx="11" ry="9" fill="#b8412f"/>
+    <path d="M104 144Q120 156 136 144" fill="none" stroke="#3a2a22" stroke-width="4" stroke-linecap="round"/>
+    <path d="M114 158Q120 176 126 158Z" fill="#ff7f9a"/>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
+// 小猴子跳跳：愛爬愛盪鞦韆的運動高手（原創造型）
+function tiaotiao(extra = '') {
+  return `
+  <g class="char tiaotiao">
+    <ellipse cx="120" cy="312" rx="88" ry="10" fill="#000" opacity=".12"/>
+    <g class="tail"><path d="M164 270Q236 268 226 206Q218 172 192 184Q210 190 210 212Q212 248 162 250Z" fill="#a0673a"/></g>
+    <ellipse cx="94" cy="306" rx="24" ry="11" fill="#f3d2a8"/><ellipse cx="146" cy="306" rx="24" ry="11" fill="#f3d2a8"/>
+    <g class="arm arm-l"><path d="M70 190Q24 230 40 280" stroke="#a0673a" stroke-width="24" fill="none" stroke-linecap="round"/><circle cx="40" cy="282" r="14" fill="#f3d2a8"/></g>
+    <g class="arm arm-r"><path d="M170 190Q216 230 200 280" stroke="#a0673a" stroke-width="24" fill="none" stroke-linecap="round"/><circle cx="200" cy="282" r="14" fill="#f3d2a8"/></g>
+    <ellipse cx="120" cy="240" rx="56" ry="66" fill="#a0673a"/>
+    <ellipse cx="120" cy="250" rx="34" ry="44" fill="#f3d2a8"/>
+    <circle cx="36" cy="110" r="30" fill="#a0673a"/><circle cx="36" cy="110" r="17" fill="#f3d2a8"/>
+    <circle cx="204" cy="110" r="30" fill="#a0673a"/><circle cx="204" cy="110" r="17" fill="#f3d2a8"/>
+    <ellipse cx="120" cy="104" rx="78" ry="74" fill="#a0673a"/>
+    <path d="M120 74C96 46 52 62 60 104C66 148 96 172 120 172C144 172 174 148 180 104C188 62 144 46 120 74Z" fill="#f3d2a8"/>
+    ${eyes(94, 146, 100, '#f3d2a8')}
+    <ellipse cx="112" cy="128" rx="3.5" ry="4" fill="#5a3a22"/><ellipse cx="128" cy="128" rx="3.5" ry="4" fill="#5a3a22"/>
+    <circle cx="74" cy="134" r="10" fill="#ff9fb0" opacity=".7"/><circle cx="166" cy="134" r="10" fill="#ff9fb0" opacity=".7"/>
+    <ellipse class="mouth" cx="120" cy="150" rx="13" ry="10" fill="#b8412f"/>
+    <path d="M100 142Q120 160 140 142" fill="none" stroke="#5a3a22" stroke-width="4" stroke-linecap="round"/>
+    <path d="M46 62Q120 20 194 62" stroke="#3fb5e8" stroke-width="16" fill="none" stroke-linecap="round"/>
+    <path d="M190 60l18 -4l-6 18Z" fill="#3fb5e8"/>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
 export const NIGHTCAP = {
   dudu: `<g class="cap"><path d="M64 60Q96 -14 176 44L180 60Q120 40 62 74Z" fill="#7a8cff"/><path d="M62 66Q120 44 182 62" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/><circle cx="182" cy="40" r="13" fill="#fff"/></g>`,
   kiki: `<g class="cap"><path d="M70 56Q100 -4 168 34L170 50Q120 36 70 66Z" fill="#7a8cff"/><path d="M70 60Q120 40 172 52" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="174" cy="32" r="12" fill="#fff"/></g>`,
 };
 
-const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu };
+const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao };
 
 // 回傳可放進 <svg> 的角色群組，x、y 為左上角，s 為縮放。
 export function characterSvg(id, { x = 0, y = 0, s = 1, extra = '' } = {}) {

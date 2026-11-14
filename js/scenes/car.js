@@ -46,7 +46,8 @@ export function mountCar(stage, { profile, onExit }) {
   let mode = 'intro';
   let timeUp = false;
   const cleanups = [];
-  const say = (who, id) => speak(who, id, { name: profile.name, who: profile.id, node: who === 'kiki' || who === 'dudu' ? rider(who) : null });
+  const say = (who, id) => speak(who, id, { name: profile.name, who: profile.id, node: who === 'kiki' || who === 'dudu' ? rider(who) : who === 'pupu' ? driver() : null });
+  const driver = () => $('.driver', root);
   const guard = () => { if (!alive) throw new Error('scene-closed'); };
   const pause = async (ms) => { await wait(ms); guard(); };
   function flash(node, cls) {
@@ -63,7 +64,7 @@ export function mountCar(stage, { profile, onExit }) {
 
   // 等小孩按某個駕駛按鈕；按錯會提醒
   async function waitBtn(correct, hintLine) {
-    await turnCall('dudu', rider('dudu'));
+    await turnCall('pupu', driver());
     guard();
     return new Promise((resolve) => {
       drive.classList.add('active');
@@ -75,7 +76,7 @@ export function mountCar(stage, { profile, onExit }) {
         if (!correct.includes(b.dataset.k)) {
           sfx('wrong');
           flash(b, 'nope');
-          say('dudu', hintLine || 'wrong');
+          say('pupu', hintLine || 'wrong');
           if (hard) $$('.dbtn', drive).forEach((x) => x.classList.toggle('glow', correct.includes(x.dataset.k)));
           return;
         }
@@ -93,14 +94,14 @@ export function mountCar(stage, { profile, onExit }) {
 
   // ---------- 一、繫安全帶 ----------
   async function buckleUp() {
-    await say('dudu', 'c_belt');
-    if (!hard) await say('dudu', 'c_belt_easy');
+    await say('pupu', 'c_belt');
+    if (!hard) await say('pupu', 'c_belt_easy');
     guard();
     // 一起玩：輪流扣，先幫奇奇、嘟嘟，最後各自扣自己的
     const first = whoseTurn();
     const mine = turnsOn() ? [`kid-${first}`, `kid-${otherKid(first)}`] : kidKeys;
     const order = ['kiki', 'dudu', ...mine];
-    if (kidKeys.length > 1) await say('dudu', 'c_belt_both');
+    if (kidKeys.length > 1) await say('pupu', 'c_belt_both');
     const done = new Set();
     await new Promise((resolve) => {
       const glowNext = () => {
@@ -109,7 +110,7 @@ export function mountCar(stage, { profile, onExit }) {
       };
       glowNext();
       let calling = turnsOn();
-      if (calling) turnCall('dudu', rider('dudu')).then(() => { calling = false; });
+      if (calling) turnCall('pupu', driver()).then(() => { calling = false; });
       $$('.buckle', root).forEach((b) => onTap(b, async () => {
         const who = b.dataset.who;
         if (done.has(who) || calling) return;
@@ -123,11 +124,11 @@ export function mountCar(stage, { profile, onExit }) {
         glowNext();
         if (kidKeys.includes(who)) {
           const id = kidIdOf[who];
-          await speak('dudu', 'c_kid_ok', { name: PROFILES[id].name, who: kidKeys.length > 1 ? id : profile.id, node: rider('dudu') });
+          await speak('pupu', 'c_kid_ok', { name: PROFILES[id].name, who: kidKeys.length > 1 ? id : profile.id, node: driver() });
         }
         else await say(who, 'c_click');
         if (done.size === order.length && !hard) { passTurn(); resolve(); return; }
-        if (turnsOn() && done.size < order.length) { calling = true; passTurn(); await turnCall('dudu', rider('dudu')); calling = false; }
+        if (turnsOn() && done.size < order.length) { calling = true; passTurn(); await turnCall('pupu', driver()); calling = false; }
       }));
       if (hard) {
         // 6 歲版：自己判斷，點「走」時檢查有沒有每個人都扣好
@@ -138,7 +139,7 @@ export function mountCar(stage, { profile, onExit }) {
           if (b.dataset.k !== 'go') { flash(b, 'nope'); return; }
           if (done.size < order.length) {
             sfx('wrong');
-            await say('dudu', 'c_not_yet');
+            await say('pupu', 'c_not_yet');
             return;
           }
           drive.removeEventListener('pointerdown', h);
@@ -166,7 +167,7 @@ export function mountCar(stage, { profile, onExit }) {
     $('.belt.kiki', root).classList.remove('on');
     await say('kiki', 'c_naughty');
     guard();
-    await turnCall('dudu', rider('dudu'));
+    await turnCall('pupu', driver());
     guard();
     k.classList.add('glow-char');
     await new Promise((resolve) => {
@@ -177,7 +178,7 @@ export function mountCar(stage, { profile, onExit }) {
     guard();
     passTurn();
     k.classList.remove('glow-char');
-    await say('dudu', 'c_sitdown');
+    await say('pupu', 'c_sitdown');
     k.classList.remove('naughty');
     $('.belt.kiki', root).classList.add('on');
     sfx('pop');
@@ -189,7 +190,7 @@ export function mountCar(stage, { profile, onExit }) {
     show('show-light', true);
     light('red');
     sfx('pop');
-    if (hard) await say('kiki', 'c_what'); else await say('dudu', 'c_red');
+    if (hard) await say('kiki', 'c_what'); else await say('pupu', 'c_red');
     await waitBtn(['stop'], 'c_red');
     guard();
     setDriving(false);
@@ -197,7 +198,7 @@ export function mountCar(stage, { profile, onExit }) {
     await pause(1500);
     light('green');
     sfx('sparkle');
-    if (!hard) await say('dudu', 'c_green');
+    if (!hard) await say('pupu', 'c_green');
     await waitBtn(['go'], 'c_green');
     guard();
     setDriving(true);
@@ -213,7 +214,7 @@ export function mountCar(stage, { profile, onExit }) {
     await waitBtn(['slow', 'stop'], 'c_yellow');
     guard();
     root.classList.add('slowing');
-    await say('dudu', 'c_yellow');
+    await say('pupu', 'c_yellow');
     setDriving(false);
     root.classList.remove('slowing');
     await pause(800);
@@ -235,9 +236,9 @@ export function mountCar(stage, { profile, onExit }) {
     await waitBtn(['stop'], 'c_walker');
     guard();
     setDriving(false);
-    await say('dudu', 'c_walker');
+    await say('pupu', 'c_walker');
     root.classList.add('walking');
-    await say('dudu', 'c_cross');
+    await say('pupu', 'c_cross');
     await pause(1500);
     show('show-walkers', false);
     root.classList.remove('walking');
@@ -274,14 +275,14 @@ export function mountCar(stage, { profile, onExit }) {
     show('arrived', true);
     sfx('sparkle');
     await say('kiki', 'c_arrive');
-    await say('dudu', 'c_unbuckle');
+    await say('pupu', 'c_unbuckle');
     guard();
     // 解開安全帶（點扣環）
     await new Promise((resolve) => {
       const left = new Set(['kiki', 'dudu', ...kidKeys]);
       $$('.buckle', root).forEach((b) => { b.classList.remove('done'); b.classList.add('glow'); });
       let calling = turnsOn();
-      if (calling) turnCall('dudu', rider('dudu')).then(() => { calling = false; });
+      if (calling) turnCall('pupu', driver()).then(() => { calling = false; });
       $$('.buckle', root).forEach((b) => onTap(b, async () => {
         const who = b.dataset.who;
         if (!left.has(who) || calling) return;
@@ -292,17 +293,17 @@ export function mountCar(stage, { profile, onExit }) {
         b.classList.add('done');
         passTurn();
         if (!left.size) { resolve(); return; }
-        if (turnsOn()) { calling = true; await turnCall('dudu', rider('dudu')); calling = false; }
+        if (turnsOn()) { calling = true; await turnCall('pupu', driver()); calling = false; }
       }));
       cleanups.push(() => resolve());
     });
     guard();
     const doors = $('.c-doors', root);
     doors.classList.remove('hidden');
-    if (hard) await say('dudu', 'c_door');
-    else { $('.cdoor[data-d="right"]', root).classList.add('glow'); await say('dudu', 'c_door_easy'); }
+    if (hard) await say('pupu', 'c_door');
+    else { $('.cdoor[data-d="right"]', root).classList.add('glow'); await say('pupu', 'c_door_easy'); }
     guard();
-    await turnCall('dudu', rider('dudu'));
+    await turnCall('pupu', driver());
     guard();
     await new Promise((resolve) => {
       $$('.cdoor', root).forEach((b) => onTap(b, async () => {
@@ -311,7 +312,7 @@ export function mountCar(stage, { profile, onExit }) {
           sfx('wrong');
           root.classList.add('honk');
           setTimeout(() => root.classList.remove('honk'), 1200);
-          await say('dudu', 'c_door_wrong');
+          await say('pupu', 'c_door_wrong');
           $('.cdoor[data-d="right"]', root).classList.add('glow');
           return;
         }
@@ -335,7 +336,7 @@ export function mountCar(stage, { profile, onExit }) {
     const node = el(`<div class="gift">${cards}</div>`);
     root.appendChild(node);
     sfx('sparkle');
-    await say('kiki', 'gift');
+    await say('pupu', 'gift');
     await pause(600);
     node.classList.add('away');
     await pause(650);
@@ -347,7 +348,7 @@ export function mountCar(stage, { profile, onExit }) {
     const winners = slot ? profile.members.filter((id) => !hasClaimed(id, `car_${slot}`)) : [];
     if (winners.length) {
       const gifts = winners.map((id) => {
-        const item = nextItem(state.profiles[id].collection, 'kiki');
+        const item = nextItem(state.profiles[id].collection, 'pupu');
         addItem(id, item);
         claim(id, `car_${slot}`);
         return { id, item };
@@ -355,16 +356,17 @@ export function mountCar(stage, { profile, onExit }) {
       save();
       await showGift(gifts);
     } else {
-      await say('kiki', 'practice');
+      await say('pupu', 'practice');
     }
     guard();
-    await say('dudu', 'c_mission');
+    await say('pupu', 'c_mission');
   }
 
   // ---------- 流程 ----------
   async function main() {
     mode = 'act';
     await say('kiki', 'c_hello');
+    await say('pupu', 'c_pupu_hi');
     guard();
     await buckleUp();
     guard();
@@ -394,7 +396,7 @@ export function mountCar(stage, { profile, onExit }) {
 
   async function goodbye() {
     mode = 'end';
-    await say('kiki', weather.niceOutside(ph) ? 'bye_sunny' : 'bye');
+    await say('pupu', weather.niceOutside(ph) ? 'bye_sunny' : 'bye');
     sfx('bye');
     root.classList.add('lights-out');
     await wait(1600);
@@ -431,7 +433,7 @@ export function mountCar(stage, { profile, onExit }) {
 
   return {
     destroy,
-    hostChar: 'kiki',
+    hostChar: 'pupu',
     requestEnd() {
       if (timeUp || !alive) return;
       timeUp = true;

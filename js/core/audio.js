@@ -88,6 +88,7 @@ function noise(t, dur, { freq = 2000, q = 1, gain = 0.3, type = 'bandpass', to =
 
 // ---------- 音效 ----------
 const SFX = {
+  water: (t) => { for (let i = 0; i < 6; i++) tone(700 + Math.random() * 900, t + i * 0.07, 0.08, { to: 300, gain: 0.08 }); },
   tap: (t) => tone(520, t, 0.12, { type: 'triangle', to: 880, gain: 0.25 }),
   pop: (t) => tone(900 + Math.random() * 500, t, 0.09, { to: 240, gain: 0.3 }),
   bubble: (t) => tone(400 + Math.random() * 500, t, 0.14, { to: 1300, gain: 0.14 }),
@@ -250,6 +251,11 @@ const TRACKS = {
     style: 'bg', bpm: 100, lead: 'triangle', leadGain: 0.18,
     melody: seq('C5 . E5 . G5 . E5 . A5 . G5 . E5 . . .  D5 . F5 . A5 . G5 . E5 . D5 . C5 . . .'),
     bass: seq('C3 . . G3 . . C3 . F2 . . C3 . . F2 .  D3 . . A2 . . G2 . C3 . . G2 . . C3 .'),
+  },
+  park: {
+    style: 'bg', bpm: 116, lead: 'triangle', leadGain: 0.2,
+    melody: seq('G4 . C5 . E5 . G5 . E5 . C5 . D5 . . .  F5 . E5 . D5 . C5 . A4 . B4 . C5 . . .  G4 . C5 . E5 . G5 . A5 . G5 . E5 . . .  F5 . D5 . B4 . G4 . C5 . . . . . . .'),
+    bass: seq('C3 . G2 . C3 . G2 . A2 . E2 . G2 . D3 .  F2 . C3 . G2 . D3 . A2 . E2 . G2 . . .  C3 . G2 . C3 . G2 . F2 . C3 . A2 . E2 .  F2 . C3 . G2 . D3 . C3 . G2 . C3 . . .'),
   },
   // ---- 一起做 ----
   tidy: {

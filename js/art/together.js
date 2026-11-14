@@ -6,6 +6,7 @@ import { classroomBack } from './school.js';
 import { farmBack } from './farm.js';
 import { roadSvg, CABIN, MIRROR } from './car.js';
 import { bathBack } from './bathroom.js';
+import { parkBack } from './park.js';
 
 const I = {
   // 玩遊戲：遊戲手把
@@ -82,6 +83,10 @@ const I = {
   moto: `<circle cx="22" cy="68" r="14" fill="none" stroke="#333" stroke-width="7"/><circle cx="78" cy="68" r="14" fill="none" stroke="#333" stroke-width="7"/>
     <path d="M22 68L42 46H66L78 68" fill="none" stroke="#4f7cff" stroke-width="8" stroke-linejoin="round"/><path d="M36 46H58Q60 36 50 36H40Z" fill="#4f7cff"/><path d="M66 46L70 30H78" stroke="#333" stroke-width="5" fill="none" stroke-linecap="round"/>`,
   zebra: `<rect x="4" y="20" width="92" height="64" rx="6" fill="#6b7280"/>${[14, 32, 50, 68].map((x) => `<rect x="${x}" y="26" width="12" height="52" fill="#fff"/>`).join('')}`,
+  park: `<rect x="14" y="30" width="8" height="64" fill="#5fa8e8"/><rect x="34" y="30" width="8" height="64" fill="#5fa8e8"/>${[0, 1, 2].map((i) => `<rect x="14" y="${46 + i * 16}" width="28" height="4" fill="#5fa8e8"/>`).join('')}
+    <rect x="10" y="24" width="44" height="10" rx="4" fill="#e5484d"/><path d="M52 28Q76 30 82 60Q88 84 98 86V94Q80 92 74 66Q68 40 52 38Z" fill="#ffd34d"/><circle cx="70" cy="14" r="10" fill="#ffd34d"/>`,
+  sandtoys: `<path d="M18 44H60L55 90H23Z" fill="#ff6b5c"/><path d="M18 44Q39 24 60 44" stroke="#e5484d" stroke-width="4" fill="none"/><path d="M70 12L80 64" stroke="#3fb5e8" stroke-width="7" stroke-linecap="round"/><path d="M74 60Q92 64 84 86Q72 82 74 60Z" fill="#3fb5e8"/>`,
+  sunscreen: `<rect x="34" y="26" width="32" height="64" rx="10" fill="#ffb300"/><rect x="40" y="12" width="20" height="16" rx="4" fill="#fff"/><circle cx="50" cy="58" r="12" fill="#fff"/><g stroke="#fff" stroke-width="3">${[0, 45, 90, 135, 180, 225, 270, 315].map((a) => `<path d="M50 58L${50 + 18 * Math.cos(a * Math.PI / 180)} ${58 + 18 * Math.sin(a * Math.PI / 180)}"/>`).join('')}</g>`,
   go: `<circle cx="50" cy="50" r="40" fill="#5ed17a"/><path d="M38 28L72 50L38 72Z" fill="#fff"/>`,
 };
 // 出門用的衣物沿用大門場景的圖
@@ -102,6 +107,7 @@ export function backFor(kind, ph, wx) {
     case 'wash': case 'brush': return bathBack(ph, wx);
     case 'bag': case 'homework': return classroomBack(ph, wx);
     case 'gym': return farmBack(ph, wx);
+    case 'outing': return parkBack(ph, wx, { night: false });
     case 'ride': return `<svg viewBox="0 0 1200 900">${CABIN}<g>${roadSvg(ph, wx)}</g>${MIRROR}</svg>`;
     default: return '';
   }

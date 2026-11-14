@@ -71,11 +71,18 @@ export const CABIN = `
   <rect x="0" y="380" width="1200" height="90" fill="#2b2f3a"/>
   <rect x="80" y="390" width="1040" height="30" rx="14" fill="#444a60"/>
   <g transform="translate(300 470)"><circle r="120" fill="none" stroke="#1d2030" stroke-width="26"/><rect x="-12" y="-120" width="24" height="120" fill="#1d2030"/><circle r="30" fill="#1d2030"/></g>
+  <!-- 司機噗噗（從後座看到的後腦勺和帽子） -->
+  <g class="driver"><g class="driver-in">
+    <circle cx="244" cy="380" r="18" fill="#9d8fd0"/><circle cx="356" cy="380" r="18" fill="#9d8fd0"/>
+    <ellipse cx="300" cy="420" rx="76" ry="66" fill="#9d8fd0"/>
+    <path d="M232 384Q236 330 300 326Q364 330 368 384Z" fill="#2f6fd6"/><path d="M232 384H368" stroke="#1f4fa8" stroke-width="8"/>
+  </g></g>
   <rect x="120" y="470" width="360" height="200" rx="40" fill="#556088"/><rect x="720" y="470" width="360" height="200" rx="40" fill="#556088"/>`;
 
 // 照後鏡（畫在道路上面）：救護車從後面來時會在鏡子裡閃
 export const MIRROR = `
   <g class="mirror"><rect x="520" y="34" width="160" height="62" rx="16" fill="#2b2f3a"/><rect class="mirror-glass" x="530" y="42" width="140" height="46" rx="12" fill="#9fb3c8"/>
+    <g class="mirror-pupu"><rect x="540" y="48" width="120" height="40" rx="10" fill="#9d8fd0"/><circle cx="580" cy="66" r="7" fill="#1d2433"/><circle cx="620" cy="66" r="7" fill="#1d2433"/><circle cx="582" cy="64" r="2.5" fill="#fff"/><circle cx="622" cy="64" r="2.5" fill="#fff"/><path d="M540 52H660" stroke="#2f6fd6" stroke-width="8"/></g>
     <g class="mirror-amb"><rect x="580" y="52" width="40" height="28" rx="5" fill="#fff"/><rect x="596" y="56" width="8" height="18" fill="#e5484d"/><rect x="591" y="61" width="18" height="8" fill="#e5484d"/><rect x="590" y="46" width="20" height="8" rx="3" fill="#e5484d"/></g></g>`;
 
 // 後座三個位子：奇奇（左）、小孩的安全座椅（中）、嘟嘟（右）
