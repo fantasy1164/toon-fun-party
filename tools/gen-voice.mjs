@@ -10,6 +10,7 @@
 //   node tools/gen-voice.mjs --force      # 已存在的也重做
 //   node tools/gen-voice.mjs --dry        # 只列出要做什麼，不呼叫 API
 //   node tools/gen-voice.mjs --convert    # 把現有的 wav 轉成 mp3（需要 ffmpeg，不呼叫 API）
+//   node tools/gen-voice.mjs --resplit    # 用 tools/voice-debug 裡存下來的原始語音重新切一次（不呼叫 API）
 //
 // 金鑰只放在環境變數，不要寫進任何檔案。
 // 角色的聲音與說話風格在 tools/voice-config.json。
@@ -203,7 +204,7 @@ export function splitBySilence(samples, rate, texts) {
   };
   // 每段長度要跟字數大致相符（每個字 0.08 到 0.7 秒）
   // 同一次請求裡說話速度差不多：每段「秒數／字數」不能跟中位數差太多（太短或太長多半是切錯）
-  const okLen = (bounds) => {
+  const okLen = (bounds, loose = false) => {
     const ok = bounds.every(([s0, e0], i) => {
       const sec = (e0 - s0) * FR;
       const c = charsOf(texts[i]);
@@ -214,14 +215,18 @@ export function splitBySilence(samples, rate, texts) {
     if (r.length < 3) return true;
     const med = r.map((x) => x.r).sort((a, b) => a - b)[Math.floor(r.length / 2)];
     // 短句（感嘆、單字）常唸得比較慢，只檢查不能太快；長句兩邊都檢查
-    return r.every((x) => x.r > med * 0.6 && (x.c <= 6 ? x.r < med * 2.6 : x.r < med * 1.6));
+    // loose：停頓非常清楚（句間停頓明顯比句中停頓長很多）時，語速檢查放寬
+    const lo = loose ? 0.45 : 0.6;
+    const hi = loose ? 2.2 : 1.6;
+    return r.every((x) => x.r > med * lo && (x.c <= 6 ? x.r < med * 2.6 : x.r < med * hi));
   };
   // 方法 A
   const byLen = gaps.slice().sort((x, y) => y.len - x.len);
   const A = byLen.slice(0, n - 1).sort((x, y) => x.start - y.start);
   const minA = Math.min(...A.map((g) => g.len));
   const nextA = byLen[n - 1]?.len || 0;
-  if (minA * FR >= 0.3 && minA >= nextA * 1.15 && okLen(boundsOf(A))) return { parts: cut(boundsOf(A)), how: 'A' };
+  const clearA = minA * FR >= 0.8 && minA >= nextA * 2.5;
+  if (minA * FR >= 0.3 && minA >= nextA * 1.15 && okLen(boundsOf(A), clearA)) return { parts: cut(boundsOf(A)), how: 'A' };
   // 方法 B：動態規劃，依序替每個交界挑一個停頓
   const w = texts.map(charsOf);
   const W = w.reduce((x, y) => x + y, 0);
@@ -346,6 +351,27 @@ if (flag('convert')) {
     }
   }
   console.log(`已轉換 ${n} 個檔案；清單已更新：${writeManifest()} 個語音檔`);
+  process.exit(0);
+}
+
+// 用之前切不開時存下來的原始語音再切一次（切割規則改良後可以撿回來，不花額度）
+if (flag('resplit')) {
+  const dir = join(ROOT, 'tools', 'voice-debug');
+  let n = 0;
+  for (const f of existsSync(dir) ? readdirSync(dir).filter((x) => x.endsWith('.txt')) : []) {
+    const wav = join(dir, f.replace(/\.txt$/, '.wav'));
+    if (!existsSync(wav)) continue;
+    const batch = readFileSync(join(dir, f), 'utf8').split('\n').filter((l) => l.includes('\t')).map((l) => { const [key, text] = l.split('\t'); return { key, text }; });
+    if (batch.every((j) => existing(j.key))) { console.log(`  ${f}：都已經有了`); continue; }
+    const b = readFileSync(wav);
+    const rate = b.readUInt32LE(24);
+    const samples = new Int16Array(b.buffer.slice(b.byteOffset + 44, b.byteOffset + b.length - ((b.length - 44) % 2)));
+    const { parts, how, info } = splitBySilence(samples, rate, batch.map((j) => j.text));
+    if (!parts) { console.log(`  ${f}：還是切不開（${info}）`); continue; }
+    batch.forEach((j, i) => { if (!existing(j.key)) { saveSamples(j.key, parts[i], rate); n++; } });
+    console.log(`  ${f}：切開了（方法 ${how}），存了 ${batch.length} 句`);
+  }
+  console.log(`撿回 ${n} 句；清單已更新：${writeManifest()} 個語音檔`);
   process.exit(0);
 }
 
