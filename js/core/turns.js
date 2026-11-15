@@ -72,6 +72,7 @@ export function turnsScene(root, { first = null } = {}) {
 // 畫面上的小孩身體：被唱名時揮手、做完時舉手歡呼
 export function kidAnim(id, cls, ms) {
   document.querySelectorAll(`[data-kid="${id}"]`).forEach((n) => {
+    if (n.closest('.bleed')) return;
     n.classList.remove(cls);
     void n.getBoundingClientRect();
     n.classList.add(cls);

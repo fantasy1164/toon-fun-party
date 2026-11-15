@@ -196,7 +196,7 @@ function hintTick() {
   if (!scene || stage.querySelector('.hint-hand, .cabinet, .parent, .gift, .storybook')) return;
   if (Date.now() - lastTouch < 8000 || quietFor() < 2500) return;
   const target = ['.glow-char', '.prop.glow', '.spot.glow', '.toy.glow', '.glow']
-    .map((q) => [...stage.querySelectorAll(q)].find((e) => e.getBoundingClientRect().width > 0))
+    .map((q) => [...stage.querySelectorAll(q)].find((e) => !e.closest('.bleed') && e.getBoundingClientRect().width > 0))
     .find(Boolean);
   if (!target) return;
   const sr = stage.getBoundingClientRect();

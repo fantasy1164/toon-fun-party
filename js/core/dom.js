@@ -1,6 +1,12 @@
 // 小工具：DOM、等待、亂數。
-export const $ = (sel, root = document) => root.querySelector(sel);
-export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+// 滿版的左右延伸（.bleed）是背景的複製品，找東西時要跳過，不然會找到看不見的那一份
+const real = (n) => !n.closest('.bleed');
+export const $ = (sel, root = document) => {
+  const n = root.querySelector(sel);
+  if (!n || real(n)) return n;
+  return [...root.querySelectorAll(sel)].find(real) || null;
+};
+export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)].filter(real);
 
 export function el(html) {
   const t = document.createElement('template');
