@@ -321,6 +321,12 @@ const TRACKS = {
     melody: seq('C5 D5 E5 . C5 . G5 . F5 . E5 . D5 . . .  E5 F5 G5 . E5 . C6 . A5 . G5 . E5 . . .  F5 . A5 . E5 . G5 . D5 . F5 . C5 . . .'),
     bass: seq('C3 . G2 . C3 . G2 . G2 . D3 . G2 . D3 .  C3 . G2 . A2 . E3 . F2 . C3 . F2 . C3 .  F2 . C3 . C3 . G2 . G2 . D3 . C3 . . .'),
   },
+  // ---- 遊樂園：像旋轉木馬的風琴 ----
+  amuse: {
+    style: 'song', bpm: 138, lead: 'square', leadGain: 0.12,
+    melody: seq('G4 . C5 . E5 . G5 . . . E5 . G5 . C6 .  B5 . A5 . G5 . E5 . F5 . D5 . . . . .  F4 . B4 . D5 . F5 . . . D5 . F5 . B5 .  A5 . G5 . F5 . D5 . E5 . C5 . . . . .'),
+    bass: seq('C3 . G3 . G3 . C3 . G3 . G3 . C3 . G3 .  A2 . E3 . E3 . F2 . C3 . G2 . D3 . D3 .  G2 . D3 . D3 . G2 . D3 . D3 . G2 . D3 .  F2 . C3 . G2 . D3 . C3 . G3 . C3 . . .'),
+  },
   bath: {
     style: 'song', bpm: 112, lead: 'triangle', leadGain: 0.2,
     melody: seq('G4 . B4 D5 G5 . D5 . E5 . C5 . B4 . . .  A4 . C5 E5 A5 . E5 . D5 . B4 . G4 . . .'),

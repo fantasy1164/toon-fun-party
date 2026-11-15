@@ -95,6 +95,13 @@ export const ITEMS = {
   lili_milk: `<path d="M30 30L40 14H60L70 30V88H30Z" fill="#fff" stroke="#9fd8ee" stroke-width="4" stroke-linejoin="round"/><path d="M30 30H70" stroke="#9fd8ee" stroke-width="4"/><path d="M30 52Q50 44 70 52V70Q50 62 30 70Z" fill="#5fa8e8"/><circle cx="50" cy="40" r="5" fill="#ff9fb0"/>`,
   lili_acorn: `<path d="M24 44Q50 26 76 44Q76 56 50 56Q24 56 24 44Z" fill="#8a4f22"/><path d="M50 24V34" stroke="#6b3a1e" stroke-width="6" stroke-linecap="round"/><path d="M30 54Q30 88 50 92Q70 88 70 54Z" fill="#d9944a"/><ellipse cx="40" cy="66" rx="5" ry="10" fill="#fff" opacity=".35"/>`,
   lili_register: `<rect x="14" y="44" width="72" height="42" rx="8" fill="#ff8a5c"/><rect x="24" y="16" width="46" height="26" rx="5" fill="#3a3a4a"/><rect x="30" y="22" width="34" height="14" rx="3" fill="#7be0a0"/>${[0, 1, 2].map((r) => [0, 1, 2].map((c) => `<rect x="${26 + c * 16}" y="${52 + r * 10}" width="12" height="7" rx="2" fill="#fff"/>`).join('')).join('')}<rect x="72" y="52" width="8" height="26" rx="3" fill="#ffd34d"/>`,
+  // 高高的遊樂園系列
+  gao_ticket: `<path d="M10 30H90V44A8 8 0 0 0 90 58V72H10V58A8 8 0 0 0 10 44Z" fill="#ff8fb0"/><path d="M66 30V72" stroke="#fff" stroke-width="3" stroke-dasharray="5 4"/><path d="M36 40l4 8h9l-7 6l3 9l-9 -5l-9 5l3 -9l-7 -6h9z" fill="#ffd34d"/>`,
+  gao_balloon: `<path d="M50 70Q46 82 54 94" stroke="#888" stroke-width="2" fill="none"/><ellipse cx="50" cy="40" rx="26" ry="31" fill="#e5484d"/><path d="M45 70h10l-5 -6z" fill="#c43a3f"/><ellipse cx="40" cy="28" rx="7" ry="11" fill="#fff" opacity=".45"/>`,
+  gao_horse: `<rect x="47" y="6" width="6" height="90" fill="#ffd34d"/><path d="M24 52Q24 38 40 38H62Q70 26 80 30L84 40L74 44V58Q74 66 64 66H34Q24 66 24 58Z" fill="#fff" stroke="#c9a0e8" stroke-width="3"/><path d="M62 38Q70 30 76 36" stroke="#c77dff" stroke-width="6" fill="none"/><circle cx="76" cy="36" r="2.5" fill="#333"/><path d="M32 66V80M44 66V82M58 66V82M68 66V78" stroke="#c9a0e8" stroke-width="5" stroke-linecap="round"/>`,
+  gao_ferris: `<circle cx="50" cy="44" r="32" fill="none" stroke="#5fa8e8" stroke-width="5"/>${[0, 60, 120, 180, 240, 300].map((r) => `<path d="M50 44L${(50 + 32 * Math.cos(r * Math.PI / 180)).toFixed(1)} ${(44 + 32 * Math.sin(r * Math.PI / 180)).toFixed(1)}" stroke="#5fa8e8" stroke-width="3"/><rect x="${(44 + 32 * Math.cos(r * Math.PI / 180)).toFixed(1)}" y="${(44 + 32 * Math.sin(r * Math.PI / 180)).toFixed(1)}" width="12" height="10" rx="3" fill="${['#e5484d', '#ffc400', '#3fbf7f'][r / 60 % 3]}"/>`).join('')}<path d="M50 44L32 94M50 44L68 94" stroke="#8a5a2b" stroke-width="5"/><circle cx="50" cy="44" r="6" fill="#ffd34d"/>`,
+  gao_popcorn: `${[[34, 30], [46, 22], [58, 28], [66, 36], [40, 40], [54, 38]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10" fill="#fff6d6" stroke="#f0d070" stroke-width="2"/>`).join('')}<path d="M26 40H74L66 94H34Z" fill="#fff"/>${[0, 1, 2].map((i) => `<path d="M${32 + i * 14} 40L${38 + i * 12} 94H${44 + i * 12}L${40 + i * 14} 40Z" fill="#e5484d"/>`).join('')}`,
+  gao_cap: `<path d="M18 62Q20 22 50 20Q80 22 82 62Z" fill="#e5484d"/><path d="M70 60Q96 58 96 70H66Z" fill="#c43a3f"/><path d="M18 62H82" stroke="#c43a3f" stroke-width="5"/><circle cx="50" cy="40" r="9" fill="#ffd34d"/><path d="M38 20L34 6M62 20L66 6" stroke="#d98a3a" stroke-width="5" stroke-linecap="round"/>`,
 };
 
 export const SERIES = {
@@ -109,6 +116,7 @@ export const SERIES = {
   tiaotiao: ['tiao_kite', 'tiao_bubble', 'tiao_sand', 'tiao_ball', 'tiao_disc', 'tiao_rope'],
   yuanyuan: ['yuan_steth', 'yuan_thermo', 'yuan_bandage', 'yuan_mask', 'yuan_bag', 'yuan_sticker'],
   lili: ['lili_cart', 'lili_ecobag', 'lili_coin', 'lili_milk', 'lili_acorn', 'lili_register'],
+  gaogao: ['gao_ticket', 'gao_balloon', 'gao_horse', 'gao_ferris', 'gao_popcorn', 'gao_cap'],
   kiki: ['kiki_leaf', 'kiki_ball', 'kiki_kite', 'kiki_car', 'kiki_star', 'kiki_mush'],
 };
 

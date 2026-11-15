@@ -562,8 +562,8 @@ html, body {
 @keyframes treeL { 0% { transform: translate(-60px, 0) scale(.2); opacity: 1; } 100% { transform: translate(-560px, 230px) scale(1.8); opacity: 1; } }
 @keyframes treeR { 0% { transform: translate(60px, 0) scale(.2); opacity: 1; } 100% { transform: translate(560px, 230px) scale(1.8); opacity: 1; } }
 .car:not(.driving) .rtree { animation-play-state: paused !important; }
-.car .tlight, .car .crosswalk, .car .walkers, .car .ambulance, .car .park, .car .mirror-amb { display: none; }
-.car.show-light .tlight, .car.show-cross .crosswalk, .car.show-walkers .walkers, .car.amb-pass .ambulance, .car.arrived .park, .car.amb-mirror .mirror-amb { display: block; }
+.car .tlight, .car .crosswalk, .car .walkers, .car .ambulance, .car .park, .car .dfarm, .car .damuse, .car .mirror-amb { display: none; }
+.car.show-light .tlight, .car.show-cross .crosswalk, .car.show-walkers .walkers, .car.amb-pass .ambulance, .car.arrived.dest-park .park, .car.arrived.dest-farm .dfarm, .car.arrived.dest-amuse .damuse, .car.amb-mirror .mirror-amb { display: block; }
 .car .tlight.red .l-red { fill: #ff3b3b; filter: drop-shadow(0 0 10px #ff3b3b); }
 .car .tlight.yellow .l-yellow { fill: #ffd34d; filter: drop-shadow(0 0 10px #ffd34d); }
 .car .tlight.green .l-green { fill: #3be37a; filter: drop-shadow(0 0 10px #3be37a); }
@@ -1211,14 +1211,14 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .hall .hf-badges { background: rgba(255, 248, 230, .97); display: flex; flex-direction: column; align-items: center; padding-top: 40px; }
 .hall .hf-bhead { position: relative; display: flex; flex-direction: column; align-items: center; }
 .hall .hf-bhead > svg:last-child { border-radius: 50%; border: 6px solid #ffd34d; }
-.hall .hf-bgrid { margin-top: 20px; display: grid; grid-template-columns: repeat(7, 130px); gap: 22px; }
-.hall .hf-badge { width: 130px; height: 130px; padding: 0; border: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #eee; box-shadow: 0 0 0 8px #d5d5d5; }
+.hall .hf-bgrid { margin-top: 20px; display: grid; grid-template-columns: repeat(8, 122px); gap: 16px; }
+.hall .hf-badge { width: 116px; height: 116px; padding: 0; border: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #eee; box-shadow: 0 0 0 8px #d5d5d5; }
 .hall .hf-badge.t0 svg { filter: grayscale(1); opacity: .35; }
 .hall .hf-badge.t1 { background: #fff; box-shadow: 0 0 0 9px #d9925a; }
 .hall .hf-badge.t2 { background: #fff; box-shadow: 0 0 0 9px #c0c8d4, 0 0 18px #fff; }
 .hall .hf-badge.t3 { background: #fff6c8; box-shadow: 0 0 0 10px #ffc400, 0 0 26px #ffd34d; }
 .hall .hf-badge.pop { animation: pulse .25s ease-in-out infinite alternate; }
-.hall .hf-close { position: absolute; right: 50px; top: 170px; width: 110px; height: 110px; }
+.hall .hf-close { position: absolute; left: 545px; top: 620px; width: 110px; height: 110px; }
 .hall .hf-concert { background: rgba(20, 8, 30, .82); }
 .hall .hf-lights { position: absolute; inset: 0; background: radial-gradient(circle at 25% 0, rgba(255, 140, 200, .35), transparent 40%), radial-gradient(circle at 75% 0, rgba(120, 220, 255, .35), transparent 40%); pointer-events: none; }
 .hall .hf-concert.show .hf-lights { animation: twinkle .5s ease-in-out infinite alternate; }
@@ -1409,3 +1409,74 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .install .ig-arrow.bc { bottom: max(14px, env(safe-area-inset-bottom)); left: calc(50% - 30px); animation: igBounce 1s ease-in-out infinite; }
 @keyframes igBounce { 50% { translate: 0 10px; } }
 @keyframes igBounceUp { 50% { translate: 0 -10px; } }
+
+/* ---------- 城鎮地圖 ---------- */
+.map .room.out svg { overflow: visible; }
+.map .room.nope { animation: shakehead .4s; }
+.map .map-amuse.closed svg { filter: saturate(.55) brightness(.95); }
+.map .map-amuse .am-wheel-mini { animation: amSpin 26s linear infinite; }
+.map .map-amuse.closed .am-wheel-mini { animation: none; }
+.map .avs { left: 600px; top: 340px; padding: 6px; border-width: 6px; }
+.map .av { width: 70px; height: 70px; border-width: 4px; }
+.map .map-walkers { position: absolute; inset: 0; pointer-events: none; z-index: 6; }
+.map .mw-kid { position: absolute; width: 58px; filter: drop-shadow(0 3px 2px rgb(0 0 0 / .25)); }
+.map .mw-kid.head { width: 54px; height: 54px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; }
+.map .mw-kid.hidden, .map .map-car.hidden { display: none; }
+.map.walking .mw-kid > svg { animation: mwStep .28s ease-in-out infinite alternate; }
+@keyframes mwStep { from { transform: translateY(0) rotate(-4deg); } to { transform: translateY(-5px) rotate(4deg); } }
+.map .map-car { position: absolute; width: 90px; height: 60px; z-index: 7; pointer-events: none; }
+.map .map-car svg { width: 100%; height: 100%; }
+
+/* ---------- 遊樂園 ---------- */
+@keyframes amSpin { to { transform: rotate(360deg); } }
+@keyframes amSpinRev { to { transform: rotate(-360deg); } }
+.amuse .am-wheel { position: absolute; z-index: 1; pointer-events: none; --spd: 40s; }
+.amuse .am-wheel svg { width: 100%; height: 100%; overflow: visible; }
+.amuse .am-wheel .am-spin { animation: amSpin var(--spd) linear infinite; }
+.amuse .am-wheel .am-cab { animation: amSpinRev var(--spd) linear infinite; }
+.amuse .am-wheel.ride { --spd: 12s; }
+.amuse .am-wheel.top .am-cab.mine rect { stroke: #ffd000; stroke-width: 5; }
+.amuse .am-coaster { position: absolute; width: 220px; height: 110px; z-index: 2; pointer-events: none; visibility: hidden; }
+.amuse .am-coaster.boarding { visibility: visible; }
+.amuse .am-coaster > svg { width: 100%; height: 100%; display: block; }
+.amuse .am-coaster .am-bar-on { opacity: 0; transition: opacity .3s; }
+.amuse .am-coaster.bar-down .am-bar-on { opacity: 1; }
+.amuse .am-riders { position: absolute; left: 22px; top: -34px; display: flex; gap: 4px; }
+.amuse .am-rider { width: 62px; height: 62px; border-radius: 50%; overflow: hidden; background: #fff; border: 3px solid #fff; }
+.amuse .am-rider svg { width: 100%; height: 100%; }
+.amuse .am-rider.kiki { background: #ffe3c4; }
+.amuse .am-horses { position: absolute; left: 565px; top: 470px; width: 150px; height: 210px; z-index: 2; }
+.amuse .am-ride { position: absolute; left: 0; top: 0; width: 150px; height: 210px; padding: 0; border: 0; background: none; pointer-events: auto; animation: amRound 6s linear infinite; animation-play-state: paused; }
+.amuse .am-horses.spin .am-ride { animation-play-state: running; }
+.amuse .am-ride.glow svg { filter: drop-shadow(0 0 10px var(--glow, #ffd000)) drop-shadow(0 0 4px var(--glow, #ffd000)); }
+.amuse .am-ride.nope svg { animation: shakehead .4s; }
+.amuse .am-ride .am-on { position: absolute; left: 46px; top: 30px; width: 54px; height: 54px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; }
+@keyframes amRound {
+  0% { transform: translate(-190px, 0) scale(.85); z-index: 2; }
+  25% { transform: translate(0, 34px) scale(1.05); z-index: 3; }
+  50% { transform: translate(190px, 0) scale(.85); z-index: 2; }
+  75% { transform: translate(0, -30px) scale(.62); z-index: 1; opacity: .75; }
+  100% { transform: translate(-190px, 0) scale(.85); z-index: 2; }
+}
+.amuse .am-stick { position: absolute; z-index: 2; pointer-events: auto; }
+.amuse .am-stick svg { width: 100%; height: 100%; overflow: visible; }
+.amuse .am-stick.glow svg { filter: drop-shadow(0 0 10px var(--glow, #ffd000)) drop-shadow(0 0 4px var(--glow, #ffd000)); animation: pulse .6s ease-in-out infinite alternate; }
+.amuse .am-stick.ok .am-line { stroke: #3fbf7f; }
+.amuse .am-stick.low .am-line { animation: pulse .3s ease-in-out infinite alternate; }
+.amuse .kt-kid.away, .amuse .p-char.away { opacity: 0; }
+.amuse .kt-kid .am-hand { position: absolute; left: 4px; top: 96px; }
+.amuse .kt-kid:not(.body) .am-hand { left: 64px; top: 64px; }
+.amuse .kt-kid .am-balloon { position: absolute; left: 76px; top: -70px; animation: bob 1.2s ease-in-out infinite alternate; }
+.amuse .kt-thing.am-stamp.press svg { transform: translateY(20px); transition: transform .2s; }
+.amuse .am-pay { position: absolute; left: 260px; top: 560px; width: 680px; z-index: 8; background: rgb(255 255 255 / .92); border-radius: 30px; padding: 16px; box-shadow: 0 6px 20px rgb(0 0 0 / .2); }
+.amuse .am-pay.hidden { display: none; }
+.amuse .am-dish { height: 110px; border-radius: 55px; background: #ffe7b0; display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 12px; }
+.amuse .am-dish svg { width: 80px; height: 80px; }
+.amuse .am-coins { display: flex; justify-content: center; align-items: center; gap: 8px; }
+.amuse .am-coin { padding: 0; border: 0; background: none; pointer-events: auto; }
+.amuse .am-coin.used { visibility: hidden; }
+.amuse .am-night { position: absolute; inset: 0; background: #0f1d3a; opacity: 0; pointer-events: none; transition: opacity 1.2s; z-index: 5; box-shadow: 0 0 0 var(--bleed, 0px) #0f1d3a; }
+.amuse.closing .am-night { opacity: .55; }
+.amuse.lost .am-night { opacity: .45; }
+.amuse.lost .p-char { opacity: .15; transition: opacity .5s; }
+.amuse .kt-cards { z-index: 9; }

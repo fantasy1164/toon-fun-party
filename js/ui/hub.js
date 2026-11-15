@@ -1,4 +1,4 @@
-// 選房間：一個社區，中間是剖開的兩層樓房子，點房間或建築進去。
+// 家：剖開的兩層樓房子，點房間進去；車庫、前院的節慶帳篷與聖誕樹。按回家回到地圖。
 import { CHARACTERS, PROFILES } from '../config.js';
 import { el, $, $$, onTap, wait, pick, burst, centerOf } from '../core/dom.js';
 import { turnsScene, callTurn } from '../core/turns.js';
@@ -8,13 +8,10 @@ import { phase, dateKey } from '../core/clock.js';
 import { state, save } from '../core/store.js';
 import { characterSvg, avatarSvg } from '../art/characters.js';
 import * as weather from '../core/weather.js';
-import { hubBack, roomSvg, SPOTS, YARD, GARAGE_CAR, schoolExt, farmExt, tentSvg, parkExt, TOWN_SIGN } from '../art/hub.js';
-import { theaterNews } from './town.js';
-import { quakeDue, runQuake } from './quake.js';
+import { hubBack, roomSvg, SPOTS, YARD, GARAGE_CAR, tentSvg } from '../art/hub.js';
 import { ICON } from './screens.js';
 import * as fest from '../core/festival.js';
 import { TREE_ICON } from '../art/xmas.js';
-import { santaPop } from './xmas.js';
 import { HUB_BALLOONS } from '../art/party.js';
 import { HUB_NY } from '../art/newyear.js';
 
@@ -27,8 +24,6 @@ export function showHub(stage, profile) {
     const bids = fest.birthdayKids();
     const ny = fest.newYear();
     const dec = fest.isDecember();
-    // 週末：公園發亮，奇奇說「今天是週末，去公園玩吧」
-    const weekend = [0, 6].includes(new Date(`${dateKey()}T12:00:00`).getDay());
     const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;height:${h}px`;
     // 前院：節慶帳篷、聖誕樹，依序放進空位
     const yard = [];
@@ -41,10 +36,6 @@ export function showHub(stage, profile) {
         ${bids.length ? HUB_BALLOONS : ''}${ny ? HUB_NY : ''}
         ${['bedroom', 'bathroom', 'kitchen', 'door'].map((r) => `<button class="room in" data-room="${r}" style="${pos(SPOTS[r])}">${roomSvg(r, ph, { newyear: !!ny })}</button>`).join('')}
         <button class="room out garage" data-room="car" style="${pos(SPOTS.car)}">${GARAGE_CAR}</button>
-        <button class="room out" data-room="school" style="${pos(SPOTS.school)}">${schoolExt(ph)}</button>
-        <button class="room out" data-room="farm" style="${pos(SPOTS.farm)}">${farmExt(ph)}</button>
-        <button class="room out park-room${weekend && !night ? ' glow-park' : ''}" data-room="park" style="${pos(SPOTS.park)}">${parkExt(ph)}</button>
-        <button class="room out town-sign${theaterNews(profile) ? ' glow-park' : ''}" data-room="town" style="${pos(SPOTS.town)}">${TOWN_SIGN}</button>
         ${yard.slice(0, YARD.length).map(([room, cls, svg], i) => `<button class="room out yard ${cls}" data-room="${room}" style="${pos(YARD[i])}">${svg}</button>`).join('')}
         <div class="avs">${avatars}</div>
         <button class="round-btn home">${ICON.home}</button>
@@ -72,38 +63,15 @@ export function showHub(stage, profile) {
     };
     $$('.room', node).forEach((b) => onTap(b, () => go(b.dataset.room, b)));
     onTap($('.home', node), () => { sfx('tap'); go('back'); });
-    // 12 月第一次進來：聖誕老公公從煙囪探頭打招呼
-    const x = fest.isDecember() ? fest.xmas() : null;
-    // 生日當天第一次進來：角色們一起說生日快樂（每個頭像每天一次）
-    const g = state.bdGreet?.date === dateKey() ? state.bdGreet : { date: dateKey(), seen: [] };
-    if (bids.length && !g.seen.includes(profile.id)) {
-      g.seen.push(profile.id);
-      state.bdGreet = g;
-      save();
-      bdGreet(node, profile, bids).then(() => { if (!done) { $('.party-room', node)?.classList.add('glow'); callTurn(host); } });
-    } else if (ny && !(state.nyGreet?.date === dateKey() && state.nyGreet.seen.includes(profile.id))) {
-      const ng = state.nyGreet?.date === dateKey() ? state.nyGreet : { date: dateKey(), seen: [] };
-      ng.seen.push(profile.id);
-      state.nyGreet = ng;
-      save();
-      $('.ny-room', node)?.classList.add('glow');
-      speak('kiki', `ny_hub_${ny.stage}`, { name: profile.name, who: profile.id }).then(() => { if (!done) callTurn('kiki'); });
-    } else if (x && fest.day() <= 24 && profile.members.some((id) => !x.greeted[id])) {
-      santaPop(node, profile).then(() => { if (!done) pickLine(); });
-    } else if (quakeDue(profile)) {
-      runQuake(node, profile, () => done).then(() => { if (!done) pickLine(); });
-    } else if (weekend && !night && !state.parkHint?.[profile.id + dateKey()]) {
-      state.parkHint = { [profile.id + dateKey()]: true };
-      save();
-      speak('kiki', 'hub_park', { name: profile.name, who: profile.id }).then(() => { if (!done) pickLine(); });
-    } else {
-      pickLine();
-    }
+    // 節慶：帳篷發亮（問候在地圖上）
+    if (bids.length) $('.party-room', node)?.classList.add('glow');
+    if (ny) $('.ny-room', node)?.classList.add('glow');
+    pickLine();
   });
 }
 
 // 生日當天：五位角色排排站說生日快樂；如果是另一個小孩，奇奇邀他一起準備驚喜
-async function bdGreet(hub, profile, bids) {
+export async function bdGreet(hub, profile, bids) {
   const bid = bids.find((id) => profile.members.includes(id));
   const ids = ['kiki', 'dudu', 'bobo', 'mian', 'gugu'];
   const ov = el(`<div class="bd-greet">

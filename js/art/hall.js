@@ -1,10 +1,13 @@
 // 明星劇場：紫色牆、紅布幕、燈泡、木頭舞台。上面兩排明星牌，舞台中間是小孩自己的明星牌。
 import { characterSvg, avatarSvg } from './characters.js';
 
-export const PLAQUE = { w: 180, h: 212, x0: 120, dx: 196, rows: [92, 318] };
-export function plaquePos(i) {
-  const r = Math.floor(i / 5);
-  return [PLAQUE.x0 + (i % 5) * PLAQUE.dx, PLAQUE.rows[r]];
+export const PLAQUE = { w: 180, h: 212, x0: 45, dx: 186, rows: [92, 318], per: 6 };
+// 一排 6 塊，第二排比較少就置中
+export function plaquePos(i, total = 11) {
+  const r = Math.floor(i / PLAQUE.per);
+  const inRow = Math.min(PLAQUE.per, total - r * PLAQUE.per);
+  const x0 = PLAQUE.x0 + ((PLAQUE.per - inRow) * PLAQUE.dx) / 2;
+  return [x0 + (i % PLAQUE.per) * PLAQUE.dx, PLAQUE.rows[r]];
 }
 
 export function hallBack() {

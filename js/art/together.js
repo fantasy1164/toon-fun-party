@@ -1,5 +1,6 @@
 // 「一起做」用的圖示與背景。圖示都是 100x100 的 viewBox。
 import { roomSvg } from './bedroom.js';
+import { amuseBack } from './amuse.js';
 import { doorView, itemIcon } from './door.js';
 import { kitchenBack, wareSvg } from './kitchen.js';
 import { classroomBack } from './school.js';
@@ -107,6 +108,10 @@ const I = {
   mic: `<rect x="38" y="8" width="24" height="44" rx="12" fill="#5a6b80"/><path d="M42 18h16M42 26h16M42 34h16" stroke="#8a9ab0" stroke-width="3"/><path d="M28 40Q28 64 50 64Q72 64 72 40" stroke="#ffd34d" stroke-width="6" fill="none"/><path d="M50 64V84M36 88H64" stroke="#ffd34d" stroke-width="6" stroke-linecap="round"/><path d="M80 20q8 -6 10 4q-2 8 -10 4ZM84 24V6l8 -2" fill="#ff5c8a" stroke="#ff5c8a" stroke-width="3"/><path d="M10 30q8 -6 10 4q-2 8 -10 4ZM14 34V16l8 -2" fill="#5fa8e8" stroke="#5fa8e8" stroke-width="3"/>`,
   breath: `<circle cx="50" cy="50" r="40" fill="#cfefff" stroke="#7cc8e8" stroke-width="5"/><path d="M30 50Q50 30 70 50Q50 70 30 50Z" fill="#7cc8e8"/>`,
   go: `<circle cx="50" cy="50" r="40" fill="#5ed17a"/><path d="M38 28L72 50L38 72Z" fill="#fff"/>`,
+  // 遊樂園
+  ferris: `<circle cx="50" cy="42" r="30" fill="none" stroke="#5fa8e8" stroke-width="6"/>${[0, 72, 144, 216, 288].map((r) => `<path d="M50 42L${(50 + 30 * Math.cos(r * Math.PI / 180)).toFixed(1)} ${(42 + 30 * Math.sin(r * Math.PI / 180)).toFixed(1)}" stroke="#5fa8e8" stroke-width="3"/><circle cx="${(50 + 30 * Math.cos(r * Math.PI / 180)).toFixed(1)}" cy="${(42 + 30 * Math.sin(r * Math.PI / 180)).toFixed(1)}" r="7" fill="${['#e5484d', '#ffc400', '#3fbf7f', '#ff8fb0', '#9b85f0'][r / 72]}"/>`).join('')}<path d="M50 42L30 92M50 42L70 92" stroke="#8a5a2b" stroke-width="6" stroke-linecap="round"/><circle cx="50" cy="42" r="7" fill="#ffd34d"/>`,
+  meetpoint: `<path d="M30 92V12" stroke="#8a5a2b" stroke-width="7" stroke-linecap="round"/><path d="M33 14H80L68 30L80 46H33Z" fill="#ff5c93"/><circle cx="55" cy="30" r="7" fill="#fff"/><ellipse cx="50" cy="92" rx="34" ry="6" fill="#000" opacity=".12"/>`,
+  ticket: `<path d="M8 32H92V44A8 8 0 0 0 92 58V70H8V58A8 8 0 0 0 8 44Z" fill="#ff8fb0"/><path d="M68 32V70" stroke="#fff" stroke-width="3" stroke-dasharray="5 4"/><path d="M36 41l4 8h9l-7 6l3 9l-9 -5l-9 5l3 -9l-7 -6h9z" fill="#ffd34d"/>`,
 };
 // 出門用的衣物沿用大門場景的圖
 const DOOR_ITEMS = ['sneakers', 'boots', 'raincoat', 'umbrella', 'jacket', 'scarf', 'hat', 'bottle'];
@@ -131,6 +136,7 @@ export function backFor(kind, ph, wx) {
     case 'doctor': return clinicBack(ph);
     case 'shop': return marketBack(ph);
     case 'bath': return bathRoomBack(ph, { tub: true });
+    case 'fun': return amuseBack(ph, wx);
     case 'ride': return `<svg viewBox="0 0 1200 900">${CABIN}<g>${roadSvg(ph, wx)}</g>${MIRROR}</svg>`;
     default: return '';
   }

@@ -37,6 +37,7 @@ export const GUESTS = {
   tiaotiao: { id: 'tiaotiao', name: '跳跳', tts: { pitch: 1.5, rate: 1.1 } },
   yuanyuan: { id: 'yuanyuan', name: '圓圓醫生', tts: { pitch: 1.05, rate: 0.9 } },
   lili: { id: 'lili', name: '栗栗', tts: { pitch: 1.45, rate: 1.05 } },
+  gaogao: { id: 'gaogao', name: '高高', tts: { pitch: 1.1, rate: 1.0 } },
   // 首頁喊標題的兩個小朋友
   kidgirl: { id: 'kidgirl', name: '小女孩', tts: { pitch: 1.9, rate: 1.15 } },
   kidboy: { id: 'kidboy', name: '小男孩', tts: { pitch: 1.7, rate: 1.15 } },
@@ -56,10 +57,11 @@ export const REWARD_SLOTS = {
   clinic: { day: [8, 18] },
   market: { day: [8, 20] },
   bath: { evening: [17, 22] },
+  amuse: { day: [9, 19] },
 };
 
 // 明星牆：每位角色一塊星星牌（照這個順序）
-export const STARS = ['dudu', 'kiki', 'bobo', 'mian', 'gugu', 'doudou', 'pupu', 'tiaotiao', 'yuanyuan', 'lili'];
+export const STARS = ['dudu', 'kiki', 'bobo', 'mian', 'gugu', 'doudou', 'pupu', 'tiaotiao', 'yuanyuan', 'lili', 'gaogao'];
 // 好朋友星星：一起做幾次集滿
 export const FRIEND_MAX = 5;
 // 小明星徽章：累計幾次變銅、銀、金

@@ -19,10 +19,11 @@ import { mountPark } from './scenes/park.js';
 import { mountParty } from './scenes/party.js';
 import { mountNewYear } from './scenes/newyear.js';
 import { showHub } from './ui/hub.js';
-import { showTown, TOWN_ROOMS } from './ui/town.js';
+import { showMap } from './ui/map.js';
 import { mountHall } from './scenes/hall.js';
 import { mountClinic } from './scenes/clinic.js';
 import { mountMarket } from './scenes/market.js';
+import { mountAmuse } from './scenes/amuse.js';
 import { chooseMode, mountTogether } from './scenes/together.js';
 import { setupTurns, turnsScene } from './core/turns.js';
 import { treeScreen, christmasMorning } from './ui/xmas.js';
@@ -111,47 +112,78 @@ async function route() {
   }
   profile = chosen;
   setupTurns(profile);
-  goHub();
+  goMap();
 }
 
-// 選房間，再進場景；從場景按回家會回到選房間
-async function goHub(inTown = false) {
+// 地圖 → 家（房子）或其他地方 → 場景；從場景按回家，回到剛才的地方（房子或地圖）
+async function goMap() {
   if (!profile) { route(); return; }
   if (closedReason()) { route(); return; }
   // 聖誕節當天：還沒拆禮物的先拆禮物
   if (fest.isChristmas() && profile.members.some((id) => !fest.xmas().gift[id])) {
     await christmasMorning(stage, profile);
   }
-  let room = inTown ? 'town' : await showHub(stage, profile);
-  if (room === 'back') { profile = null; route(); return; }
-  // 街上：診所、明星劇場、超市
-  if (room === 'town') {
-    if (closedReason()) { route(); return; }
-    room = await showTown(stage, profile);
-    if (room === 'hub') { goHub(); return; }
-  }
-  if (room === 'tree') { await treeScreen(stage, profile); goHub(); return; }
+  const r = await showMap(stage, profile);
+  if (r.room === 'back') { profile = null; route(); return; }
   if (closedReason()) { route(); return; }
-  // 先選：玩遊戲，還是跟角色一起做
-  const choice = await chooseMode(stage, room, profile);
-  const town = TOWN_ROOMS.includes(room);
-  if (choice.mode === 'home') { goHub(town); return; }
+  if (r.room === 'home') { goHouse(); return; }
+  if (r.room === 'trip') { startTrip(r.dest); return; }
+  enterRoom(r.room, 'map');
+}
+
+async function goHouse() {
+  if (!profile) { route(); return; }
   if (closedReason()) { route(); return; }
-  const mount = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear, theater: mountHall, clinic: mountClinic, market: mountMarket }[room] || mountBathroom;
+  const room = await showHub(stage, profile);
+  if (room === 'back') { goMap(); return; }
+  if (room === 'tree') { await treeScreen(stage, profile); goHouse(); return; }
+  if (closedReason()) { route(); return; }
+  enterRoom(room, 'house');
+}
+const goBack = (from) => (from === 'house' ? goHouse() : goMap());
+
+const MOUNT = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear, theater: mountHall, clinic: mountClinic, market: mountMarket, amuse: mountAmuse };
+
+function startScene(make) {
   if (state.session.usedMs === 0) warned = false;
-  const onExit = (why) => {
-    scene = null;
-    stage.querySelector('.playclock')?.remove();
-    if (why === 'home') goHub(town); else route();
-  };
-  if (choice.mode === 'together' && choice.kind !== 'brush') {
-    scene = mountTogether(stage, { profile, onExit, kind: choice.kind, host: choice.host });
-  } else {
-    scene = mount(stage, { profile, onExit, charId: choice.host, together: choice.kind === 'brush' });
-  }
+  scene = make();
   // 一起玩：每個場景都放兩個頭像、輪流（誰先開始每次換）
   turnsScene(stage.querySelector('.screen'));
   updateClock();
+}
+function sceneExit(from) {
+  return (why) => {
+    scene = null;
+    stage.querySelector('.playclock')?.remove();
+    if (why === 'home') goBack(from); else route();
+  };
+}
+
+async function enterRoom(room, from) {
+  // 先選：玩遊戲，還是跟角色一起做
+  const choice = await chooseMode(stage, room, profile);
+  if (choice.mode === 'home') { goBack(from); return; }
+  if (closedReason()) { route(); return; }
+  const mount = MOUNT[room] || mountBathroom;
+  const onExit = sceneExit(from);
+  startScene(() => (choice.mode === 'together' && choice.kind !== 'brush'
+    ? mountTogether(stage, { profile, onExit, kind: choice.kind, host: choice.host })
+    : mount(stage, { profile, onExit, charId: choice.host, together: choice.kind === 'brush' })));
+}
+
+// 地圖上遠的地方：坐噗噗的車去，到了直接進那個地方
+function startTrip(dest) {
+  const exitHome = sceneExit('map');
+  startScene(() => mountCar(stage, {
+    profile, dest, trip: true,
+    onExit: (why) => {
+      if (why !== 'arrive') { exitHome(why); return; }
+      scene = null;
+      stage.querySelector('.playclock')?.remove();
+      if (closedReason()) { route(); return; }
+      enterRoom(dest, 'map');
+    },
+  }));
 }
 
 // ---------- 剩餘遊玩時間：場景右上角的小時鐘餅 ----------

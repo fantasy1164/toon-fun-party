@@ -59,6 +59,25 @@ export function roadSvg(ph, wx) {
       <rect x="${cx - 300}" y="${horizon - 40}" width="20" height="160" fill="#8a5a2b"/><circle cx="${cx - 290}" cy="${horizon - 60}" r="70" fill="${night ? '#24533a' : '#4caf50'}"/>
       <rect x="${W.x}" y="${bottom - 50}" width="${W.w}" height="50" fill="#c9c2b4"/>
     </g>
+    <!-- 目的地：農場 -->
+    <g class="dfarm">
+      <rect x="${W.x}" y="${W.y}" width="${W.w}" height="${W.h}" fill="url(#csky)"/>
+      <rect x="${W.x}" y="${horizon + 30}" width="${W.w}" height="${bottom - horizon}" fill="${night ? '#2f6b45' : '#9ed882'}"/>
+      <g transform="translate(${cx - 140} ${horizon - 80})"><path d="M0 90L110 10L220 90V230H0Z" fill="#d9483b"/><path d="M-8 96L110 2L228 96" fill="none" stroke="#fff" stroke-width="10" stroke-linejoin="round"/>
+        <rect x="76" y="140" width="68" height="90" fill="#a8322a"/><path d="M76 140L144 230M144 140L76 230" stroke="#fff" stroke-width="6"/><rect x="92" y="60" width="36" height="34" fill="${night ? '#ffd34d' : '#fff8e0'}"/></g>
+      <g stroke="#fff" stroke-width="8" stroke-linecap="round">${[0, 1, 2, 3, 4, 5].map((i) => `<path d="M${W.x + 40 + i * 60} ${bottom - 30}V${bottom - 80}"/>`).join('')}<path d="M${W.x + 30} ${bottom - 70}H${W.x + 360}M${W.x + 30} ${bottom - 45}H${W.x + 360}"/></g>
+      <rect x="${W.x}" y="${bottom - 22}" width="${W.w}" height="22" fill="#d8c09a"/>
+    </g>
+    <!-- 目的地：遊樂園 -->
+    <g class="damuse">
+      <rect x="${W.x}" y="${W.y}" width="${W.w}" height="${W.h}" fill="url(#csky)"/>
+      <rect x="${W.x}" y="${horizon + 60}" width="${W.w}" height="${bottom - horizon}" fill="#f3e6c8"/>
+      <g transform="translate(${cx - 230} ${horizon + 20})"><circle r="150" fill="none" stroke="#5fa8e8" stroke-width="8"/>
+        ${[0, 45, 90, 135, 180, 225, 270, 315].map((a, i) => { const r = (a * Math.PI) / 180; return `<path d="M0 0L${(150 * Math.cos(r)).toFixed(0)} ${(150 * Math.sin(r)).toFixed(0)}" stroke="#5fa8e8" stroke-width="4"/><rect x="${(150 * Math.cos(r) - 16).toFixed(0)}" y="${(150 * Math.sin(r) - 12).toFixed(0)}" width="32" height="26" rx="6" fill="${['#e5484d', '#ffc400', '#3fbf7f', '#ff8fb0'][i % 4]}"/>`; }).join('')}
+        <circle r="14" fill="#ffd34d"/></g>
+      <path d="M${cx + 60} ${bottom - 40}Q${cx + 140} ${horizon - 60} ${cx + 220} ${horizon + 40}Q${cx + 300} ${horizon + 120} ${cx + 400} ${horizon - 40}" fill="none" stroke="#e5484d" stroke-width="10"/>
+      <g transform="translate(${cx - 10} ${bottom - 150})"><rect x="-120" y="40" width="240" height="110" fill="#ff8fb0"/><path d="M-136 46Q0 -30 136 46" fill="none" stroke="#ffd34d" stroke-width="20" stroke-linecap="round"/><rect x="-44" y="70" width="88" height="80" fill="#7a2a4a"/></g>
+    </g>
     ${weatherLayer(wx, ph, W.x, W.y, W.w, W.h)}
   </g></g>
   <path d="M${W.x + 40} ${W.y}H${W.x + W.w - 40}Q${W.x + W.w} ${W.y} ${W.x + W.w} ${W.y + 60}V${bottom}H${W.x}V${W.y + 60}Q${W.x} ${W.y} ${W.x + 40} ${W.y}Z" fill="none" stroke="#2b2f3a" stroke-width="22"/>`;

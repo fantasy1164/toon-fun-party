@@ -311,12 +311,46 @@ function lili(extra = '') {
   </g>`;
 }
 
+// 長頸鹿 高高：遊樂園工作人員，紅色制服背心、工作帽（穿制服，走失時要找的人）
+function gaogao(extra = '') {
+  const spot = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#d98a3a"/>`;
+  return `
+  <g class="char gaogao">
+    <ellipse cx="120" cy="312" rx="84" ry="10" fill="#000" opacity=".12"/>
+    <rect x="88" y="262" width="22" height="48" rx="8" fill="#f5c451"/><rect x="130" y="262" width="22" height="48" rx="8" fill="#f5c451"/>
+    <ellipse cx="99" cy="308" rx="16" ry="8" fill="#7a4a22"/><ellipse cx="141" cy="308" rx="16" ry="8" fill="#7a4a22"/>
+    <g class="arm arm-l"><ellipse cx="68" cy="230" rx="13" ry="38" fill="#f5c451" transform="rotate(20 68 230)"/><circle cx="56" cy="262" r="11" fill="#7a4a22"/></g>
+    <g class="arm arm-r"><ellipse cx="172" cy="230" rx="13" ry="38" fill="#f5c451" transform="rotate(-20 172 230)"/><circle cx="184" cy="262" r="11" fill="#7a4a22"/></g>
+    <ellipse cx="120" cy="240" rx="54" ry="50" fill="#f5c451"/>
+    <path d="M100 212L108 112H136L144 212Z" fill="#f5c451"/>
+    ${spot(118, 140, 7)}${spot(130, 170, 8)}${spot(112, 192, 6)}
+    <path d="M76 206H164L158 286H82Z" fill="#e5484d"/><path d="M120 206V286" stroke="#c43a3f" stroke-width="3"/>
+    <path d="M82 206L120 236L158 206" fill="none" stroke="#ffd34d" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="132" y="242" width="22" height="16" rx="3" fill="#fff"/><path d="M143 245l2 4h4l-3 3l1 4l-4 -2l-4 2l1 -4l-3 -3h4z" fill="#ffc400"/>
+    <path d="M98 30L94 4M144 30L150 4" stroke="#d98a3a" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="94" cy="4" r="9" fill="#7a4a22"/><circle cx="150" cy="4" r="9" fill="#7a4a22"/>
+    <ellipse cx="68" cy="58" rx="22" ry="11" fill="#f5c451" transform="rotate(-25 68 58)"/><ellipse cx="68" cy="58" rx="12" ry="5" fill="#f4b8c6" transform="rotate(-25 68 58)"/>
+    <ellipse cx="178" cy="58" rx="22" ry="11" fill="#f5c451" transform="rotate(25 178 58)"/><ellipse cx="178" cy="58" rx="12" ry="5" fill="#f4b8c6" transform="rotate(25 178 58)"/>
+    <ellipse cx="122" cy="74" rx="52" ry="44" fill="#f5c451"/>
+    ${spot(84, 52, 6)}${spot(160, 48, 5)}
+    <path d="M84 40Q122 16 160 40L162 48H82Z" fill="#e5484d"/><path d="M150 46Q178 46 182 54H148Z" fill="#c43a3f"/>
+    <circle cx="122" cy="32" r="5" fill="#ffd34d"/>
+    ${eyes(102, 142, 70, '#f5c451')}
+    <ellipse cx="122" cy="102" rx="34" ry="22" fill="#fae2a8"/>
+    <ellipse cx="110" cy="96" rx="4" ry="3" fill="#7a4a22"/><ellipse cx="134" cy="96" rx="4" ry="3" fill="#7a4a22"/>
+    <circle cx="80" cy="90" r="9" fill="#ff9fb0" opacity=".7"/><circle cx="164" cy="90" r="9" fill="#ff9fb0" opacity=".7"/>
+    <ellipse class="mouth" cx="122" cy="112" rx="10" ry="7" fill="#b8412f"/>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
 export const NIGHTCAP = {
   dudu: `<g class="cap"><path d="M64 60Q96 -14 176 44L180 60Q120 40 62 74Z" fill="#7a8cff"/><path d="M62 66Q120 44 182 62" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/><circle cx="182" cy="40" r="13" fill="#fff"/></g>`,
   kiki: `<g class="cap"><path d="M70 56Q100 -4 168 34L170 50Q120 36 70 66Z" fill="#7a8cff"/><path d="M70 60Q120 40 172 52" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="174" cy="32" r="12" fill="#fff"/></g>`,
 };
 
-const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao, yuanyuan, lili };
+const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao, yuanyuan, lili, gaogao };
 
 // 回傳可放進 <svg> 的角色群組，x、y 為左上角，s 為縮放。
 export function characterSvg(id, { x = 0, y = 0, s = 1, extra = '' } = {}) {

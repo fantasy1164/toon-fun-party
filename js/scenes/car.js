@@ -13,7 +13,7 @@ import { avatarSvg } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { ICON, openCabinet } from '../ui/screens.js';
 
-export function mountCar(stage, { profile, onExit }) {
+export function mountCar(stage, { profile, onExit, dest = 'park', trip = false }) {
   const hard = profile.level === 'hard';
   // 一起玩時兩張安全座椅，各自扣自己的
   const kidKeys = seatLayout(profile).kids.map((k) => k.key);
@@ -22,7 +22,7 @@ export function mountCar(stage, { profile, onExit }) {
   const wx = weather.current();
 
   const root = el(`
-    <div class="screen scene car ${ph}">
+    <div class="screen scene car ${ph} dest-${dest}">
       <svg class="c-art" viewBox="0 0 1200 900">${CABIN}<g class="road">${roadSvg(ph, wx)}</g>${MIRROR}${backSeat(profile)}</svg>
       <div class="c-belts">${beltsSvg(profile)}</div>
       <div class="drive">
@@ -274,7 +274,7 @@ export function mountCar(stage, { profile, onExit }) {
     setDriving(false);
     show('arrived', true);
     sfx('sparkle');
-    await say('kiki', 'c_arrive');
+    await say('kiki', dest === 'park' ? 'c_arrive' : `c_arrive_${dest}`);
     await say('pupu', 'c_unbuckle');
     guard();
     // 解開安全帶（點扣環）
@@ -325,7 +325,7 @@ export function mountCar(stage, { profile, onExit }) {
     doors.classList.add('hidden');
     sfx('fanfare');
     root.classList.add('out');
-    await say('kiki', 'c_out');
+    await say('kiki', dest === 'park' ? 'c_out' : `c_out_${dest}`);
   }
 
   // ---------- 給獎 ----------
@@ -359,13 +359,15 @@ export function mountCar(stage, { profile, onExit }) {
       await say('pupu', 'practice');
     }
     guard();
+    // 坐車去地圖上遠的地方：到了就直接進那個地方
+    if (trip) { await pause(400); destroy(); onExit('arrive'); return; }
     await say('pupu', 'c_mission');
   }
 
   // ---------- 流程 ----------
   async function main() {
     mode = 'act';
-    await say('kiki', 'c_hello');
+    await say('kiki', dest === 'park' ? 'c_hello' : `c_hello_${dest}`);
     await say('pupu', 'c_pupu_hi');
     guard();
     await buckleUp();
@@ -390,6 +392,7 @@ export function mountCar(stage, { profile, onExit }) {
     await arrive();
     guard();
     await celebrate();
+    if (!alive) return;
     mode = 'done';
     if (timeUp) await goodbye();
   }
