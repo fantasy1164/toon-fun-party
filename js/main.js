@@ -7,6 +7,7 @@ import { loadVoiceManifest, hush, primeTts, speak, isSpeaking, quietFor } from '
 import { setupBleed } from './core/bleed.js';
 import { showSplash, showProfiles, showClosed } from './ui/screens.js';
 import { openParent } from './ui/parent.js';
+import { needInstallGuide, showInstallGuide } from './ui/install.js';
 import { mountBathroom } from './scenes/bathroom.js';
 import { mountDoor } from './scenes/door.js';
 import { mountKitchen } from './scenes/kitchen.js';
@@ -51,7 +52,7 @@ fit();
 setupBleed(stage);
 
 // ---------- 防止 iPad 的縮放、捲動、長按選單 ----------
-const inParent = (e) => e.target.closest?.('.parent');
+const inParent = (e) => e.target.closest?.('.parent, .install');
 document.addEventListener('touchmove', (e) => { if (!inParent(e)) e.preventDefault(); }, { passive: false });
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 document.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -247,6 +248,8 @@ async function boot() {
   weather.refresh();
   setInterval(() => weather.refresh(), 10 * 60 * 1000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) weather.refresh(); });
+  // 用一般瀏覽器打開：先教爸媽加到主畫面
+  if (needInstallGuide()) await showInstallGuide();
   await showSplash(stage);
   unlock();
   primeTts();

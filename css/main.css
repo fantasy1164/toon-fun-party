@@ -1380,3 +1380,32 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .newyear.lantern-night .ny-kid.body { top: 560px; }
 .hall .hf-aud-kid.body { width: 120px; height: 160px; border-radius: 0; overflow: visible; border: 0; }
 .hall .hf-pkid.body > svg:last-child { border: 0; border-radius: 0; background: none; }
+
+/* ---------- 安裝引導（一般瀏覽器打開時，給爸媽看） ---------- */
+.install { position: fixed; inset: 0; z-index: 9999; overflow-y: auto; -webkit-overflow-scrolling: touch; background: linear-gradient(160deg, #7fd3e6, #ffd9e8); display: flex; align-items: flex-start; justify-content: center; padding: max(20px, env(safe-area-inset-top)) 16px 90px; box-sizing: border-box; font-family: -apple-system, "PingFang TC", "Noto Sans TC", sans-serif; color: #333; -webkit-user-select: text; user-select: text; touch-action: pan-y; }
+.install .ig-card { background: #fff; border-radius: 26px; padding: 22px 22px 16px; max-width: 560px; width: 100%; box-shadow: 0 10px 30px rgb(0 0 0 / .15); animation: igPop .45s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes igPop { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.install .ig-head { display: flex; gap: 14px; align-items: center; margin-bottom: 8px; }
+.install .ig-logo { width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 3px 8px rgb(0 0 0 / .2); flex: none; }
+.install h1 { font-size: 22px; margin: 0 0 4px; }
+.install .ig-head p { margin: 0; font-size: 15px; color: #666; line-height: 1.4; }
+.install .ig-steps { list-style: none; counter-reset: s; padding: 0; margin: 14px 0 6px; }
+.install .ig-steps li { counter-increment: s; display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #f0e8e0; font-size: 17px; line-height: 1.4; }
+.install .ig-steps li::before { content: counter(s); flex: none; width: 28px; height: 28px; border-radius: 50%; background: #ff9f43; color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 15px; }
+.install .ig-ic { flex: none; width: 44px; height: 44px; border-radius: 12px; background: #f4f6fa; display: grid; place-items: center; }
+.install .ig-ic svg { width: 32px; height: 32px; }
+.install .ig-ic img { width: 38px; height: 38px; border-radius: 9px; }
+.install .ig-note { font-size: 14px; color: #a0522d; background: #fff4e5; border-radius: 12px; padding: 8px 12px; margin: 8px 0; }
+.install .ig-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.install button { font: inherit; font-size: 17px; border: 0; border-radius: 14px; padding: 12px 20px; cursor: pointer; }
+.install .ig-install, .install .ig-play.main { background: #ff9f43; color: #fff; font-weight: 700; }
+.install .ig-copy { background: #1a7cff; color: #fff; }
+.install .ig-play:not(.main) { display: block; margin: 14px auto 0; background: none; color: #999; font-size: 14px; text-decoration: underline; padding: 6px; }
+.install .ig-install.hidden { display: none; }
+.install .ig-msg { min-height: 1em; margin: 8px 0 0; color: #1a8a3a; font-weight: 700; word-break: break-all; }
+.install .ig-arrow { position: fixed; width: 60px; height: 60px; pointer-events: none; filter: drop-shadow(0 2px 4px rgb(0 0 0 / .25)); }
+.install .ig-arrow.tr { top: max(6px, env(safe-area-inset-top)); right: 18px; transform: rotate(180deg); animation: igBounceUp 1s ease-in-out infinite; }
+.install .ig-arrow.br { bottom: max(14px, env(safe-area-inset-bottom)); right: 18px; animation: igBounce 1s ease-in-out infinite; }
+.install .ig-arrow.bc { bottom: max(14px, env(safe-area-inset-bottom)); left: calc(50% - 30px); animation: igBounce 1s ease-in-out infinite; }
+@keyframes igBounce { 50% { translate: 0 10px; } }
+@keyframes igBounceUp { 50% { translate: 0 -10px; } }
