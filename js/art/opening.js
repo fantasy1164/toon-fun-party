@@ -46,7 +46,7 @@ export function logoSvg() {
   const line = (txt, y, size, x0, gap, off) => [...txt].map((ch, i) => {
     const x = x0 + i * gap;
     const c = LOGO_COLORS[(i + off) % LOGO_COLORS.length];
-    return `<g class="lg-ch" style="animation-delay:${((i + off) * 0.09).toFixed(2)}s;transform-origin:${x}px ${y - size * 0.35}px">
+    return `<g class="lg-ch" style="animation-delay:${((i + off) * 0.09).toFixed(2)}s;transform-origin:${x}px ${y}px">
       <text x="${x}" y="${y}" font-size="${size}" text-anchor="middle" stroke="#5a2a6a" stroke-width="${size * 0.2}" stroke-linejoin="round" fill="#5a2a6a">${ch}</text>
       <text x="${x}" y="${y}" font-size="${size}" text-anchor="middle" stroke="#fff" stroke-width="${size * 0.1}" stroke-linejoin="round" fill="${c}" paint-order="stroke">${ch}</text></g>`;
   }).join('');
