@@ -76,6 +76,7 @@ function testSection() {
     <button data-act="t-apply">套用並重新開始</button>
     <button class="quiet" data-act="t-real">恢復真實時間與天氣</button><br>
     <span class="note">本月地震演習：${+dateKey().slice(5, 7)} 月 ${drillDay(dateKey().slice(0, 7))} 日起，早上 8 點到晚上 7 點第一次進選房間時（${['yh', 'xz'].map((id) => `${id === 'yh' ? '妍卉' : '向澤'}${state.profiles[id].quakeMonth === dateKey().slice(0, 7) ? '已演習' : '還沒演習'}`).join('、')}）</span><br>
+    <button class="quiet small" data-act="sync-test">雲端同步測試（Google Drive）</button><br>
     <button class="quiet small" data-act="t-quake">${state.quakeForce ? '已設定：下次進選房間會地震演習' : '下次進選房間就地震演習'}</button><br>
     <span class="note">快速設定：</span>
     <button class="quiet small" data-act="t-preset" data-d="12-01" data-h="9">12/1 早上</button>
@@ -226,6 +227,7 @@ export function openParent(onClose, { onStamp } = {}) {
       location.reload();
       return;
     }
+    if (act === 'sync-test') { location.href = 'sync-test.html'; return; }
     if (act === 't-quake') {
       state.quakeForce = true;
       save();

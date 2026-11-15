@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>雲端同步測試</title>
+<style>
+  body { font: 17px/1.5 -apple-system, "PingFang TC", "Noto Sans TC", sans-serif; margin: 0; padding: 20px max(20px, env(safe-area-inset-left)); background: #fff8e6; color: #333; }
+  h1 { font-size: 22px; margin: 0 0 10px; }
+  h2 { font-size: 18px; margin: 22px 0 8px; }
+  .box { background: #fff; border-radius: 14px; padding: 14px 16px; box-shadow: 0 2px 8px rgb(0 0 0 / .08); margin-bottom: 12px; }
+  button, .btn { font: inherit; border: 0; border-radius: 12px; padding: 12px 18px; margin: 4px 6px 4px 0; background: #ff9f43; color: #fff; cursor: pointer; text-decoration: none; display: inline-block; }
+  button.quiet, .btn.quiet { background: #e9e2d0; color: #333; }
+  input { font: inherit; padding: 10px; border-radius: 10px; border: 1px solid #ccc; width: min(100%, 640px); box-sizing: border-box; }
+  .ok { color: #1a8a3a; } .bad { color: #c0392b; }
+  #log { font: 14px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; background: #222; color: #e8e8e8; border-radius: 12px; padding: 12px; min-height: 120px; max-height: 50vh; overflow: auto; }
+  .note { font-size: 14px; color: #777; }
+  table td { padding: 2px 10px 2px 0; vertical-align: top; }
+</style>
+</head>
+<body>
+<h1>雲端同步測試（Google Drive）</h1>
+<p class="note">只測「登入 → 寫一個小檔案 → 讀回來」，不會動到遊戲進度。請在 iPad、iPhone 的主畫面 app 裡從家長頁點進來測，電腦用瀏覽器開即可。</p>
+
+<div class="box">
+  <table>
+    <tr><td>裝置</td><td id="env-dev"></td></tr>
+    <tr><td>主畫面 app 模式</td><td id="env-standalone"></td></tr>
+    <tr><td>權杖</td><td id="env-token">還沒有</td></tr>
+  </table>
+</div>
+
+<h2>0. OAuth 用戶端 ID</h2>
+<div class="box">
+  <input id="cid" placeholder="xxxxxxxx.apps.googleusercontent.com" autocomplete="off" autocapitalize="off" spellcheck="false">
+  <button class="quiet" id="save-cid">記住</button>
+  <p class="note">用戶端 ID 是公開的識別碼，不是密碼。</p>
+</div>
+
+<h2>1. 登入（兩種方式都試）</h2>
+<div class="box">
+  <button id="login-popup">A. 彈出視窗登入</button>
+  <button id="login-redirect">B. 整頁跳轉登入</button>
+  <button class="quiet" id="login-silent">C. 不跳畫面再取一次權杖</button>
+  <p class="note">A 是一般做法；B 是 A 在主畫面 app 失敗時的備案；C 測試權杖過期後能不能不打擾小孩自動續上（A 成功後再按）。</p>
+</div>
+
+<h2>2. 寫入、讀回</h2>
+<div class="box">
+  <button id="write">寫入測試檔</button>
+  <button id="read">讀回來</button>
+  <button class="quiet" id="clear">刪掉測試檔</button>
+  <p class="note">在 A 裝置寫入，到 B 裝置按「讀回來」，看到 A 的裝置名稱和時間就代表跨裝置成功。</p>
+</div>
+
+<h2>紀錄</h2>
+<div id="log"></div>
+<p><button class="quiet" id="copy">複製紀錄</button> <a class="btn quiet" href="./">回到遊戲</a></p>
+
+<script>
+const SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
+const FILE = 'sync-test.json';
+const LS_CID = 'tfp-sync-cid';
+const LS_TOKEN = 'tfp-sync-test-token';
+const $ = (id) => document.getElementById(id);
+
+// ---------- 紀錄 ----------
+function log(msg, cls = '') {
+  const t = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = `[${t}] ${msg}`;
+  $('log').appendChild(line);
+  $('log').scrollTop = 1e9;
+}
+
+// ---------- 環境 ----------
+const ua = navigator.userAgent;
+const isIPad = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+const isIPhone = /iPhone/.test(ua);
+const device = isIPad ? 'iPad' : isIPhone ? 'iPhone' : /Android/.test(ua) ? 'Android' : '電腦';
+const standalone = navigator.standalone === true
+  || matchMedia('(display-mode: fullscreen)').matches
+  || matchMedia('(display-mode: standalone)').matches;
+$('env-dev').textContent = device;
+$('env-standalone').innerHTML = standalone ? '<span class="ok">是</span>' : '否（一般瀏覽器）';
+
+// ---------- 權杖 ----------
+let token = null;
+let expiresAt = 0;
+function setToken(t, sec, how) {
+  token = t;
+  expiresAt = Date.now() + (sec || 3600) * 1000;
+  localStorage.setItem(LS_TOKEN, JSON.stringify({ token, expiresAt }));
+  log(`取得權杖（${how}），${Math.round((sec || 3600) / 60)} 分鐘後過期`, 'ok');
+  showToken();
+}
+function showToken() {
+  if (!token) { $('env-token').textContent = '還沒有'; return; }
+  const left = Math.round((expiresAt - Date.now()) / 60000);
+  $('env-token').innerHTML = left > 0 ? `<span class="ok">有，剩 ${left} 分鐘</span>` : '<span class="bad">已過期</span>';
+}
+try {
+  const saved = JSON.parse(localStorage.getItem(LS_TOKEN) || 'null');
+  if (saved && saved.expiresAt > Date.now()) { token = saved.token; expiresAt = saved.expiresAt; }
+} catch (e) { /* 忽略 */ }
+setInterval(showToken, 30000);
+showToken();
+
+// ---------- 用戶端 ID ----------
+$('cid').value = localStorage.getItem(LS_CID) || '';
+$('save-cid').onclick = () => {
+  localStorage.setItem(LS_CID, $('cid').value.trim());
+  log('已記住用戶端 ID');
+};
+function cid() {
+  const v = $('cid').value.trim();
+  if (!v) { log('請先填用戶端 ID', 'bad'); return null; }
+  localStorage.setItem(LS_CID, v);
+  return v;
+}
+
+// ---------- B. 整頁跳轉回來（網址 # 後面帶權杖） ----------
+if (location.hash.includes('access_token=')) {
+  const p = new URLSearchParams(location.hash.slice(1));
+  setToken(p.get('access_token'), +p.get('expires_in'), 'B 整頁跳轉');
+  history.replaceState(null, '', location.pathname);
+} else if (location.hash.includes('error=')) {
+  const p = new URLSearchParams(location.hash.slice(1));
+  log(`B 整頁跳轉失敗：${p.get('error')}`, 'bad');
+  history.replaceState(null, '', location.pathname);
+}
+
+// ---------- A、C. Google Identity Services ----------
+let gisReady = null;
+function loadGis() {
+  if (!gisReady) {
+    gisReady = new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = res;
+      s.onerror = () => rej(new Error('載入 Google 登入程式失敗（沒網路？）'));
+      document.head.appendChild(s);
+    });
+  }
+  return gisReady;
+}
+loadGis().then(() => log('Google 登入程式已載入')).catch((e) => log(e.message, 'bad'));
+
+function gisToken(prompt, how) {
+  const id = cid();
+  if (!id) return;
+  if (!window.google?.accounts?.oauth2) { log('Google 登入程式還沒載入好，等一下再按', 'bad'); return; }
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: id,
+    scope: SCOPE,
+    callback: (r) => {
+      if (r.error) { log(`${how}失敗：${r.error} ${r.error_description || ''}`, 'bad'); return; }
+      setToken(r.access_token, +r.expires_in, how);
+    },
+    error_callback: (e) => log(`${how}失敗：${e.type}${e.message ? ' ' + e.message : ''}`, 'bad'),
+  });
+  log(`${how}：開始`);
+  client.requestAccessToken({ prompt });
+}
+$('login-popup').onclick = () => gisToken('', 'A 彈出視窗');
+$('login-silent').onclick = () => gisToken('none', 'C 不跳畫面');
+
+$('login-redirect').onclick = () => {
+  const id = cid();
+  if (!id) return;
+  const back = location.origin + location.pathname;
+  const q = new URLSearchParams({
+    client_id: id, redirect_uri: back, response_type: 'token', scope: SCOPE,
+    include_granted_scopes: 'true', prompt: 'select_account',
+  });
+  log('B 整頁跳轉：前往 Google…');
+  location.href = `https://accounts.google.com/o/oauth2/v2/auth?${q}`;
+};
+
+// ---------- Drive ----------
+async function api(url, opt = {}) {
+  if (!token || Date.now() > expiresAt) throw new Error('沒有權杖或已過期，請先登入');
+  const r = await fetch(url, { ...opt, headers: { Authorization: `Bearer ${token}`, ...(opt.headers || {}) } });
+  if (!r.ok) throw new Error(`HTTP ${r.status} ${(await r.text()).slice(0, 200)}`);
+  return r;
+}
+async function findFile() {
+  const q = encodeURIComponent(`name='${FILE}'`);
+  const r = await api(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id,name,modifiedTime)`);
+  return (await r.json()).files[0] || null;
+}
+
+$('write').onclick = async () => {
+  try {
+    const old = await findFile();
+    let n = 1;
+    if (old) {
+      const prev = await (await api(`https://www.googleapis.com/drive/v3/files/${old.id}?alt=media`)).json().catch(() => ({}));
+      n = (prev.n || 0) + 1;
+    }
+    const body = JSON.stringify({ device, standalone, at: new Date().toISOString(), n });
+    if (old) {
+      await api(`https://www.googleapis.com/upload/drive/v3/files/${old.id}?uploadType=media`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body,
+      });
+    } else {
+      const fd = new FormData();
+      fd.append('metadata', new Blob([JSON.stringify({ name: FILE, parents: ['appDataFolder'] })], { type: 'application/json' }));
+      fd.append('file', new Blob([body], { type: 'application/json' }));
+      await api('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', body: fd });
+    }
+    log(`寫入成功：${body}`, 'ok');
+  } catch (e) { log(`寫入失敗：${e.message}`, 'bad'); }
+};
+
+$('read').onclick = async () => {
+  try {
+    const f = await findFile();
+    if (!f) { log('雲端還沒有測試檔'); return; }
+    const data = await (await api(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`)).text();
+    log(`讀回成功（雲端修改時間 ${new Date(f.modifiedTime).toLocaleString('zh-TW', { hour12: false })}）：${data}`, 'ok');
+  } catch (e) { log(`讀回失敗：${e.message}`, 'bad'); }
+};
+
+$('clear').onclick = async () => {
+  try {
+    const f = await findFile();
+    if (!f) { log('雲端沒有測試檔'); return; }
+    await api(`https://www.googleapis.com/drive/v3/files/${f.id}`, { method: 'DELETE' });
+    log('已刪掉測試檔', 'ok');
+  } catch (e) { log(`刪除失敗：${e.message}`, 'bad'); }
+};
+
+$('copy').onclick = async () => {
+  const text = `裝置：${device}，主畫面 app：${standalone ? '是' : '否'}\n${$('log').innerText}`;
+  try { await navigator.clipboard.writeText(text); log('已複製，可以貼給 Claude'); }
+  catch (e) { log('複製失敗，請長按紀錄自己選取', 'bad'); }
+};
+
+log(`開始：${device}，${standalone ? '主畫面 app' : '一般瀏覽器'}`);
+</script>
+</body>
+</html>
