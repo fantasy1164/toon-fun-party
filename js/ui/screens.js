@@ -144,7 +144,7 @@ export function showProfiles(stage, { onParent }) {
         d.classList.add('in');
         sfx('pop');
         popAt(d, 'star', 6);
-        await wait(380);
+        await wait(190);
       }
       // 4. 明星一位一位進場
       for (const c of $$('.op-char', node)) {
