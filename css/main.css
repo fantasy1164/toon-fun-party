@@ -11,10 +11,16 @@ html, body {
 #stage {
   position: absolute; left: 50%; top: 50%; width: 1200px; height: 900px;
   transform: translate(-50%, -50%) scale(var(--s, 1));
-  overflow: hidden; background: #dcf3f5; border-radius: 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+  background: #dcf3f5;
+  /* 滿版：可以點的東西在中間 1200x900，左右多出來的地方（--bleed）放背景延伸 */
+  box-shadow: 0 0 0 var(--bleed, 0px) #dcf3f5;
 }
-.screen { position: absolute; inset: 0; overflow: hidden; }
+.screen { position: absolute; inset: 0; overflow: visible; }
+.screen::before { content: ''; position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--bleed, 0px)); right: calc(-1 * var(--bleed, 0px)); background: inherit; z-index: -1; pointer-events: none; }
+.screen > .bleed { position: absolute; top: 0; height: 900px; width: var(--bleed, 0px); }
+.screen > .bleed.l { left: calc(-1 * var(--bleed, 0px)); }
+.screen > .bleed.r { left: 1200px; }
+.screen > .bleed svg { display: block; }
 .screen svg { display: block; }
 .hidden { display: none !important; }
 
@@ -1252,7 +1258,7 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .tg-pick .tg-choices.n4 .tg-choice .badge svg { transform: scale(.8); }
 
 /* ---------- 首頁派對（開場、選人） ---------- */
-.opening { background: #ffb8d9; overflow: hidden; }
+.opening { background: #ffb8d9; }
 .opening .op-back { position: absolute; inset: 0; z-index: 0; }
 .opening .op-back svg { width: 100%; height: 100%; display: block; }
 .opening .op-spot { transform-box: fill-box; transform-origin: 50% 50%; animation: opSpot 2.4s ease-in-out infinite alternate; }
@@ -1326,3 +1332,23 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
   65% { transform: scale(1.1, .9); }
   85% { transform: scale(.96, 1.04); }
 }
+
+/* ---------- 滿版：蓋整個畫面的東西也延伸到左右兩邊 ---------- */
+.light, .scene .fade, .bedroom .darkness, .party .dim, .tg .tg-veil, .tg .tg-dark, .hub .quake .qk-veil, .hall .hf-lights,
+.hud, .turnbar {
+  left: calc(-1 * var(--bleed, 0px)); right: calc(-1 * var(--bleed, 0px));
+}
+.playclock { right: calc(22px - var(--bleed, 0px)); }
+.opening .lock { left: calc(24px - var(--bleed, 0px)); }
+.gift { box-shadow: 0 0 0 var(--bleed, 0px) rgba(255, 255, 255, .35); }
+.cabinet { box-shadow: 0 0 0 var(--bleed, 0px) rgba(40, 30, 20, .55); }
+.parent { box-shadow: 0 0 0 var(--bleed, 0px) #fffaf0; }
+.bd-greet { box-shadow: 0 0 0 var(--bleed, 0px) rgba(255, 236, 246, .94); }
+.hall .hf-show { box-shadow: 0 0 0 var(--bleed, 0px) rgba(20, 8, 30, .78); }
+.hall .hf-badges { box-shadow: 0 0 0 var(--bleed, 0px) rgba(255, 248, 230, .97); }
+.hall .hf-concert { box-shadow: 0 0 0 var(--bleed, 0px) rgba(20, 8, 30, .82); }
+.hall .hf-party { box-shadow: 0 0 0 var(--bleed, 0px) rgba(40, 10, 60, .92); }
+.opening .op-curtain { width: calc(640px + var(--bleed, 0px)); }
+.opening .op-curtain.l { left: calc(-1 * var(--bleed, 0px)); }
+.opening .op-curtain.r { right: calc(-1 * var(--bleed, 0px)); }
+.hub .home { left: calc(22px - var(--bleed, 0px)); }

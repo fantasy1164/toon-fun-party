@@ -4,6 +4,7 @@ import { state, save, addPlayTime } from './core/store.js';
 import { isAsleep, testing, dateKey, hour, testSettings } from './core/clock.js';
 import { unlock, sfx, setMusicVolume } from './core/audio.js';
 import { loadVoiceManifest, hush, primeTts, speak, isSpeaking, quietFor } from './core/voice.js';
+import { setupBleed } from './core/bleed.js';
 import { showSplash, showProfiles, showClosed } from './ui/screens.js';
 import { openParent } from './ui/parent.js';
 import { mountBathroom } from './scenes/bathroom.js';
@@ -40,10 +41,14 @@ const sessionMs = () => (testSettings().nolimit ? Infinity : (sessionOverride ??
 function fit() {
   const s = Math.min(window.innerWidth / STAGE_W, window.innerHeight / STAGE_H);
   stage.style.setProperty('--s', s.toFixed(4));
+  // 比 4:3 寬的螢幕：左右各多出來多少（舞台座標），背景延伸過去填滿
+  const bleed = Math.max(0, Math.ceil((window.innerWidth / s - STAGE_W) / 2) + 2);
+  document.documentElement.style.setProperty('--bleed', `${bleed}px`);
 }
 window.addEventListener('resize', fit);
 window.addEventListener('orientationchange', () => setTimeout(fit, 200));
 fit();
+setupBleed(stage);
 
 // ---------- 防止 iPad 的縮放、捲動、長按選單 ----------
 const inParent = (e) => e.target.closest?.('.parent');
