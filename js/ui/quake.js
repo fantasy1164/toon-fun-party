@@ -13,7 +13,7 @@ const URL_FORCE = new URLSearchParams(location.search).has('quake');
 let forcedOnce = false;
 
 // 每個月的哪一天演習（3～22 號之間，每個月不一樣）
-function drillDay(month) {
+export function drillDay(month) {
   let h = 0;
   for (const ch of month) h = (h * 31 + ch.charCodeAt(0)) % 9973;
   return 3 + (h % 20);
