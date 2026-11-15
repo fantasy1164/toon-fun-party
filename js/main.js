@@ -245,7 +245,6 @@ async function boot() {
   await showSplash(stage);
   unlock();
   primeTts();
-  sfx('fanfare');
   route();
 }
 boot();

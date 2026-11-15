@@ -294,6 +294,12 @@ const TRACKS = {
     melody: seq('C5 . . . E5 . . . D5 . . . G4 . . .  A4 . . . C5 . . . B4 . . . . . . .'),
     bass: seq('C3 . . . . . . . G2 . . . . . . .  F2 . . . . . . . G2 . . . . . . .'),
   },
+  // ---- 首頁派對 ----
+  opening: {
+    style: 'song', bpm: 132, lead: 'square', leadGain: 0.14,
+    melody: seq('G4 . C5 . E5 . G5 . G5 . E5 G5 . . C6 .  A5 . G5 . E5 . C5 . D5 . E5 . D5 . . .  F5 . A5 . C6 . A5 . G5 . E5 . C5 . D5 .  E5 . D5 . C5 . G4 . C5 . E5 . C6 . . .'),
+    bass: seq('C3 . G2 . C3 . G2 . C3 . G2 . E3 . C3 .  F2 . C3 . F2 . C3 . G2 . D3 . G2 . D3 .  F2 . C3 . F2 . C3 . C3 . G2 . A2 . E3 .  F2 . G2 . C3 . G2 . C3 . G2 . C3 . . .'),
+  },
   // ---- 明星劇場、診所、超市、洗澡 ----
   stage: {
     style: 'bg', bpm: 104, lead: 'triangle', leadGain: 0.19,

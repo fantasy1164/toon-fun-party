@@ -120,6 +120,26 @@ function playTts(text, charId, my) {
   });
 }
 
+// 跟別人一起喊（例如開場兩個小朋友一起「耶！」）：不打斷正在說的，只播語音檔，沒有檔案就不出聲
+export async function cheer(charId, lineId) {
+  const key = `${charId}/${lineId}`;
+  const ctx = getCtx();
+  if (!ctx || !available.has(key)) return;
+  try {
+    let buf = buffers.get(key);
+    if (!buf) {
+      const r = await fetch(`assets/voice/${available.get(key)}`);
+      if (!r.ok) return;
+      buf = await ctx.decodeAudioData(await r.arrayBuffer());
+      buffers.set(key, buf);
+    }
+    const s = ctx.createBufferSource();
+    s.buffer = buf;
+    s.connect(getVoiceBus());
+    s.start();
+  } catch { /* 忽略 */ }
+}
+
 // 說一句台詞。回傳的 Promise 在說完（或被下一句打斷）時結束。
 // 給手指提示、時間提醒判斷「角色現在有沒有在說話」
 let speakingToken = -1;

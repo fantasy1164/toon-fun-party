@@ -2,7 +2,8 @@
 import { PROFILES, CHARACTERS } from '../config.js';
 import { el, $, $$, onTap, wait, pick, burst, centerOf } from '../core/dom.js';
 import { sfx, playMusic, stopMusic } from '../core/audio.js';
-import { speak } from '../core/voice.js';
+import { speak, hush, cheer } from '../core/voice.js';
+import { opBack, CURTAIN_L, CURTAIN_R, START_STAR, logoSvg, DECOR, POPPER, opCast, OP_SND, confettiRain } from '../art/opening.js';
 import { phase } from '../core/clock.js';
 import * as weather from '../core/weather.js';
 import * as fest from '../core/festival.js';
@@ -23,16 +24,14 @@ const ICON = {
 };
 export { ICON };
 
-// ---------- 開場：點一下才能開始（瀏覽器規定要有觸碰才能出聲） ----------
+// ---------- 開場：布幕關著，點中間的大星星拉開派對（瀏覽器規定要有觸碰才能出聲） ----------
 export function showSplash(stage) {
   return new Promise((resolve) => {
     const node = el(`
-      <div class="screen splash">
-        <svg class="cast" viewBox="0 0 1200 900">
-          ${characterSvg('dudu', { x: 120, y: 430, s: 1.2 })}
-          ${characterSvg('kiki', { x: 800, y: 430, s: 1.2 })}
-        </svg>
-        <button class="round-btn play" aria-label="start">${ICON.play}</button>
+      <div class="screen opening splash closed">
+        <div class="op-back">${opBack()}</div>
+        <div class="op-curtain l">${CURTAIN_L}</div><div class="op-curtain r">${CURTAIN_R}</div>
+        <button class="op-start" aria-label="start">${START_STAR}</button>
       </div>`);
     stage.replaceChildren(node);
     let done = false;
@@ -59,31 +58,108 @@ export function lockButton(onOpen) {
   return b;
 }
 
-// ---------- 選人 ----------
+// ---------- 選人（首頁派對）----------
+// 打開 app 第一次：布幕拉開 → 小朋友喊「明星總動員！歡樂派對！耶！」→ 派對布置一樣一樣彈出來
+// → 十位明星一位一位進場 → 奇奇歡迎 → 三個頭像飄上來。點畫面可以跳過。
+// 之後回到首頁（休息完、從房子回來）：短版，布置和明星都在，奇奇說一句。
+let introDone = false;
 export function showProfiles(stage, { onParent }) {
   return new Promise((resolve) => {
-    const host = pick(Object.keys(CHARACTERS));
+    const full = !introDone;
+    introDone = true;
     const node = el(`
-      <div class="screen profiles">
+      <div class="screen opening profiles ${full ? 'closed intro' : 'quick'}">
+        <div class="op-back">${opBack()}</div>
+        <div class="op-rain">${confettiRain()}</div>
+        ${DECOR.map((d, i) => `<div class="op-decor ${d.cls}" data-i="${i}" style="left:${d.pos[0]}px;top:${d.pos[1]}px;width:${d.pos[2]}px;height:${d.pos[3]}px">${d.svg}</div>`).join('')}
+        <div class="op-logo">${logoSvg()}</div>
+        <div class="op-popper l">${POPPER(false)}</div><div class="op-popper r">${POPPER(true)}</div>
+        <div class="op-cast">${opCast()}</div>
         <button class="who" data-id="yh">${avatarSvg('yh')}</button>
         <button class="who" data-id="both">${avatarSvg('both')}</button>
         <button class="who" data-id="xz">${avatarSvg('xz')}</button>
-        <svg class="host" viewBox="0 0 1200 900">${characterSvg(host, { x: 490, y: 590, s: 0.92 })}</svg>
+        <div class="op-curtain l">${CURTAIN_L}</div><div class="op-curtain r">${CURTAIN_R}</div>
       </div>`);
     node.appendChild(lockButton(onParent));
     stage.replaceChildren(node);
-    playMusic('lobby');
+    playMusic('opening');
     let chosen = false;
+    let skipped = !full;
+    const alive = () => !chosen && node.isConnected;
+    const kiki = () => $('.op-char[data-id="kiki"] .op-dance', node);
+    const popAt = (n, k = 'star', count = 14) => { const c = centerOf(n); burst(c.x, c.y, { n: count, kind: k, spread: 170 }); };
+    // 跳過：全部直接到位
+    const finish = () => {
+      skipped = true;
+      hush();
+      node.classList.remove('closed');
+      node.classList.add('logo-on', 'avs-on');
+      $$('.op-decor, .op-char', node).forEach((n) => n.classList.add('in'));
+    };
     node.querySelectorAll('.who').forEach((b) => onTap(b, async () => {
-      if (chosen) return;
+      if (chosen || !node.classList.contains('avs-on')) return;
       chosen = true;
+      hush();
       b.classList.add('chosen');
       sfx('fanfare');
-      const c = centerOf(b);
-      burst(c.x, c.y, { n: 12, kind: 'star', spread: 160 });
+      popAt(b, 'star', 12);
       await wait(700);
       resolve(PROFILES[b.dataset.id]);
     }));
+    onTap(node, () => { if (!skipped) finish(); });
+
+    (async () => {
+      if (!full) {
+        node.classList.add('logo-on');
+        $$('.op-decor', node).forEach((n) => n.classList.add('in'));
+        $$('.op-char', node).forEach((n, i) => setTimeout(() => n.classList.add('in'), i * 60));
+        await wait(500);
+        node.classList.add('avs-on');
+        if (!alive()) return;
+        await speak(pick(['kidgirl', 'kidboy']), 'op_go');
+        if (alive()) await speak('kiki', pick(['op_again1', 'op_again2', 'op_again3']), { node: kiki() });
+        return;
+      }
+      // 1. 拉開布幕
+      await wait(150);
+      sfx('whoosh');
+      node.classList.remove('closed');
+      await wait(900);
+      if (skipped || !alive()) return;
+      // 2. 標題一個字一個字跳出來，小朋友大喊
+      node.classList.add('logo-on');
+      sfx('sparkle');
+      await speak('kidgirl', 'op_title1');
+      if (skipped || !alive()) return;
+      await speak('kidboy', 'op_title2');
+      if (skipped || !alive()) return;
+      cheer('kidgirl', 'op_yeah');
+      cheer('kidboy', 'op_yeah');
+      $$('.op-popper', node).forEach((p) => { p.classList.add('fire'); popAt(p, 'star', 22); });
+      sfx('pop');
+      await wait(700);
+      // 3. 派對布置一樣一樣彈出來
+      for (const d of $$('.op-decor', node)) {
+        if (skipped || !alive()) return;
+        d.classList.add('in');
+        sfx('pop');
+        popAt(d, 'star', 6);
+        await wait(380);
+      }
+      // 4. 明星一位一位進場
+      for (const c of $$('.op-char', node)) {
+        if (skipped || !alive()) return;
+        c.classList.add('in');
+        sfx(OP_SND[c.dataset.id] || 'pop');
+        await wait(300);
+      }
+      await wait(400);
+      if (skipped || !alive()) return;
+      // 5. 奇奇歡迎，頭像飄上來
+      node.classList.add('avs-on');
+      skipped = true;
+      await speak('kiki', 'op_welcome', { node: kiki() });
+    })();
   });
 }
 

@@ -36,6 +36,9 @@ export const GUESTS = {
   tiaotiao: { id: 'tiaotiao', name: '跳跳', tts: { pitch: 1.5, rate: 1.1 } },
   yuanyuan: { id: 'yuanyuan', name: '圓圓醫生', tts: { pitch: 1.05, rate: 0.9 } },
   lili: { id: 'lili', name: '栗栗', tts: { pitch: 1.45, rate: 1.05 } },
+  // 首頁喊標題的兩個小朋友
+  kidgirl: { id: 'kidgirl', name: '小女孩', tts: { pitch: 1.9, rate: 1.15 } },
+  kidboy: { id: 'kidboy', name: '小男孩', tts: { pitch: 1.7, rate: 1.15 } },
 };
 
 // 各活動每天可領獎的時段（對應現實作息）。[開始小時, 結束小時)

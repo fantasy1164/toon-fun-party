@@ -980,3 +980,15 @@ Object.assign(LINES, {
   tba_rinse_end: { dudu: '洗好了，好香喔。' },
   tba_dry: { dudu: '擦乾身體，穿上睡衣。做好了按勾勾。' },
 });
+
+// ================= 首頁派對 =================
+Object.assign(LINES, {
+  op_title1: { kidgirl: '明星總動員！' },
+  op_title2: { kidboy: '歡樂派對！' },
+  op_yeah: { kidgirl: '耶！', kidboy: '耶！' },
+  op_go: { kidgirl: '派對開始囉！', kidboy: '派對開始囉！' },
+  op_welcome: { kiki: '歡迎來到明星總動員歡樂派對！今天誰要來玩呢？' },
+  op_again1: { kiki: '派對繼續！今天誰要來玩呢？' },
+  op_again2: { kiki: '大家都在等你喔！誰要來玩？' },
+  op_again3: { kiki: '歡迎回來！點一下你的照片。' },
+});
