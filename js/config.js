@@ -8,6 +8,7 @@ export const DEFAULT_SETTINGS = {
   bedtime: 21,    // 幾點後角色都睡了
   wake: 6,        // 幾點起床
   musicVol: 'mid', // 音樂大小：low、mid、high
+  kidLook: 'body', // 小孩在遊戲裡的樣子：body（全身／半身）、head（只有頭）
 };
 
 export const PROFILES = {

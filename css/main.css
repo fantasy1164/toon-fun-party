@@ -1027,7 +1027,7 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 @keyframes spotpulse { from { background: rgb(var(--glow-rgb, 255 208 0) / .08); } to { background: rgb(var(--glow-rgb, 255 208 0) / .3); } }
 .park .p-char { z-index: 2; }
 .park .p-char.away, .park .pk-kid.away { opacity: 0; }
-.park .p-char.glow-c { pointer-events: auto; }
+.park .p-char.glow-c { pointer-events: auto; z-index: 5; }
 @keyframes pkwave { from { transform: rotate(0); } to { transform: rotate(-40deg); } }
 .park .p-char.glow-c .char { filter: drop-shadow(0 0 10px var(--glow, #ffd000)) drop-shadow(0 0 4px var(--glow, #ffd000)); }
 .park .p-char.wave .arm-r { animation: pkwave .3s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 20% 10%; }
@@ -1102,7 +1102,7 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .kit .kt-thing.glow { filter: drop-shadow(0 0 10px var(--glow, #ffd000)) drop-shadow(0 0 4px var(--glow, #ffd000)); animation: pulse .6s ease-in-out infinite alternate; }
 .kit .kt-thing.nope { animation: shakehead .4s; }
 .kit .p-char { z-index: 2; }
-.kit .p-char.glow-c { pointer-events: auto; }
+.kit .p-char.glow-c { pointer-events: auto; z-index: 5; }
 .kit .p-char.glow-c .char { filter: drop-shadow(0 0 10px var(--glow, #ffd000)) drop-shadow(0 0 4px var(--glow, #ffd000)); }
 .kit .p-char.running .char { animation: jump .25s ease-out infinite alternate; }
 .kit .kt-kid { position: absolute; width: 110px; height: 110px; border-radius: 50%; background: #fff; z-index: 4; }
@@ -1352,3 +1352,31 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .opening .op-curtain.l { left: calc(-1 * var(--bleed, 0px)); }
 .opening .op-curtain.r { right: calc(-1 * var(--bleed, 0px)); }
 .hub .home { left: calc(22px - var(--bleed, 0px)); }
+
+/* ---------- 妍卉、向澤全身（kidLook = body） ---------- */
+.kid-fig { display: block; overflow: visible; }
+.kb { transform-origin: 120px 320px; animation: kbIdle 1.8s ease-in-out infinite alternate; }
+@keyframes kbIdle { from { transform: scale(1, 1); } to { transform: scale(1.02, .985); } }
+.kb-called .kb-arm.r { animation: kbWave .22s ease-in-out infinite alternate; }
+@keyframes kbWave { from { transform: rotate(-155deg); } to { transform: rotate(-115deg); } }
+.kb-yay .kb-arm.r { transform: rotate(-145deg); }
+.kb-yay .kb-arm.l { transform: rotate(145deg); }
+.kb-yay .kb { animation: kbJump .5s ease-out 2; }
+@keyframes kbJump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-26px); } }
+.kb-arm { transition: transform .2s; }
+.kit .kt-kid.body, .park .pk-kid.body { width: 130px; height: 173px; border-radius: 0; background: none; box-shadow: none; overflow: visible; }
+.kit .kt-kid.body > svg, .park .pk-kid.body > svg { border-radius: 0; }
+.kit .kt-kid.body.glow, .park .pk-kid.body.glow { box-shadow: none; filter: drop-shadow(0 0 10px var(--glow, #ffd000)) drop-shadow(0 0 4px var(--glow, #ffd000)); }
+.kit .kt-kid.body .kt-mask { left: 25px; top: 46px; }
+.kit .kt-kid.body .kt-band { left: 82px; right: auto; top: 96px; }
+.kit .kt-kid.body .kt-sticker { left: 22px; top: 82px; }
+.kit .kt-kid.body.ah { animation: none; }
+.kit .kt-kid.body.ah .kb-head { transform-origin: 120px 160px; animation: pulse .3s ease-in-out infinite alternate; }
+.kitchen .kid-face.body.turn .kb { filter: drop-shadow(0 0 8px var(--glow, #ffd000)) drop-shadow(0 0 3px var(--glow, #ffd000)); }
+.party .kid.body { width: 150px; height: 200px; top: 640px; border-radius: 0; background: none; box-shadow: none; }
+.party .kid.body > svg { border-radius: 0; }
+.party .kid.body .hat { left: 42px; top: -58px; }
+.newyear .ny-kid.body { width: 140px; height: 187px; top: 660px; border-radius: 0; overflow: visible; background: none; box-shadow: none !important; }
+.newyear.lantern-night .ny-kid.body { top: 560px; }
+.hall .hf-aud-kid.body { width: 120px; height: 160px; border-radius: 0; overflow: visible; border: 0; }
+.hall .hf-pkid.body > svg:last-child { border: 0; border-radius: 0; background: none; }

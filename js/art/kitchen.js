@@ -1,5 +1,5 @@
 // 廚房（餐桌）：背景、座位、餐具、食物、盤子、水槽。舞台 1200x900。
-import { characterSvg, avatarSvg } from './characters.js';
+import { characterSvg, avatarSvg, kidBody, useBody } from './characters.js';
 import { weatherLayer, skyColors } from './bathroom.js';
 
 // 三個座位：左邊波波、中間小孩、右邊另一位角色
@@ -97,11 +97,12 @@ export function seatedChars(other, seats = seatsFor({ members: ['yh'] })) {
 
 export function tableFront(profile, seats = seatsFor(profile)) {
   return `<svg viewBox="0 0 1200 900">
+    ${useBody() ? seats.filter((st) => st.who === 'kid').map((st) => `<g class="kid-face body" data-id="${st.id}" data-kid="${st.id}" transform="translate(${st.x - 95} ${TABLE_Y - 208}) scale(${190 / 240})">${kidBody(st.id, { half: true })}</g>`).join('') : ''}
     <rect x="20" y="${TABLE_Y - 20}" width="1160" height="60" rx="20" fill="#d9a066"/>
     <rect x="20" y="${TABLE_Y + 30}" width="1160" height="20" fill="#b9824f"/>
     <rect x="60" y="${TABLE_Y + 50}" width="40" height="200" fill="#b9824f"/><rect x="1100" y="${TABLE_Y + 50}" width="40" height="200" fill="#b9824f"/>
     <path d="M20 ${TABLE_Y - 8}H1180" stroke="#fff" stroke-width="10" stroke-dasharray="30 30" opacity=".5"/>
-    ${seats.filter((st) => st.who === 'kid').map((st) => `<g class="kid-face" data-id="${st.id}" transform="translate(${st.x - 40} ${TABLE_Y - 220})"><circle cx="40" cy="40" r="44" fill="#fff"/>${avatarSvg(st.id, 80).replace('<svg ', '<svg x="0" y="0" ')}</g>`).join('')}
+    ${useBody() ? '' : seats.filter((st) => st.who === 'kid').map((st) => `<g class="kid-face" data-id="${st.id}" transform="translate(${st.x - 40} ${TABLE_Y - 220})"><circle cx="40" cy="40" r="44" fill="#fff"/>${avatarSvg(st.id, 80).replace('<svg ', '<svg x="0" y="0" ')}</g>`).join('')}
   </svg>`;
 }
 

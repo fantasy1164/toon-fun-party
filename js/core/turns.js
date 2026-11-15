@@ -69,10 +69,21 @@ export function turnsScene(root, { first = null } = {}) {
 }
 
 // 唱名：第一次「妍卉，換你囉」，剛換人時「換向澤囉」，其他時候只叫名字
+// 畫面上的小孩身體：被唱名時揮手、做完時舉手歡呼
+export function kidAnim(id, cls, ms) {
+  document.querySelectorAll(`[data-kid="${id}"]`).forEach((n) => {
+    n.classList.remove(cls);
+    void n.getBoundingClientRect();
+    n.classList.add(cls);
+    setTimeout(() => n.classList.remove(cls), ms);
+  });
+}
+
 export async function callTurn(charId, node = null, { line = null } = {}) {
   if (!turnsOn()) return;
   free = false;
   paint();
+  kidAnim(cur, 'kb-called', 1800);
   const id = line || (!said ? `tg_turn_${cur}` : thank ? `tg_tx_${cur}` : `tg_name_${cur}`);
   window.__turns?.push(`call:${cur}`);
   said = true;
@@ -95,6 +106,7 @@ export async function turnCall(charId, node = null) {
 export async function passTurn(charId = null, node = null) {
   if (!turnsOn()) return;
   window.__turns?.push(`pass:${cur}`);
+  kidAnim(cur, 'kb-yay', 1000);
   cur = otherKid();
   free = false;
   paint();

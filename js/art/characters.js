@@ -1,3 +1,4 @@
+import { state } from '../core/store.js';
 // 原創角色與小孩頭像（SVG）。角色畫在 240x320 的框內，腳底在 y=320。
 
 const eye = (x, y, lid) => `
@@ -362,4 +363,55 @@ export function avatarSvg(id, size = 200) {
       <g transform="translate(84 40) scale(.56)">${boy()}</g></svg>`;
   }
   return `<svg viewBox="0 0 200 200" width="${size}" height="${size}">${id === 'yh' ? girl() : boy()}</svg>`;
+}
+
+// ---------- 妍卉、向澤的身體（跟動物明星同一種大頭比例，240x320，腳在 y=320）----------
+// 家長頁可以切回只有頭（state.settings.kidLook = 'head'）
+export function useBody() { return (state.settings?.kidLook ?? 'body') !== 'head'; }
+const SKIN = '#ffd9b8';
+const KID_LOOK = {
+  yh: { top: '#ff7fae', trim: '#fff', shoe: '#ff5c93' },
+  xz: { top: '#3fbf6a', trim: '#ffd34d', shoe: '#fff' },
+};
+function headOnly(id) {
+  return (id === 'yh' ? girl() : boy()).replace(/<circle cx="100" cy="100" r="96" fill="#(ffc7dc|bfe3ff)"\/>/, '');
+}
+// pose：stand、sit（坐著，腿短短的垂下來）；half：只畫到腰（坐在桌子、座椅後面）
+// outfit：rain（黃色雨衣、雨鞋）、pj（睡衣）
+export function kidBody(id, { pose = 'stand', half = false, outfit = '' } = {}) {
+  const L = KID_LOOK[id] || KID_LOOK.yh;
+  const girlish = id === 'yh';
+  const top = outfit === 'rain' ? '#ffd02e' : outfit === 'pj' ? (girlish ? '#c7a8ff' : '#8fc8ff') : L.top;
+  const shoe = outfit === 'rain' ? '#ffb300' : L.shoe;
+  const legY = pose === 'sit' ? 262 : 268;
+  const legH = pose === 'sit' ? 26 : 38;
+  const legs = half ? '' : `
+    <rect x="92" y="${legY}" width="18" height="${legH}" rx="8" fill="${outfit === 'pj' ? top : SKIN}"/><rect x="130" y="${legY}" width="18" height="${legH}" rx="8" fill="${outfit === 'pj' ? top : SKIN}"/>
+    ${outfit === 'rain' ? `<rect x="86" y="${legY + legH - 22}" width="30" height="26" rx="6" fill="${shoe}"/><rect x="124" y="${legY + legH - 22}" width="30" height="26" rx="6" fill="${shoe}"/>`
+      : `<ellipse cx="100" cy="${legY + legH + 4}" rx="20" ry="11" fill="${shoe}"/><ellipse cx="140" cy="${legY + legH + 4}" rx="20" ry="11" fill="${shoe}"/>`}
+    ${!girlish && outfit !== 'rain' ? `<path d="M82 ${legY + legH + 6}h36M122 ${legY + legH + 6}h36" stroke="#3a7bd5" stroke-width="5"/>` : ''}`;
+  const body = outfit === 'rain'
+    ? `<path d="M84 164Q120 150 156 164L182 274Q120 290 58 274Z" fill="${top}"/><path d="M120 170V280" stroke="#e0a800" stroke-width="4"/><circle cx="112" cy="200" r="4" fill="#e0a800"/><circle cx="112" cy="232" r="4" fill="#e0a800"/>`
+    : girlish
+      ? `<path d="M84 168Q120 156 156 168L178 268Q120 284 62 268Z" fill="${top}"/><path d="M62 268Q120 284 178 268" stroke="${L.trim}" stroke-width="6" fill="none"/>
+         <path d="M98 166Q120 182 142 166" stroke="${L.trim}" stroke-width="6" fill="none"/><circle cx="120" cy="198" r="7" fill="${L.trim}"/>`
+      : `<path d="M82 168Q120 154 158 168L164 246H76Z" fill="${top}"/><path d="M110 196l10 -10l10 10l-4 14h-12z" fill="${L.trim}"/>
+         ${outfit === 'pj' ? `<path d="M78 240H162L160 276H80Z" fill="${top}"/>` : '<path d="M78 240H162L160 276H128L120 258L112 276H80Z" fill="#2f4b7c"/>'}`;
+  const sleeve = top;
+  const arm = (side) => {
+    const r = side === 'r';
+    const sx = r ? 154 : 86;
+    const hx = r ? 178 : 62;
+    return `<g class="kb-arm ${side}" style="transform-origin:${sx}px 176px"><path d="M${sx} 178L${r ? 176 : 64} 236" stroke="${sleeve}" stroke-width="22" stroke-linecap="round"/><circle cx="${hx}" cy="244" r="13" fill="${SKIN}"/></g>`;
+  };
+  const hood = outfit === 'rain' ? '<path d="M40 110Q42 20 120 16Q198 20 200 110L188 112Q182 40 120 36Q58 40 52 112Z" fill="#ffd02e"/>' : '';
+  return `<g class="kb">
+    <ellipse cx="120" cy="314" rx="70" ry="9" fill="#000" opacity="${half ? 0 : 0.12}"/>
+    ${legs}${arm('l')}${arm('r')}${body}
+    <g class="kb-head"><g transform="translate(25 6) scale(.95)">${headOnly(id)}</g>${hood}</g>
+  </g>`;
+}
+// 一個小孩：w 是寬度（高度是寬的 4/3）
+export function kidFigure(id, { w = 130, pose, half, outfit, cls = '' } = {}) {
+  return `<svg class="kid-fig ${cls}" data-kid="${id}" viewBox="0 0 240 320" width="${w}" height="${Math.round((w * 4) / 3)}" overflow="visible">${kidBody(id, { pose, half, outfit })}</svg>`;
 }

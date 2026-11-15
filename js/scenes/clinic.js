@@ -8,7 +8,7 @@ import { phase } from '../core/clock.js';
 import { avatarSvg } from '../art/characters.js';
 import { clinicBack, CL, TOOL } from '../art/clinic.js';
 import { makeScene, charDiv } from './party.js';
-import { pickCard, tapOne, hardNow, giveReward, moveTo } from './kit.js';
+import { pickCard, tapOne, hardNow, giveReward, moveTo, kidNode } from './kit.js';
 
 const HOST = 'yuanyuan';
 const CHAIRS = [[298, 560], [408, 560], [518, 560]];
@@ -20,7 +20,7 @@ export function mountClinic(stage, { profile, onExit }) {
     <div class="kt-things"></div>
     ${charDiv('kiki', 600, 420)}
     ${charDiv(HOST, 930, 420)}
-    ${kids.map((id, i) => `<div class="kt-kid k-${id}" data-id="${id}" style="left:${560 + i * 120}px;top:700px">${avatarSvg(id, 110)}</div>`).join('')}
+    ${kids.map((id, i) => kidNode(id, 560 + i * 130, 810)).join('')}
     <div class="kt-cards hidden"></div>`;
   const ctl = makeScene(stage, profile, onExit, inner, HOST, { cls: 'kit clinic', back: clinicBack(phase()) });
   const { root, guard, pause } = ctl;

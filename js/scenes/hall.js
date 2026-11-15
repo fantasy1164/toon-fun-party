@@ -7,7 +7,7 @@ import { el, $, $$, wait, pick, burst, centerOf, onTap } from '../core/dom.js';
 import { sfx, playMusic, musicBeat, musicLevel } from '../core/audio.js';
 import { speak, hush } from '../core/voice.js';
 import { state, save } from '../core/store.js';
-import { characterSvg, avatarSvg } from '../art/characters.js';
+import { characterSvg, avatarSvg, kidFigure, useBody } from '../art/characters.js';
 import { tgIcon } from '../art/together.js';
 import { hallBack, plaquePos, plaqueSvg, starRow, KID_COLOR, photoSvg, meSvg, CROWN, NOTE, CLOSE } from '../art/hall.js';
 import { makeScene, charDiv } from './party.js';
@@ -136,7 +136,7 @@ export function mountHall(stage, { profile, onExit }) {
     const N = two ? 4 : 3;
     const ov = el(`<div class="hf-concert"><div class="hf-lights"></div><div class="hf-cstage"></div>
       <div class="hf-pick">${STARS.map((id) => `<button class="hf-head" data-id="${id}"><svg viewBox="10 0 220 200" width="104" height="96">${characterSvg(id)}</svg></button>`).join('')}</div>
-      <div class="hf-aud">${kids.map((k) => `<div class="hf-aud-kid k-${k}">${avatarSvg(k, 100)}</div>`).join('')}</div></div>`);
+      <div class="hf-aud">${kids.map((k) => (useBody() ? `<div class="hf-aud-kid body k-${k}">${kidFigure(k, { w: 120 })}</div>` : `<div class="hf-aud-kid k-${k}">${avatarSvg(k, 100)}</div>`)).join('')}</div></div>`);
     root.appendChild(ov);
     const cstage = $('.hf-cstage', ov);
     const xs = N === 3 ? [330, 600, 870] : [240, 480, 720, 960];
@@ -219,7 +219,7 @@ export function mountHall(stage, { profile, onExit }) {
     const pos = STARS.map((_, i) => (i < 5 ? [150 + i * 200, 140] : [250 + (i - 5) * 200, 320]));
     const ov = el(`<div class="hf-party">
       ${STARS.map((id, i) => `<div class="hf-pc" style="left:${pos[i][0]}px;top:${pos[i][1]}px;animation-delay:${(i % 4) * 0.12}s"><svg viewBox="0 0 240 320" width="100%" height="100%">${characterSvg(id)}</svg></div>`).join('')}
-      <div class="hf-pkids">${due.map((k) => `<div class="hf-pkid">${CROWN}${avatarSvg(k, 150)}</div>`).join('')}</div></div>`);
+      <div class="hf-pkids">${due.map((k) => `<div class="hf-pkid${useBody() ? ' body' : ''}">${CROWN}${useBody() ? kidFigure(k, { w: 150 }) : avatarSvg(k, 150)}</div>`).join('')}</div></div>`);
     root.appendChild(ov);
     playMusic('party');
     const conf = setInterval(() => {

@@ -1,5 +1,5 @@
 // 學堂（教室）：咕咕老師站在黑板旁，奇奇、小孩、嘟嘟坐前排。晚上換成看星星的大窗戶。舞台 1200x900。
-import { characterSvg, avatarSvg } from './characters.js';
+import { characterSvg, avatarSvg, kidBody, useBody } from './characters.js';
 import { weatherLayer, skyColors } from './bathroom.js';
 import { hour } from '../core/clock.js';
 
@@ -74,7 +74,8 @@ export function desksSvg(profile) {
     const s = two ? 0.82 : 1;
     const color = two ? (id === 'yh' ? '#ff9fc0' : '#6fcf97') : '#5fa8e8';
     return `<g class="kidchair" data-id="${id}"><rect x="${x - 80 * s}" y="${720 - 200 * s}" width="${160 * s}" height="${200 * s}" rx="30" fill="${color}"/>
-      <g class="kidav" transform="translate(${x - 70 * s} ${730 - 200 * s}) scale(${s})"><circle cx="70" cy="70" r="72" fill="#fff"/>${avatarSvg(id, 140).replace('<svg ', '<svg x="0" y="0" ')}</g></g>`;
+      ${useBody() ? `<g class="kidav body" data-kid="${id}" transform="translate(${x - 100 * s} ${730 - 214 * s}) scale(${(s * 200) / 240})">${kidBody(id, { half: true })}</g>`
+        : `<g class="kidav" transform="translate(${x - 70 * s} ${730 - 200 * s}) scale(${s})"><circle cx="70" cy="70" r="72" fill="#fff"/>${avatarSvg(id, 140).replace('<svg ', '<svg x="0" y="0" ')}</g>`}</g>`;
   };
   const bo = two ? 50 : 0;   // 嘟嘟的積木跟著桌子往右一點
   return `<svg viewBox="0 0 1200 900">
@@ -224,7 +225,8 @@ export function nightSky(ph, wx, profile) {
     <!-- 望遠鏡 -->
     <g transform="translate(720 ${W.y + W.h})"><path d="M0 0L-30 -10L-50 -120" stroke="#5a5a6a" stroke-width="8" fill="none"/><path d="M0 0L30 -10L-30 -110" stroke="#5a5a6a" stroke-width="8"/>
       <g transform="translate(-40 -120) rotate(-30)"><rect x="-70" y="-16" width="150" height="32" rx="10" fill="#e5734f"/><rect x="72" y="-22" width="18" height="44" rx="6" fill="#c9562f"/></g></g>
-    <g transform="translate(150 ${W.y + W.h + 60})"><circle cx="80" cy="80" r="84" fill="#fff"/>${avatarSvg(kid, 160).replace('<svg ', '<svg x="0" y="0" ')}</g>
+    ${useBody() ? `<g data-kid="${kid}" transform="translate(130 ${W.y + W.h + 56}) scale(${200 / 240})">${kidBody(kid, { half: true, outfit: 'pj' })}</g>`
+      : `<g transform="translate(150 ${W.y + W.h + 60})"><circle cx="80" cy="80" r="84" fill="#fff"/>${avatarSvg(kid, 160).replace('<svg ', '<svg x="0" y="0" ')}</g>`}
   </svg>`;
 }
 

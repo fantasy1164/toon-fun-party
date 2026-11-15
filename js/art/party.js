@@ -1,5 +1,5 @@
 // 生日派對：房間、裝飾、蛋糕、蠟燭、禮物盒、做卡片。舞台 1200x900。
-import { characterSvg, avatarSvg } from './characters.js';
+import { characterSvg, avatarSvg, kidFigure, useBody } from './characters.js';
 
 export const PARTY_CHARS = [
   ['kiki', 30, 330], ['dudu', 230, 340], ['gugu', 506, 250], ['bobo', 800, 330], ['mian', 1000, 340],
@@ -86,6 +86,7 @@ export function boxSvg(c) {
 export const HAT = `<svg viewBox="0 0 80 90" width="80" height="90"><path d="M40 4L72 84H8Z" fill="#c77dff"/><path d="M24 44L56 44M18 62H62" stroke="#ffd34d" stroke-width="7"/><circle cx="40" cy="6" r="9" fill="#ffd34d"/></svg>`;
 
 export function kidSeat(id, cls = '') {
+  if (useBody()) return `<div class="kid body ${cls}" data-id="${id}">${kidFigure(id, { w: 150 })}<div class="hat">${HAT}</div></div>`;
   return `<div class="kid ${cls}" data-id="${id}">${avatarSvg(id, 140)}<div class="hat">${HAT}</div></div>`;
 }
 

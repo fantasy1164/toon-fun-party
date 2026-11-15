@@ -9,7 +9,7 @@ import { avatarSvg } from '../art/characters.js';
 import { marketBack, COUNTER, PRODUCTS, LIST_POOL, TEMPT, PRICE, ECOBAG, PLASTIC, COIN, WALLET, LIST_PAPER } from '../art/market.js';
 import { makeScene, charDiv } from './party.js';
 import { turnsOn, passTurn } from '../core/turns.js';
-import { pickCard, tapOne, tapEach, hardNow, giveReward, moveTo, shuffle } from './kit.js';
+import { pickCard, tapOne, tapEach, hardNow, giveReward, moveTo, shuffle, kidNode } from './kit.js';
 
 const HOST = 'lili';
 // 貨架上的位置（左上角）
@@ -32,7 +32,7 @@ export function mountMarket(stage, { profile, onExit }) {
     <div class="mk-list hidden">${LIST_PAPER(list)}</div>
     <div class="mk-cart"><svg viewBox="0 0 100 100" width="170" height="170"><path d="M8 22H22L32 66H80L88 34H26" stroke="#3a7bd5" stroke-width="6" fill="#dbe9ff" stroke-linejoin="round"/><circle cx="38" cy="80" r="8" fill="#333"/><circle cx="74" cy="80" r="8" fill="#333"/></svg><div class="mk-in"></div></div>
     ${charDiv('kiki', 30, 640)}
-    ${kids.map((id, i) => `<div class="kt-kid k-${id}" data-id="${id}" style="left:${420 + i * 120}px;top:740px">${avatarSvg(id, 110)}</div>`).join('')}
+    ${kids.map((id, i) => kidNode(id, 420 + i * 130, 850)).join('')}
     <div class="mk-belt"></div>
     <div class="mk-pay hidden"></div>
     <div class="kt-cards hidden"></div>`;

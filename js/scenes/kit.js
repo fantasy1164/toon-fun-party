@@ -91,7 +91,12 @@ import { REWARD_SLOTS } from '../config.js';
 import { hour, currentSlot } from '../core/clock.js';
 import { state, save, hasClaimed, claim, addItem } from '../core/store.js';
 import { itemSvg, nextItem } from '../art/items.js';
-import { avatarSvg } from '../art/characters.js';
+import { avatarSvg, kidFigure, useBody } from '../art/characters.js';
+// 場景裡的小孩：全身（預設）或只有頭；footY 是腳底（舞台座標）
+export function kidNode(id, x, footY, { cls = 'kt-kid', outfit = '' } = {}) {
+  if (useBody()) return `<div class="${cls} body k-${id}" data-id="${id}" style="left:${x}px;top:${footY - 173}px">${kidFigure(id, { w: 130, outfit })}</div>`;
+  return `<div class="${cls} k-${id}" data-id="${id}" style="left:${x}px;top:${footY - 110}px">${avatarSvg(id, 110)}</div>`;
+}
 export async function giveReward({ root, kids, reward, series, say }) {
   sfx('fanfare');
   const slot = currentSlot(REWARD_SLOTS[reward], hour());

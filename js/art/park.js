@@ -1,6 +1,6 @@
 // 公園：小猴子跳跳的地盤。溜滑梯（左）、鞦韆（中右）、沙坑與洗手台（右下）、大樹（左上）。舞台 1200x900。
 import { weatherLayer, skyColors } from './bathroom.js';
-import { avatarSvg, characterSvg } from './characters.js';
+import { avatarSvg, characterSvg, kidBody, useBody } from './characters.js';
 import { itemIcon } from './door.js';
 
 // 鞦韆的支點與鍊子長度（舞台座標）
@@ -71,6 +71,7 @@ export function swingSvg(seat = '') {
 export function swingRider(kind) {
   const { x, y, len } = SWING;
   if (kind === 'tiaotiao') return characterSvg('tiaotiao', { x: x - 60, y: y + len - 150, s: 0.5 });
+  if (useBody()) return `<g data-kid="${kind}" transform="translate(${x - 60} ${y + len - 150}) scale(.5)">${kidBody(kind, { pose: 'sit' })}</g>`;
   return `<g transform="translate(${x - 52} ${y + len - 118})"><circle cx="52" cy="52" r="54" fill="#fff"/>${avatarSvg(kind, 104).replace('<svg ', '<svg x="0" y="0" ')}</g>`;
 }
 

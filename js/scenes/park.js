@@ -14,6 +14,7 @@ import { itemSvg, nextItem } from '../art/items.js';
 import { parkBack, swingSvg, swingRider, PK, CARDS, SLIDE, QUEUE, SWING } from '../art/park.js';
 import { makeScene, charDiv } from './party.js';
 import { sceneWeather } from './door.js';
+import { kidNode } from './kit.js';
 import { itemIcon } from '../art/door.js';
 import { turnsOn, passTurn, setTurn, callTurn, whoseTurn, otherKid, freeTurns } from '../core/turns.js';
 
@@ -37,7 +38,7 @@ export function mountPark(stage, { profile, onExit }) {
     <div class="pk-things"></div>
     ${charDiv(HOST, 40, 560)}
     ${charDiv('dudu', 860, 440)}
-    ${kids.map((id, i) => `<div class="pk-kid k-${id}" data-id="${id}" style="left:${620 + i * 120}px;top:640px">${avatarSvg(id, 110)}</div>`).join('')}
+    ${kids.map((id, i) => kidNode(id, 620 + i * 130, 750, { cls: 'pk-kid', outfit: rain ? 'rain' : '' })).join('')}
     <div class="pk-cards hidden"></div>
     <div class="p-tray hidden"></div>`;
   const ctl = makeScene(stage, profile, onExit, inner, HOST, {

@@ -7,7 +7,7 @@ import { phase } from '../core/clock.js';
 import { avatarSvg } from '../art/characters.js';
 import { bathRoomBack, TUB_FRONT, BT, BTC } from '../art/bath.js';
 import { makeScene, charDiv } from './party.js';
-import { pickCard, tapOne, tapEach, hardNow, giveReward, moveTo } from './kit.js';
+import { pickCard, tapOne, tapEach, hardNow, giveReward, moveTo, kidNode } from './kit.js';
 
 const HOST = 'dudu';
 
@@ -18,7 +18,7 @@ export function mountBath(stage, { profile, onExit }) {
     ${charDiv(HOST, 250, 420, 0.8)}
     <div class="bt-tub">${TUB_FRONT}</div>
     <div class="kt-things"></div>
-    ${kids.map((id, i) => `<div class="kt-kid k-${id}" data-id="${id}" style="left:${40 + i * 120}px;top:740px">${avatarSvg(id, 110)}</div>`).join('')}
+    ${kids.map((id, i) => kidNode(id, 40 + i * 130, 850)).join('')}
     <div class="kt-cards hidden"></div>`;
   const ctl = makeScene(stage, profile, onExit, inner, HOST, { cls: 'kit bath', back: bathRoomBack(phase()) });
   const { root, guard, pause } = ctl;

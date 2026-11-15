@@ -12,7 +12,7 @@ import {
   FU, COUPLET, LANTERN, nyRoom, DUST, TOYS, DUSTPILE, NIAN, TOOLS, DISHES, EASY_DISHES, DISH_QUIZ,
   ENVELOPE, PIGGY, HANDS, SAFE_CARD, RUN_CARD, LANTERNS, RIDDLE, BOWL, lanternStreet, fireworkSky, fireworkSvg,
 } from '../art/newyear.js';
-import { avatarSvg } from '../art/characters.js';
+import { avatarSvg, kidFigure, useBody } from '../art/characters.js';
 import { itemSvg, nextItem } from '../art/items.js';
 import { turnsOn, turnCall, passTurn, freeTurns, setTurn, callTurn, whoseTurn, otherKid, evenCount } from '../core/turns.js';
 
@@ -23,8 +23,8 @@ const DOOR_DONE = `<svg class="door-done" viewBox="0 0 1200 900">${nest(COUPLET,
 // 拜年收紅包：一起玩時兩個頭像（妍卉左下、向澤右下），紅包各疊在自己旁邊
 const ENV_X = { solo: (n) => 220 + n * 26, yh: (n) => 175 + n * 22, xz: (n) => 965 - n * 22 };
 const kidAvs = (profile) => (profile.members.length > 1
-  ? profile.members.map((id) => `<div class="ny-kid k-${id}" data-id="${id}">${avatarSvg(id, 130)}</div>`).join('')
-  : `<div class="ny-kid">${avatarSvg(profile.members[0], 130)}</div>`);
+  ? profile.members.map((id) => `<div class="ny-kid${useBody() ? ' body' : ''} k-${id}" data-id="${id}">${useBody() ? kidFigure(id, { w: 140 }) : avatarSvg(id, 130)}</div>`).join('')
+  : `<div class="ny-kid${useBody() ? ' body' : ''}">${useBody() ? kidFigure(profile.members[0], { w: 140 }) : avatarSvg(profile.members[0], 130)}</div>`);
 const kidAv = (profile) => `<div class="ny-kid">${avatarSvg(profile.members.length > 1 ? 'both' : profile.members[0], 130)}</div>`;
 
 export function mountNewYear(stage, opts) {

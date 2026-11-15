@@ -1,5 +1,5 @@
 // 汽車內：從後座往前看。擋風玻璃外是會捲動的道路；後座三個位子（奇奇、小孩的安全座椅、嘟嘟）。舞台 1200x900。
-import { characterSvg, avatarSvg } from './characters.js';
+import { characterSvg, avatarSvg, kidBody, useBody } from './characters.js';
 import { weatherLayer, skyColors } from './bathroom.js';
 
 // 擋風玻璃範圍
@@ -107,7 +107,8 @@ export function backSeat(profile) {
   const seat = ({ id, x, w }) => `<g class="kidseat">
     <path d="M${x - w - 20} 900V600Q${x - w - 20} 520 ${x} 520Q${x + w + 20} 520 ${x + w + 20} 600V900Z" fill="${two ? (id === 'yh' ? '#e8738f' : '#3fa86a') : '#e5734f'}"/>
     <path d="M${x - w} 900V610Q${x - w} 550 ${x} 550Q${x + w} 550 ${x + w} 610V900Z" fill="${two ? (id === 'yh' ? '#f59ab0' : '#62c48a') : '#f08a6a'}"/>
-    <g transform="translate(${x - 60} 580)"><circle cx="60" cy="60" r="62" fill="#fff"/>${avatarSvg(id, 120).replace('<svg ', '<svg x="0" y="0" ')}</g>
+    ${useBody() ? `<g data-kid="${id}" transform="translate(${x - 95} 560) scale(${190 / 240})">${kidBody(id, { half: true })}</g>`
+      : `<g transform="translate(${x - 60} 580)"><circle cx="60" cy="60" r="62" fill="#fff"/>${avatarSvg(id, 120).replace('<svg ', '<svg x="0" y="0" ')}</g>`}
   </g>`;
   return `
   <rect x="0" y="560" width="1200" height="340" fill="#6a76a0"/>

@@ -133,6 +133,10 @@ export function openParent(onClose, { onStamp } = {}) {
       ${[['low', '小'], ['mid', '中'], ['high', '大']].map(([v, t]) => `<label><input type="radio" name="mv" data-mv="${v}" ${(s.musicVol || 'mid') === v ? 'checked' : ''}> ${t}</label>`).join('')}
       <p class="note">只調背景音樂和活動歌（刷牙歌、洗手歌……），角色說話的音量不變。改了馬上生效。</p>
 
+      <h2>小孩在遊戲裡的樣子</h2>
+      ${[['body', '全身（站著全身、坐著半身）'], ['head', '只有頭']].map(([v, t]) => `<label><input type="radio" name="kl" data-kl="${v}" ${(s.kidLook || 'body') === v ? 'checked' : ''}> ${t}</label>`).join('')}
+      <p class="note">下次進場景時換成新的樣子。可以兩種都讓孩子玩幾天，看他們喜歡哪一種。</p>
+
       <h2>時間設定</h2>
       <label>每次可玩 <input type="number" data-k="sessionMin" min="1" max="60" value="${s.sessionMin}"> 分鐘</label>
       <label>下班後休息 <input type="number" data-k="restMin" min="0" max="600" value="${s.restMin}"> 分鐘</label><br>
@@ -162,6 +166,11 @@ export function openParent(onClose, { onStamp } = {}) {
   node.addEventListener('change', (e) => {
     if (e.target.dataset?.xmas === 'real') { fest.setRealGift(e.target.checked); return; }
     if (e.target.dataset?.bd) { fest.setBirthday(e.target.dataset.bd, e.target.value); return; }
+    if (e.target.dataset?.kl) {
+      state.settings.kidLook = e.target.dataset.kl;
+      save();
+      return;
+    }
     if (e.target.dataset?.mv) {
       state.settings.musicVol = e.target.dataset.mv;
       save();
