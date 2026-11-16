@@ -12,7 +12,9 @@
   .box { background: #fff; border-radius: 14px; padding: 14px 16px; box-shadow: 0 2px 8px rgb(0 0 0 / .08); margin-bottom: 12px; }
   button, .btn { font: inherit; border: 0; border-radius: 12px; padding: 12px 18px; margin: 4px 6px 4px 0; background: #ff9f43; color: #fff; cursor: pointer; text-decoration: none; display: inline-block; }
   button.quiet, .btn.quiet { background: #e9e2d0; color: #333; }
-  input { font: inherit; padding: 10px; border-radius: 10px; border: 1px solid #ccc; width: min(100%, 640px); box-sizing: border-box; }
+  button:disabled { opacity: .5; }
+  input { font: inherit; padding: 10px; border-radius: 10px; border: 1px solid #ccc; width: min(100%, 640px); box-sizing: border-box; margin: 4px 0; }
+  label { display: block; margin-top: 6px; }
   .ok { color: #1a8a3a; } .bad { color: #c0392b; }
   #log { font: 14px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; background: #222; color: #e8e8e8; border-radius: 12px; padding: 12px; min-height: 120px; max-height: 50vh; overflow: auto; }
   .note { font-size: 14px; color: #777; }
@@ -20,38 +22,39 @@
 </style>
 </head>
 <body>
-<h1>雲端同步測試（Google Drive）</h1>
-<p class="note">只測「登入 → 寫一個小檔案 → 讀回來」，不會動到遊戲進度。請在 iPad、iPhone 的主畫面 app 裡從家長頁點進來測，電腦用瀏覽器開即可。</p>
+<h1>雲端同步測試（Google Apps Script）</h1>
+<p class="note">只會讀寫雲端的 <b>sync-test.json</b>，不會動到遊戲進度。請在 iPad、iPhone 的主畫面 app 裡從家長頁點進來測；電腦用瀏覽器開即可。</p>
 
 <div class="box">
   <table>
     <tr><td>裝置</td><td id="env-dev"></td></tr>
     <tr><td>主畫面 app 模式</td><td id="env-standalone"></td></tr>
-    <tr><td>權杖</td><td id="env-token">還沒有</td></tr>
+    <tr><td>目前遊戲進度大小</td><td id="env-size"></td></tr>
   </table>
 </div>
 
-<h2>0. OAuth 用戶端 ID</h2>
+<h2>0. 連線設定（每台裝置填一次）</h2>
 <div class="box">
-  <input id="cid" placeholder="xxxxxxxx.apps.googleusercontent.com" autocomplete="off" autocapitalize="off" spellcheck="false">
-  <button class="quiet" id="save-cid">記住</button>
-  <p class="note">用戶端 ID 是公開的識別碼，不是密碼。</p>
+  <label>Apps Script 網址<input id="url" placeholder="https://script.google.com/macros/s/……/exec" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+  <label>家庭密碼<input id="key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+  <label>這台裝置的名字<input id="dev" autocomplete="off"></label>
+  <button class="quiet" id="save">記住</button>
+  <span class="note" id="saved"></span>
+  <p class="note">只存在這台裝置。網址之後會直接寫進遊戲設定檔，正式版每台只要輸入密碼。</p>
 </div>
 
-<h2>1. 登入（兩種方式都試）</h2>
+<h2>1. 連線測試</h2>
 <div class="box">
-  <button id="login-popup">A. 彈出視窗登入</button>
-  <button id="login-redirect">B. 整頁跳轉登入</button>
-  <button class="quiet" id="login-silent">C. 不跳畫面再取一次權杖</button>
-  <p class="note">A 是一般做法；B 是 A 在主畫面 app 失敗時的備案；C 測試權杖過期後能不能不打擾小孩自動續上（A 成功後再按）。</p>
+  <button id="ping">連線 3 次</button>
+  <p class="note">第一次通常比較慢（Google 要喚醒程式），看看大約幾秒。關掉 Wi-Fi 再按一次，確認沒網路時會好好顯示失敗、不會卡住。</p>
 </div>
 
-<h2>2. 寫入、讀回</h2>
+<h2>2. 跨裝置寫入、讀回</h2>
 <div class="box">
   <button id="write">寫入測試檔</button>
   <button id="read">讀回來</button>
-  <button class="quiet" id="clear">刪掉測試檔</button>
-  <p class="note">在 A 裝置寫入，到 B 裝置按「讀回來」，看到 A 的裝置名稱和時間就代表跨裝置成功。</p>
+  <button class="quiet" id="remove">刪掉測試檔</button>
+  <p class="note">寫入時會連同「目前遊戲進度」一起送上去，測實際大小的速度。在 A 裝置寫入，到 B 裝置按「讀回來」，看到 A 的名字和時間就是跨裝置成功。</p>
 </div>
 
 <h2>紀錄</h2>
@@ -59,187 +62,132 @@
 <p><button class="quiet" id="copy">複製紀錄</button> <a class="btn quiet" href="./">回到遊戲</a></p>
 
 <script>
-const SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
-const FILE = 'sync-test.json';
-const LS_CID = 'tfp-sync-cid';
-const LS_TOKEN = 'tfp-sync-test-token';
+const CFG_KEY = 'tfp-sync';
+const GAME_KEY = 'toon-fun-party';
 const $ = (id) => document.getElementById(id);
+const logEl = $('log');
 
-// ---------- 紀錄 ----------
-function log(msg, cls = '') {
-  const t = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+function log(msg, cls) {
+  const t = new Date().toTimeString().slice(0, 8);
   const line = document.createElement('div');
   if (cls) line.className = cls;
-  line.textContent = `[${t}] ${msg}`;
-  $('log').appendChild(line);
-  $('log').scrollTop = 1e9;
+  line.textContent = `${t} ${msg}`;
+  logEl.append(line);
+  logEl.scrollTop = logEl.scrollHeight;
 }
 
-// ---------- 環境 ----------
-const ua = navigator.userAgent;
-const isIPad = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
-const isIPhone = /iPhone/.test(ua);
-const device = isIPad ? 'iPad' : isIPhone ? 'iPhone' : /Android/.test(ua) ? 'Android' : '電腦';
-const standalone = navigator.standalone === true
-  || matchMedia('(display-mode: fullscreen)').matches
-  || matchMedia('(display-mode: standalone)').matches;
-$('env-dev').textContent = device;
-$('env-standalone').innerHTML = standalone ? '<span class="ok">是</span>' : '否（一般瀏覽器）';
-
-// ---------- 權杖 ----------
-let token = null;
-let expiresAt = 0;
-function setToken(t, sec, how) {
-  token = t;
-  expiresAt = Date.now() + (sec || 3600) * 1000;
-  localStorage.setItem(LS_TOKEN, JSON.stringify({ token, expiresAt }));
-  log(`取得權杖（${how}），${Math.round((sec || 3600) / 60)} 分鐘後過期`, 'ok');
-  showToken();
+function detect() {
+  const ua = navigator.userAgent;
+  const ipad = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  if (ipad) return 'iPad';
+  if (/iPhone/.test(ua)) return 'iPhone';
+  if (/Android/.test(ua)) return 'Android';
+  if (/Windows/.test(ua)) return 'Windows 電腦';
+  if (/Macintosh/.test(ua)) return 'Mac';
+  return '其他';
 }
-function showToken() {
-  if (!token) { $('env-token').textContent = '還沒有'; return; }
-  const left = Math.round((expiresAt - Date.now()) / 60000);
-  $('env-token').innerHTML = left > 0 ? `<span class="ok">有，剩 ${left} 分鐘</span>` : '<span class="bad">已過期</span>';
-}
-try {
-  const saved = JSON.parse(localStorage.getItem(LS_TOKEN) || 'null');
-  if (saved && saved.expiresAt > Date.now()) { token = saved.token; expiresAt = saved.expiresAt; }
-} catch (e) { /* 忽略 */ }
-setInterval(showToken, 30000);
-showToken();
+const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+$('env-dev').textContent = detect();
+$('env-standalone').innerHTML = standalone ? '<span class="ok">是</span>' : '否（瀏覽器分頁）';
+const game = localStorage.getItem(GAME_KEY) || '';
+$('env-size').textContent = game ? `${(game.length / 1024).toFixed(1)} KB` : '沒有進度';
 
-// ---------- 用戶端 ID ----------
-$('cid').value = localStorage.getItem(LS_CID) || '';
-$('save-cid').onclick = () => {
-  localStorage.setItem(LS_CID, $('cid').value.trim());
-  log('已記住用戶端 ID');
+function readCfg() { try { return JSON.parse(localStorage.getItem(CFG_KEY) || '{}'); } catch { return {}; } }
+const cfg = readCfg();
+$('url').value = cfg.url || '';
+$('key').value = cfg.key || '';
+$('dev').value = cfg.dev || detect();
+$('save').onclick = () => {
+  const c = { ...readCfg(), url: $('url').value.trim(), key: $('key').value.trim(), dev: $('dev').value.trim() || detect() };
+  localStorage.setItem(CFG_KEY, JSON.stringify(c));
+  $('saved').textContent = '已記住';
+  log('已記住連線設定（密碼不會出現在紀錄裡）');
 };
-function cid() {
-  const v = $('cid').value.trim();
-  if (!v) { log('請先填用戶端 ID', 'bad'); return null; }
-  localStorage.setItem(LS_CID, v);
-  return v;
-}
 
-// ---------- B. 整頁跳轉回來（網址 # 後面帶權杖） ----------
-if (location.hash.includes('access_token=')) {
-  const p = new URLSearchParams(location.hash.slice(1));
-  setToken(p.get('access_token'), +p.get('expires_in'), 'B 整頁跳轉');
-  history.replaceState(null, '', location.pathname);
-} else if (location.hash.includes('error=')) {
-  const p = new URLSearchParams(location.hash.slice(1));
-  log(`B 整頁跳轉失敗：${p.get('error')}`, 'bad');
-  history.replaceState(null, '', location.pathname);
-}
+const ERR = {
+  key: '家庭密碼不對',
+  nopass: 'Code.gs 裡的 FAMILY_PASS 還沒改（或少於 8 碼）',
+  locked: '密碼錯太多次，10 分鐘後再試',
+  size: '資料太大',
+  op: '不認得的動作',
+  badjson: '送出的資料格式不對',
+  server: 'Apps Script 執行出錯',
+};
 
-// ---------- A、C. Google Identity Services ----------
-let gisReady = null;
-function loadGis() {
-  if (!gisReady) {
-    gisReady = new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = 'https://accounts.google.com/gsi/client';
-      s.onload = res;
-      s.onerror = () => rej(new Error('載入 Google 登入程式失敗（沒網路？）'));
-      document.head.appendChild(s);
+async function call(body, timeout = 15000) {
+  const url = $('url').value.trim();
+  const key = $('key').value.trim();
+  if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(url)) throw new Error('網址格式不對，要是 https://script.google.com/macros/s/……/exec');
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), timeout);
+  const t0 = performance.now();
+  try {
+    // text/plain：Apps Script 不處理 CORS 預檢，用 application/json 會被瀏覽器擋
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ ...body, key }),
+      redirect: 'follow',
+      cache: 'no-store',
+      signal: ctl.signal,
     });
+    const text = await res.text();
+    const ms = Math.round(performance.now() - t0);
+    let j;
+    try { j = JSON.parse(text); } catch {
+      throw new Error(`回傳的不是資料（HTTP ${res.status}），可能部署時「誰可以存取」不是「任何人」。開頭：${text.slice(0, 80).replace(/\s+/g, ' ')}`);
+    }
+    if (!j.ok) throw new Error(`${ERR[j.err] || j.err}${j.msg ? '：' + j.msg : ''}`);
+    return { j, ms };
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error(`逾時（${timeout / 1000} 秒沒回應）`);
+    if (e instanceof TypeError) throw new Error(`連不上（${e.message}）：沒網路，或被瀏覽器擋下（CORS）`);
+    throw e;
+  } finally {
+    clearTimeout(timer);
   }
-  return gisReady;
-}
-loadGis().then(() => log('Google 登入程式已載入')).catch((e) => log(e.message, 'bad'));
-
-function gisToken(prompt, how) {
-  const id = cid();
-  if (!id) return;
-  if (!window.google?.accounts?.oauth2) { log('Google 登入程式還沒載入好，等一下再按', 'bad'); return; }
-  const client = google.accounts.oauth2.initTokenClient({
-    client_id: id,
-    scope: SCOPE,
-    callback: (r) => {
-      if (r.error) { log(`${how}失敗：${r.error} ${r.error_description || ''}`, 'bad'); return; }
-      setToken(r.access_token, +r.expires_in, how);
-    },
-    error_callback: (e) => log(`${how}失敗：${e.type}${e.message ? ' ' + e.message : ''}`, 'bad'),
-  });
-  log(`${how}：開始`);
-  client.requestAccessToken({ prompt });
-}
-$('login-popup').onclick = () => gisToken('', 'A 彈出視窗');
-$('login-silent').onclick = () => gisToken('none', 'C 不跳畫面');
-
-$('login-redirect').onclick = () => {
-  const id = cid();
-  if (!id) return;
-  const back = location.origin + location.pathname;
-  const q = new URLSearchParams({
-    client_id: id, redirect_uri: back, response_type: 'token', scope: SCOPE,
-    include_granted_scopes: 'true', prompt: 'select_account',
-  });
-  log('B 整頁跳轉：前往 Google…');
-  location.href = `https://accounts.google.com/o/oauth2/v2/auth?${q}`;
-};
-
-// ---------- Drive ----------
-async function api(url, opt = {}) {
-  if (!token || Date.now() > expiresAt) throw new Error('沒有權杖或已過期，請先登入');
-  const r = await fetch(url, { ...opt, headers: { Authorization: `Bearer ${token}`, ...(opt.headers || {}) } });
-  if (!r.ok) throw new Error(`HTTP ${r.status} ${(await r.text()).slice(0, 200)}`);
-  return r;
-}
-async function findFile() {
-  const q = encodeURIComponent(`name='${FILE}'`);
-  const r = await api(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id,name,modifiedTime)`);
-  return (await r.json()).files[0] || null;
 }
 
-$('write').onclick = async () => {
-  try {
-    const old = await findFile();
-    let n = 1;
-    if (old) {
-      const prev = await (await api(`https://www.googleapis.com/drive/v3/files/${old.id}?alt=media`)).json().catch(() => ({}));
-      n = (prev.n || 0) + 1;
-    }
-    const body = JSON.stringify({ device, standalone, at: new Date().toISOString(), n });
-    if (old) {
-      await api(`https://www.googleapis.com/upload/drive/v3/files/${old.id}?uploadType=media`, {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body,
-      });
-    } else {
-      const fd = new FormData();
-      fd.append('metadata', new Blob([JSON.stringify({ name: FILE, parents: ['appDataFolder'] })], { type: 'application/json' }));
-      fd.append('file', new Blob([body], { type: 'application/json' }));
-      await api('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', body: fd });
-    }
-    log(`寫入成功：${body}`, 'ok');
-  } catch (e) { log(`寫入失敗：${e.message}`, 'bad'); }
-};
+function busy(on) { document.querySelectorAll('button').forEach((b) => { b.disabled = on; }); }
+async function step(name, fn) {
+  busy(true);
+  try { await fn(); } catch (e) { log(`${name}失敗：${e.message}`, 'bad'); }
+  busy(false);
+}
 
-$('read').onclick = async () => {
-  try {
-    const f = await findFile();
-    if (!f) { log('雲端還沒有測試檔'); return; }
-    const data = await (await api(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`)).text();
-    log(`讀回成功（雲端修改時間 ${new Date(f.modifiedTime).toLocaleString('zh-TW', { hour12: false })}）：${data}`, 'ok');
-  } catch (e) { log(`讀回失敗：${e.message}`, 'bad'); }
-};
+$('ping').onclick = () => step('連線', async () => {
+  for (let i = 1; i <= 3; i++) {
+    const { ms } = await call({ op: 'ping' });
+    log(`連線 ${i}：成功，${(ms / 1000).toFixed(2)} 秒`, 'ok');
+  }
+});
 
-$('clear').onclick = async () => {
-  try {
-    const f = await findFile();
-    if (!f) { log('雲端沒有測試檔'); return; }
-    await api(`https://www.googleapis.com/drive/v3/files/${f.id}`, { method: 'DELETE' });
-    log('已刪掉測試檔', 'ok');
-  } catch (e) { log(`刪除失敗：${e.message}`, 'bad'); }
-};
+$('write').onclick = () => step('寫入', async () => {
+  const payload = { dev: $('dev').value.trim() || detect(), at: new Date().toLocaleString('zh-TW'), standalone, game: localStorage.getItem(GAME_KEY) || null };
+  const data = JSON.stringify(payload);
+  const { ms } = await call({ op: 'save', slot: 'test', data });
+  log(`寫入成功：${payload.dev}、${payload.at}，${(data.length / 1024).toFixed(1)} KB，${(ms / 1000).toFixed(2)} 秒`, 'ok');
+});
+
+$('read').onclick = () => step('讀回', async () => {
+  const { j, ms } = await call({ op: 'load', slot: 'test' });
+  if (!j.data) { log(`雲端還沒有測試檔（${(ms / 1000).toFixed(2)} 秒）`); return; }
+  const p = JSON.parse(j.data);
+  const size = p.game ? `${(p.game.length / 1024).toFixed(1)} KB 進度` : '沒附進度';
+  log(`讀回成功：來自「${p.dev}」${p.standalone ? '（主畫面 app）' : '（瀏覽器）'}，寫入時間 ${p.at}，${size}，${(ms / 1000).toFixed(2)} 秒`, 'ok');
+});
+
+$('remove').onclick = () => step('刪除', async () => {
+  const { ms } = await call({ op: 'remove', slot: 'test' });
+  log(`測試檔已移到雲端硬碟垃圾桶（${(ms / 1000).toFixed(2)} 秒）`, 'ok');
+});
 
 $('copy').onclick = async () => {
-  const text = `裝置：${device}，主畫面 app：${standalone ? '是' : '否'}\n${$('log').innerText}`;
-  try { await navigator.clipboard.writeText(text); log('已複製，可以貼給 Claude'); }
-  catch (e) { log('複製失敗，請長按紀錄自己選取', 'bad'); }
+  const text = `[${detect()}｜${standalone ? '主畫面 app' : '瀏覽器'}｜${navigator.userAgent}]\n${logEl.innerText}`;
+  try { await navigator.clipboard.writeText(text); log('紀錄已複製'); } catch { log('無法自動複製，請長按紀錄區自行複製', 'bad'); }
 };
 
-log(`開始：${device}，${standalone ? '主畫面 app' : '一般瀏覽器'}`);
+log(`測試頁已開啟：${detect()}，${standalone ? '主畫面 app' : '瀏覽器分頁'}`);
 </script>
 </body>
 </html>
