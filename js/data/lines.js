@@ -60,7 +60,7 @@ Object.assign(LINES, {
   k_meal_bf: { bobo: '早餐時間！來裝一盤營養早餐：要有麵包、荷包蛋、牛奶，還有水果。' },
   k_meal2: { bobo: '來裝一盤好吃又健康的飯！要有飯、青菜、魚或豆干，還有水果。' },
   k_tummy_bf: { bobo: '哎喲，肚子好痛……零食吃太多了。早餐要吃麵包、蛋和牛奶才對。' },
-  f_toast: { bobo: '吐司！' }, f_milk: { bobo: '牛奶！' }, f_tofu: { bobo: '豆干！' }, f_sprouts: { bobo: '豆芽菜！' },
+  f_toast: { bobo: '吐司！' }, f_tofu: { bobo: '豆干！' }, f_sprouts: { bobo: '豆芽菜！' },
   en_toast: { bobo: 'Toast！' }, en_milk: { bobo: 'Milk！' }, en_tofu: { bobo: 'Tofu！' }, en_sprouts: { bobo: 'Bean sprouts！' },
   f_rice: { bobo: '白飯！' }, f_broccoli: { bobo: '花椰菜！' }, f_carrot: { bobo: '紅蘿蔔！' }, f_egg: { bobo: '荷包蛋！' }, f_fish: { bobo: '魚！' },
   f_apple: { bobo: '蘋果！' }, f_banana: { bobo: '香蕉！' }, f_candy: { bobo: '糖果……' }, f_chips: { bobo: '洋芋片……' },
@@ -151,7 +151,10 @@ Object.assign(LINES, {
 
 // ---- 學堂（咕咕老師） ----
 Object.assign(LINES, {
-  s_hello: { gugu: '各位同學好，我是咕咕老師。{name}，歡迎來上課！' },
+  s_hello: {
+    gugu: '各位同學好，我是咕咕老師。{name}，歡迎來上課！',
+    santa: '呵呵呵！{name}你好，我是聖誕老公公！這個月要當好寶寶喔，我會看你的印章本！',
+  },
   s_morning: { kiki: '咕咕老師早安！', dudu: '咕咕老師早安。' },
   s_noon: { kiki: '咕咕老師午安！', dudu: '咕咕老師午安。' },
   s_wave: { gugu: '{name}，你也跟老師打招呼吧。點一下，揮揮手。' },
@@ -230,7 +233,7 @@ Object.assign(LINES, {
   f_fed: { mian: '大家都吃飽了……謝謝你。' },
   f_barn: { mian: '我們去雞窩看看……母雞在孵蛋喔。點一下母雞。' },
   f_eggs: { mian: '有雞蛋！點一下，把雞蛋放進籃子裡。' },
-  f_milk: { mian: '乳牛要擠牛奶了。按住亮亮的地方，輕輕地擠。' },
+  f_milk: { mian: '乳牛要擠牛奶了。按住亮亮的地方，輕輕地擠。', bobo: '牛奶！' },  // 波波的是廚房早餐
   f_milk_done: { mian: '好多牛奶喔。' },
   f_food_from: { mian: '雞蛋是母雞生的，牛奶是乳牛給的。明天早上，會變成香香的早餐喔。' },
   f_garden: { mian: '這是{name}的小菜園。' },
@@ -423,7 +426,6 @@ Object.assign(LINES, {
   sleeping_eve: { dudu: '噓……聖誕老公公快來了，快去睡覺吧，晚安。', kiki: '噓……聖誕老公公要來了……晚安……' },
   m_look: { dudu: '你看，餅乾被吃掉了，地上還有腳印。', kiki: '哇！餅乾被吃掉了！還有大大的腳印！' },
   m_gift: { dudu: '樹下有一個禮物，點點看。', kiki: '樹下有大禮物！快點點看！' },
-  s_hello: { santa: '呵呵呵！{name}你好，我是聖誕老公公！這個月要當好寶寶喔，我會看你的印章本！' },
   s_merry: { santa: '呵呵呵！聖誕快樂！' },
   s_book: { santa: '我看了你的印章本，{name}這個月好棒喔！' },
   s_bed: { santa: '快去看看你的床邊有什麼！呵呵呵！' },
