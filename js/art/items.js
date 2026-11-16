@@ -102,6 +102,13 @@ export const ITEMS = {
   gao_ferris: `<circle cx="50" cy="44" r="32" fill="none" stroke="#5fa8e8" stroke-width="5"/>${[0, 60, 120, 180, 240, 300].map((r) => `<path d="M50 44L${(50 + 32 * Math.cos(r * Math.PI / 180)).toFixed(1)} ${(44 + 32 * Math.sin(r * Math.PI / 180)).toFixed(1)}" stroke="#5fa8e8" stroke-width="3"/><rect x="${(44 + 32 * Math.cos(r * Math.PI / 180)).toFixed(1)}" y="${(44 + 32 * Math.sin(r * Math.PI / 180)).toFixed(1)}" width="12" height="10" rx="3" fill="${['#e5484d', '#ffc400', '#3fbf7f'][r / 60 % 3]}"/>`).join('')}<path d="M50 44L32 94M50 44L68 94" stroke="#8a5a2b" stroke-width="5"/><circle cx="50" cy="44" r="6" fill="#ffd34d"/>`,
   gao_popcorn: `${[[34, 30], [46, 22], [58, 28], [66, 36], [40, 40], [54, 38]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="10" fill="#fff6d6" stroke="#f0d070" stroke-width="2"/>`).join('')}<path d="M26 40H74L66 94H34Z" fill="#fff"/>${[0, 1, 2].map((i) => `<path d="M${32 + i * 14} 40L${38 + i * 12} 94H${44 + i * 12}L${40 + i * 14} 40Z" fill="#e5484d"/>`).join('')}`,
   gao_cap: `<path d="M18 62Q20 22 50 20Q80 22 82 62Z" fill="#e5484d"/><path d="M70 60Q96 58 96 70H66Z" fill="#c43a3f"/><path d="M18 62H82" stroke="#c43a3f" stroke-width="5"/><circle cx="50" cy="40" r="9" fill="#ffd34d"/><path d="M38 20L34 6M62 20L66 6" stroke="#d98a3a" stroke-width="5" stroke-linecap="round"/>`,
+  // 勇勇的消防系列
+  yong_helmet: `<path d="M14 62Q16 18 50 16Q84 18 86 62Z" fill="#e5383b"/><path d="M6 62H94Q92 74 80 74H20Q8 74 6 62Z" fill="#c12a2d"/><path d="M50 18V58" stroke="#c12a2d" stroke-width="5"/><path d="M50 28l6 11h12l-9 8l3 12l-12 -7l-12 7l3 -12l-9 -8h12z" fill="#ffd34d"/>`,
+  yong_hose: `<path d="M20 84Q14 40 50 40Q84 40 78 70Q74 86 58 80" fill="none" stroke="#e0a83a" stroke-width="14" stroke-linecap="round"/><path d="M54 76L74 60L84 72L64 88Z" fill="#9aa0aa"/><path d="M84 66Q94 60 96 50M88 72Q98 70 100 62" stroke="#5fc3e8" stroke-width="4" stroke-linecap="round"/>`,
+  yong_truck: `<rect x="8" y="40" width="62" height="36" rx="5" fill="#e5383b"/><path d="M70 50H86L94 62V76H70Z" fill="#e5383b"/><rect x="74" y="54" width="12" height="10" fill="#d6f4ff"/><path d="M12 36L62 22" stroke="#c9d0d6" stroke-width="5"/><path d="M14 30L60 18" stroke="#c9d0d6" stroke-width="3"/><circle cx="26" cy="78" r="9" fill="#333"/><circle cx="78" cy="78" r="9" fill="#333"/><rect x="40" y="34" width="10" height="7" rx="2" fill="#5fc3e8"/><path d="M8 60H70" stroke="#fff" stroke-width="3"/>`,
+  yong_ext: `<rect x="34" y="28" width="32" height="64" rx="12" fill="#e5383b"/><rect x="40" y="16" width="20" height="14" rx="3" fill="#333"/><path d="M58 20H76V30" stroke="#333" stroke-width="5" fill="none"/><path d="M60 26Q80 24 82 44" stroke="#333" stroke-width="5" fill="none"/><rect x="38" y="50" width="24" height="18" rx="3" fill="#fff"/>`,
+  yong_alarm: `<circle cx="50" cy="50" r="38" fill="#f4f6fa" stroke="#c9d0d6" stroke-width="5"/><circle cx="50" cy="50" r="22" fill="#fff" stroke="#c9d0d6" stroke-width="3"/><circle cx="50" cy="50" r="5" fill="#e5383b"/>${[0, 1, 2].map((i) => `<path d="M${76 + i * 7} ${30 - i * 3}Q${86 + i * 7} 50 ${76 + i * 7} ${70 + i * 3}" stroke="#ff9f43" stroke-width="3" fill="none"/>`).join('')}`,
+  yong_badge: `<path d="M50 8L84 22V50Q84 76 50 92Q16 76 16 50V22Z" fill="#ffd34d" stroke="#d9a02a" stroke-width="5"/><path d="M50 30l7 13h14l-11 9l4 14l-14 -8l-14 8l4 -14l-11 -9h14z" fill="#e5383b"/>`,
 };
 
 export const SERIES = {
@@ -116,6 +123,7 @@ export const SERIES = {
   tiaotiao: ['tiao_kite', 'tiao_bubble', 'tiao_sand', 'tiao_ball', 'tiao_disc', 'tiao_rope'],
   yuanyuan: ['yuan_steth', 'yuan_thermo', 'yuan_bandage', 'yuan_mask', 'yuan_bag', 'yuan_sticker'],
   lili: ['lili_cart', 'lili_ecobag', 'lili_coin', 'lili_milk', 'lili_acorn', 'lili_register'],
+  yongyong: ['yong_helmet', 'yong_hose', 'yong_truck', 'yong_ext', 'yong_alarm', 'yong_badge'],
   gaogao: ['gao_ticket', 'gao_balloon', 'gao_horse', 'gao_ferris', 'gao_popcorn', 'gao_cap'],
   kiki: ['kiki_leaf', 'kiki_ball', 'kiki_kite', 'kiki_car', 'kiki_star', 'kiki_mush'],
 };

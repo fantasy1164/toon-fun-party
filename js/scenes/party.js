@@ -136,6 +136,8 @@ export function makeScene(stage, profile, onExit, inner, hostId, { cls = '', bac
     ctl.blow?.stop();
     hush();
   };
+  // 場景自己結束（例如坐車、坐火車到站）
+  ctl.leave = (why) => { if (!ctl.alive) return; ctl.destroy(); onExit(why); };
   ctl.goodbye = async () => {
     if (ctl.mode === 'end') return;
     ctl.mode = 'end';

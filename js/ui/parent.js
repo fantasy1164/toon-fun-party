@@ -117,7 +117,7 @@ export function openParent(onClose, { onStamp } = {}) {
       <label>妍卉 <input type="date" data-bd="yh" value="${fest.birthday('yh')}"></label>
       <label>向澤 <input type="date" data-bd="xz" value="${fest.birthday('xz')}"></label>
       <p class="note">生日只存在這台 iPad。生日當天選房間畫面會出現「派對」房間；另一個小孩進去會偷偷幫壽星做生日卡。</p>
-      <button class="quiet" data-act="mic">允許麥克風（吹蠟燭用）</button>
+      <button class="quiet" data-act="mic">允許麥克風（吹蠟燭、圖書館輕聲說話用）</button>
       <span class="mic-meter"><i></i></span> <span class="note mic-msg"></span>
       <p class="note">麥克風只用來偵測吹氣的音量，不錄音、不上傳。iPad 主畫面 app 的麥克風授權通常只在這次開啟期間有效，生日當天把 iPad 交給小孩前先按一次；沒有允許的話，吹蠟燭會改成用點的。</p>
 

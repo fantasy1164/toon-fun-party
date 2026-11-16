@@ -38,6 +38,7 @@ export const GUESTS = {
   yuanyuan: { id: 'yuanyuan', name: '圓圓醫生', tts: { pitch: 1.05, rate: 0.9 } },
   lili: { id: 'lili', name: '栗栗', tts: { pitch: 1.45, rate: 1.05 } },
   gaogao: { id: 'gaogao', name: '高高', tts: { pitch: 1.1, rate: 1.0 } },
+  yongyong: { id: 'yongyong', name: '勇勇', tts: { pitch: 0.8, rate: 0.98 } },
   // 首頁喊標題的兩個小朋友
   kidgirl: { id: 'kidgirl', name: '小女孩', tts: { pitch: 1.9, rate: 1.15 } },
   kidboy: { id: 'kidboy', name: '小男孩', tts: { pitch: 1.7, rate: 1.15 } },
@@ -58,10 +59,16 @@ export const REWARD_SLOTS = {
   market: { day: [8, 20] },
   bath: { evening: [17, 22] },
   amuse: { day: [9, 19] },
+  fire: { day: [8, 18] },
+  dental: { day: [8, 18] },
+  library: { day: [8, 18] },
+  hike: { day: [7, 17] },
+  bus: { day: [7, 20] },
+  train: { day: [7, 20] },
 };
 
 // 明星牆：每位角色一塊星星牌（照這個順序）
-export const STARS = ['dudu', 'kiki', 'bobo', 'mian', 'gugu', 'doudou', 'pupu', 'tiaotiao', 'yuanyuan', 'lili', 'gaogao'];
+export const STARS = ['dudu', 'kiki', 'bobo', 'mian', 'gugu', 'doudou', 'pupu', 'tiaotiao', 'yuanyuan', 'lili', 'gaogao', 'yongyong'];
 // 好朋友星星：一起做幾次集滿
 export const FRIEND_MAX = 5;
 // 小明星徽章：累計幾次變銅、銀、金

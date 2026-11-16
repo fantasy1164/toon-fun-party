@@ -1096,7 +1096,7 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .quake .qk-count .qk-ic svg { position: static; width: 250px; height: 250px; }
 
 /* ---------- 新場景共用（診所、超市、洗澡） ---------- */
-.kit .kt-things { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.kit .kt-things { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
 .kit .kt-thing { position: absolute; padding: 0; border: 0; background: none; pointer-events: auto; border-radius: 30%; }
 .kit .kt-thing svg { display: block; overflow: visible; }
 .kit .kt-thing.glow { filter: drop-shadow(0 0 10px var(--glow, #ffd000)) drop-shadow(0 0 4px var(--glow, #ffd000)); animation: pulse .6s ease-in-out infinite alternate; }
@@ -1211,8 +1211,8 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .hall .hf-badges { background: rgba(255, 248, 230, .97); display: flex; flex-direction: column; align-items: center; padding-top: 40px; }
 .hall .hf-bhead { position: relative; display: flex; flex-direction: column; align-items: center; }
 .hall .hf-bhead > svg:last-child { border-radius: 50%; border: 6px solid #ffd34d; }
-.hall .hf-bgrid { margin-top: 20px; display: grid; grid-template-columns: repeat(8, 122px); gap: 16px; }
-.hall .hf-badge { width: 116px; height: 116px; padding: 0; border: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #eee; box-shadow: 0 0 0 8px #d5d5d5; }
+.hall .hf-bgrid { margin-top: 20px; display: grid; grid-template-columns: repeat(9, 108px); gap: 12px; }
+.hall .hf-badge { width: 104px; height: 104px; padding: 0; border: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #eee; box-shadow: 0 0 0 8px #d5d5d5; }
 .hall .hf-badge.t0 svg { filter: grayscale(1); opacity: .35; }
 .hall .hf-badge.t1 { background: #fff; box-shadow: 0 0 0 9px #d9925a; }
 .hall .hf-badge.t2 { background: #fff; box-shadow: 0 0 0 9px #c0c8d4, 0 0 18px #fff; }
@@ -1480,3 +1480,119 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .amuse.lost .am-night { opacity: .45; }
 .amuse.lost .p-char { opacity: .15; transition: opacity .5s; }
 .amuse .kt-cards { z-index: 9; }
+
+/* ---------- 三張地圖：選區（火車站） ---------- */
+.map .map-zones { position: absolute; inset: 0; z-index: 20; background: rgb(20 30 60 / .55); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 var(--bleed, 0px) rgb(20 30 60 / .55); }
+.map .map-zones.hidden { display: none; }
+.map .mz-row { display: flex; gap: 60px; }
+.map .mz-card { width: 300px; height: 240px; padding: 0; border: 8px solid #fff; border-radius: 34px; background: #fff; box-shadow: 0 10px 30px rgb(0 0 0 / .3); animation: igPop .45s cubic-bezier(.3, 1.6, .5, 1); }
+.map .mz-card svg { width: 100%; height: 100%; display: block; border-radius: 26px; }
+.map .map-beach.closed svg, .map .map-amuse.closed svg { filter: saturate(.55) brightness(.95); }
+
+/* ---------- 公車 ---------- */
+.transit .bt-inside, .transit .tr-inside { position: absolute; inset: 0; z-index: 1; opacity: 0; pointer-events: none; transition: opacity .5s; box-shadow: 0 0 0 var(--bleed, 0px) #e8eef4; }
+.transit.inside .bt-inside, .transit.inside .tr-inside { opacity: 1; pointer-events: auto; }
+.transit .bt-inside > svg, .transit .tr-inside > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.transit .bt-view { position: absolute; left: 0; top: 60px; width: 1200px; height: 300px; overflow: hidden; }
+.transit .tr-view { position: absolute; left: 0; top: 80px; width: 1200px; height: 300px; overflow: hidden; }
+.transit .bt-strip, .transit .tr-strip { display: flex; width: 4800px; height: 300px; }
+.transit .bt-strip svg, .transit .tr-strip svg { width: 2400px; height: 300px; flex: none; }
+.transit.moving .bt-strip, .transit.moving .tr-strip { animation: btScroll 3s linear infinite; }
+@keyframes btScroll { to { transform: translateX(-2400px); } }
+.transit .bt-disp { position: absolute; left: 470px; top: 22px; width: 260px; height: 48px; display: flex; align-items: center; justify-content: center; }
+.transit .bt-goal { position: absolute; right: 30px; top: 150px; width: 110px; height: 110px; border-radius: 24px; background: #fff; border: 5px solid #3a7bd5; display: none; align-items: center; justify-content: center; z-index: 6; }
+.transit .bt-goal.show { display: flex; }
+.transit.inside .bt-goal { top: 110px; }
+.transit .bt-bus { position: absolute; left: 1300px; top: 360px; width: 700px; height: 300px; z-index: 2; pointer-events: auto; }
+.transit .bt-bus svg { width: 100%; height: 100%; }
+.transit .bt-bus.glow svg { filter: drop-shadow(0 0 14px var(--glow, #ffd000)) drop-shadow(0 0 6px var(--glow, #ffd000)); }
+.transit.inside .bt-bus { display: none; }
+.transit .bt-gp { position: absolute; left: 1250px; top: 480px; width: 200px; height: 260px; z-index: 3; opacity: 0; transition: left 1.2s ease, opacity .3s; pointer-events: none; }
+.transit.inside .bt-gp.in { opacity: 1; left: 880px; }
+.transit.inside .bt-gp.sit { left: 480px; top: 420px; }
+.transit .bt-gp.away { display: none; }
+.transit .kt-kid.away, .transit .p-char.away { opacity: 0; }
+
+/* ---------- 火車 ---------- */
+.transit .tr-train { position: absolute; left: 1300px; top: 170px; width: 1300px; height: 360px; z-index: 1; transition: left 2.2s cubic-bezier(.2,.7,.3,1); pointer-events: none; }
+.transit .tr-train svg { width: 100%; height: 100%; }
+.transit .tr-train.in { left: -100px; }
+.transit .tr-train .tr-dl, .transit .tr-train .tr-dr { transition: transform .6s; }
+.transit .tr-train.open .tr-dl { transform: translateX(-90px); }
+.transit .tr-train.open .tr-dr { transform: translateX(90px); }
+.transit.inside .tr-train, .transit.inside .tr-gate, .transit.inside .tr-bunny { display: none; }
+.transit .tr-gate { position: absolute; left: 30px; top: 560px; width: 220px; height: 220px; z-index: 5; pointer-events: auto; }
+.transit .tr-gate.glow svg { filter: drop-shadow(0 0 12px var(--glow, #ffd000)); }
+.transit .tr-gate .gt-flap { transition: transform .3s; transform-origin: 110px 140px; }
+.transit .tr-gate.open .gt-flap { transform: scaleX(0); }
+.transit .tr-bunny { position: absolute; top: 330px; width: 120px; height: 200px; z-index: 2; opacity: 0; transition: left 1.6s linear, opacity .3s; }
+.transit .tr-bunny.b1 { left: 620px; } .transit .tr-bunny.b2 { left: 660px; }
+.transit .tr-bunny.out { opacity: 1; left: 1260px; }
+.transit .tr-bunny.b2.out { transition-delay: .4s; }
+.transit .tr-seats { position: absolute; left: 230px; top: 440px; display: flex; gap: 40px; }
+.transit .tr-seat { padding: 0; border: 0; background: none; pointer-events: auto; }
+.transit .tr-seat.glow svg { filter: drop-shadow(0 0 12px var(--glow, #ffd000)) drop-shadow(0 0 5px var(--glow, #ffd000)); }
+.transit .tr-seat.nope svg { animation: shakehead .4s; }
+.transit .tr-ticket { position: absolute; right: 40px; top: 120px; z-index: 6; animation: igPop .4s; }
+.transit .tr-ticket.hidden { display: none; }
+.transit .p-char.running { animation: trRun 1.2s ease-in-out infinite alternate; }
+@keyframes trRun { from { transform: translateX(0); } to { transform: translateX(560px); } }
+
+/* ---------- 消防局 ---------- */
+.fire .fi-drill, .fire .fi-fire { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .5s; z-index: 1; }
+.fire.drill .fi-drill { opacity: 1; box-shadow: 0 0 0 var(--bleed, 0px) #f4e8d6; }
+.fire .fi-room svg, .fire .fi-house svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fire .fi-smoke { position: absolute; left: 0; top: -500px; width: 1200px; height: 500px; transition: top 2.5s ease; }
+.fire .fi-smoke svg { width: 100%; height: 100%; }
+.fire.smoky .fi-smoke { top: 0; }
+.fire.crawl .kt-kid.body > svg { transform: rotate(-70deg) translate(-40px, 20px); transition: transform .5s; }
+.fire .kt-kid .fi-mask { position: absolute; left: 30px; top: 40px; transform: scale(.55); transform-origin: 0 0; }
+.fire .kt-thing.fi-knob.hot svg { filter: drop-shadow(0 0 14px #ff3b30) drop-shadow(0 0 6px #ff3b30); }
+.fire.fireside .fi-fire { opacity: 1; pointer-events: auto; box-shadow: 0 0 0 var(--bleed, 0px) #ffd9b8; }
+.fire .fi-flame { pointer-events: none; }
+.fire.fireside .fi-flame { pointer-events: auto; }
+.fire .fi-flame svg .fl-o { animation: flick .5s ease-in-out infinite alternate; transform-origin: 50px 110px; }
+@keyframes flick { to { transform: scale(1.08, .92); } }
+.fire .fi-flame.out { opacity: .7; transition: opacity 1.5s; }
+.fire.rush { animation: shakehead .3s 6; }
+.fire .fi-phone { position: absolute; left: 380px; top: 120px; width: 440px; z-index: 8; background: #2a2f3a; border-radius: 40px; padding: 24px; box-shadow: 0 10px 30px rgb(0 0 0 / .35); }
+.fire .fi-phone.hidden { display: none; }
+.fire .fi-num { height: 70px; border-radius: 16px; background: #d6f4ff; font: 700 52px/70px system-ui, sans-serif; text-align: center; color: #2a5fa8; letter-spacing: 12px; margin-bottom: 18px; }
+.fire .fi-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.fire .fi-key { height: 96px; border-radius: 48px; border: 0; background: #fff; font: 700 48px system-ui, sans-serif; color: #333; pointer-events: auto; }
+.fire .fi-key.glow { box-shadow: 0 0 0 6px var(--glow, #ffd000), 0 0 20px var(--glow, #ffd000); }
+
+/* ---------- 牙科 ---------- */
+.dental .dt-mouth { position: absolute; inset: 0; z-index: 8; background: rgb(0 0 0 / .4); opacity: 0; pointer-events: none; transition: opacity .4s; box-shadow: 0 0 0 var(--bleed, 0px) rgb(0 0 0 / .4); }
+.dental.open .dt-mouth { opacity: 1; pointer-events: auto; }
+.dental .dt-mouth-in { position: absolute; left: 200px; top: 150px; width: 800px; height: 520px; }
+.dental .dt-mouth-in > svg { width: 100%; height: 100%; }
+.dental .dt-tooth .dt-hole { opacity: 0; transition: opacity .3s; }
+.dental .dt-tooth.hole .dt-hole { opacity: 1; }
+.dental .dt-lamp .dt-lamp-on { opacity: 0; transition: opacity .3s; }
+.dental .dt-lamp.on .dt-lamp-on { opacity: 1; }
+
+/* ---------- 圖書館 ---------- */
+.library.shake .lb-shelf, .library.shake .h-back svg { animation: shakehead .4s; }
+.library .lb-meter { position: absolute; left: 400px; top: 60px; width: 400px; height: 46px; border-radius: 23px; background: #fff; border: 5px solid #8a6fd0; z-index: 7; overflow: hidden; }
+.library .lb-meter.hidden { display: none; }
+.library .lb-meter i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #7be0a0; transition: width .08s; }
+.library .lb-meter.loud i { background: #ff6b5c; }
+.library .lb-book { position: absolute; inset: 0; z-index: 6; background: rgb(40 30 60 / .45); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 var(--bleed, 0px) rgb(40 30 60 / .45); }
+.library .lb-book.hidden { display: none; }
+.library .lb-book-in { position: relative; width: 800px; height: 500px; }
+.library .lb-book-in > svg { width: 100%; height: 100%; }
+.library .lb-page { position: absolute; left: 400px; top: 30px; width: 360px; height: 440px; transform-origin: 0 50%; pointer-events: auto; touch-action: none; }
+.library .lb-page.glow { filter: drop-shadow(0 0 12px var(--glow, #ffd000)); }
+.library .lb-page.flip { transition: transform .6s; transform: perspective(900px) rotateY(-175deg); }
+.library .lb-page.crumple { animation: shakehead .4s; filter: sepia(.5); }
+.library .kt-thing.lb-scan.beep .lb-scan-light { fill: #ff5c5c; }
+
+/* ---------- 登山步道 ---------- */
+.hike .hk-summit { position: absolute; inset: 0; z-index: 1; opacity: 0; transition: opacity 1.2s; pointer-events: none; }
+.hike .hk-summit svg { width: 100%; height: 100%; }
+.hike.top .hk-summit { opacity: 1; box-shadow: 0 0 0 var(--bleed, 0px) #bfe6fb; }
+.hike .hk-critter { opacity: .55; }
+.hike.peek .hk-critter { opacity: 1; }
+.hike .hk-critter.seen svg { animation: bob 1s ease-in-out infinite alternate; }
+.hike.top .hk-critter { display: none; }

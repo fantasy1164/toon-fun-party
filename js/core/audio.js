@@ -128,6 +128,12 @@ const SFX = {
   trumpet: (t) => { tone(220, t, 0.7, { type: 'sawtooth', to: 440, gain: 0.12, attack: 0.08 }); tone(330, t + 0.1, 0.6, { type: 'sawtooth', to: 660, gain: 0.08, attack: 0.08 }); },
   applause: (t) => { for (let i = 0; i < 40; i++) noise(t + Math.random() * 1.6, 0.05, { freq: 1500 + Math.random() * 2500, q: 1.2, gain: 0.12 }); },
   beep: (t) => tone(1760, t, 0.12, { type: 'square', gain: 0.07 }),
+  // 煙霧警報器：嗶嗶嗶三聲一組
+  alarm: (t) => { for (let k = 0; k < 2; k++) for (let i = 0; i < 3; i++) tone(3100, t + k * 1.1 + i * 0.25, 0.16, { type: 'square', gain: 0.06 }); },
+  // 消防車鳴笛：高低兩音交替
+  siren: (t) => { for (let i = 0; i < 4; i++) { tone(960, t + i * 0.6, 0.3, { type: 'sawtooth', gain: 0.05 }); tone(720, t + i * 0.6 + 0.3, 0.3, { type: 'sawtooth', gain: 0.05 }); } },
+  splash: (t) => noise(t, 0.5, { freq: 1800, to: 600, q: 0.7, gain: 0.35 }),
+  shh: (t) => noise(t, 0.9, { freq: 4200, to: 3600, q: 1.2, gain: 0.25 }),
   ding: (t) => { tone(1319, t, 0.5, { type: 'sine', gain: 0.2 }); tone(1047, t + 0.25, 0.7, { type: 'sine', gain: 0.18 }); },
   heart: (t) => [0, 0.18, 0.8, 0.98].forEach((d, i) => tone(i % 2 ? 70 : 90, t + d, 0.16, { type: 'sine', to: 45, gain: 0.55 })),
   note: (t) => tone([523, 587, 659, 784, 880, 1047][Math.floor(Math.random() * 6)], t, 0.35, { type: 'triangle', gain: 0.22 }),
@@ -326,6 +332,18 @@ const TRACKS = {
     style: 'song', bpm: 138, lead: 'square', leadGain: 0.12,
     melody: seq('G4 . C5 . E5 . G5 . . . E5 . G5 . C6 .  B5 . A5 . G5 . E5 . F5 . D5 . . . . .  F4 . B4 . D5 . F5 . . . D5 . F5 . B5 .  A5 . G5 . F5 . D5 . E5 . C5 . . . . .'),
     bass: seq('C3 . G3 . G3 . C3 . G3 . G3 . C3 . G3 .  A2 . E3 . E3 . F2 . C3 . G2 . D3 . D3 .  G2 . D3 . D3 . G2 . D3 . D3 . G2 . D3 .  F2 . C3 . G2 . D3 . C3 . G3 . C3 . . .'),
+  },
+  // ---- 消防局：勇敢的進行曲 ----
+  fire: {
+    style: 'song', bpm: 120, lead: 'square', leadGain: 0.11,
+    melody: seq('C5 . C5 . G4 . C5 . E5 . . . C5 . . .  D5 . D5 . B4 . D5 . F5 . . . D5 . . .  E5 . G5 . E5 . C5 . D5 . E5 . F5 . D5 .  E5 . C5 . G4 . B4 . C5 . . . . . . .'),
+    bass: seq('C3 . . . G2 . . . C3 . . . G2 . . .  G2 . . . D3 . . . G2 . . . D3 . . .  C3 . . . E3 . . . F2 . . . G2 . . .  C3 . . . G2 . . . C3 . . . . . . .'),
+  },
+  // ---- 登山：輕快的郊遊歌 ----
+  hike: {
+    style: 'song', bpm: 108, lead: 'triangle', leadGain: 0.16,
+    melody: seq('E5 . D5 . C5 . D5 . E5 . E5 . E5 . . .  D5 . D5 . D5 . . . E5 . G5 . G5 . . .  E5 . D5 . C5 . D5 . E5 . E5 . E5 . C5 .  D5 . D5 . E5 . D5 . C5 . . . . . . .'),
+    bass: seq('C3 . G3 . C3 . G3 . C3 . G3 . C3 . G3 .  G2 . D3 . G2 . D3 . C3 . G3 . C3 . G3 .  C3 . G3 . C3 . G3 . A2 . E3 . A2 . E3 .  G2 . D3 . G2 . D3 . C3 . G3 . C3 . . .'),
   },
   bath: {
     style: 'song', bpm: 112, lead: 'triangle', leadGain: 0.2,

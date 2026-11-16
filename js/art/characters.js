@@ -345,12 +345,46 @@ function gaogao(extra = '') {
   </g>`;
 }
 
+// 獅子 勇勇：消防隊長，勇敢強壯。紅色消防頭盔、反光條消防衣
+function yongyong(extra = '') {
+  const mane = Array.from({ length: 14 }, (_, i) => {
+    const a = (i / 14) * Math.PI * 2;
+    return `<circle cx="${(120 + Math.cos(a) * 66).toFixed(1)}" cy="${(110 + Math.sin(a) * 62).toFixed(1)}" r="26" fill="${i % 2 ? '#c8662a' : '#d97a32'}"/>`;
+  }).join('');
+  return `
+  <g class="char yongyong">
+    <ellipse cx="120" cy="312" rx="92" ry="11" fill="#000" opacity=".12"/>
+    <rect x="80" y="262" width="34" height="44" rx="10" fill="#2b2b33"/><rect x="126" y="262" width="34" height="44" rx="10" fill="#2b2b33"/>
+    <rect x="74" y="296" width="44" height="14" rx="6" fill="#1a1a20"/><rect x="122" y="296" width="44" height="14" rx="6" fill="#1a1a20"/>
+    <g class="arm arm-l"><ellipse cx="54" cy="224" rx="22" ry="40" fill="#e0a83a" transform="rotate(22 54 224)"/><path d="M38 228l26 8" stroke="#d8ff3c" stroke-width="7"/><circle cx="42" cy="258" r="16" fill="#f5c451"/></g>
+    <g class="arm arm-r"><ellipse cx="186" cy="224" rx="22" ry="40" fill="#e0a83a" transform="rotate(-22 186 224)"/><path d="M202 228l-26 8" stroke="#d8ff3c" stroke-width="7"/><circle cx="198" cy="258" r="16" fill="#f5c451"/></g>
+    <path d="M62 190Q120 170 178 190L170 278H70Z" fill="#e0a83a"/>
+    <path d="M70 248H170M66 222H174" stroke="#d8ff3c" stroke-width="9"/><path d="M70 248H170M66 222H174" stroke="#c9d0d6" stroke-width="3"/>
+    <path d="M120 186V278" stroke="#a87a20" stroke-width="4"/>
+    ${mane}
+    <circle cx="120" cy="110" r="58" fill="#f5c451"/>
+    <circle cx="74" cy="72" r="14" fill="#f5c451"/><circle cx="74" cy="72" r="7" fill="#e89a6a"/>
+    <circle cx="166" cy="72" r="14" fill="#f5c451"/><circle cx="166" cy="72" r="7" fill="#e89a6a"/>
+    <path d="M58 70Q120 0 182 70Z" fill="#e5383b"/><path d="M50 72H190Q186 82 176 82H64Q54 82 50 72Z" fill="#c12a2d"/>
+    <path d="M120 22V66" stroke="#c12a2d" stroke-width="6"/>
+    <path d="M120 34l7 12h13l-10 9l4 13l-14 -8l-14 8l4 -13l-10 -9h13z" fill="#ffd34d"/>
+    ${eyes(100, 140, 106, '#f5c451')}
+    <path d="M90 92Q100 86 110 92M130 92Q140 86 150 92" stroke="#8a5a1a" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="120" cy="138" rx="28" ry="20" fill="#fde7b0"/>
+    <path d="M110 126H130L120 136Z" fill="#7a3a22"/>
+    <circle cx="80" cy="132" r="10" fill="#ff9f80" opacity=".6"/><circle cx="160" cy="132" r="10" fill="#ff9f80" opacity=".6"/>
+    <ellipse class="mouth" cx="120" cy="148" rx="11" ry="7" fill="#b8412f"/>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
 export const NIGHTCAP = {
   dudu: `<g class="cap"><path d="M64 60Q96 -14 176 44L180 60Q120 40 62 74Z" fill="#7a8cff"/><path d="M62 66Q120 44 182 62" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/><circle cx="182" cy="40" r="13" fill="#fff"/></g>`,
   kiki: `<g class="cap"><path d="M70 56Q100 -4 168 34L170 50Q120 36 70 66Z" fill="#7a8cff"/><path d="M70 60Q120 40 172 52" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="174" cy="32" r="12" fill="#fff"/></g>`,
 };
 
-const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao, yuanyuan, lili, gaogao };
+const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao, yuanyuan, lili, gaogao, yongyong };
 
 // 回傳可放進 <svg> 的角色群組，x、y 為左上角，s 為縮放。
 export function characterSvg(id, { x = 0, y = 0, s = 1, extra = '' } = {}) {

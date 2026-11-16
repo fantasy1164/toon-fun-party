@@ -1,6 +1,8 @@
 // 「一起做」用的圖示與背景。圖示都是 100x100 的 viewBox。
 import { roomSvg } from './bedroom.js';
 import { amuseBack } from './amuse.js';
+import { fireBack } from './fire.js';
+import { libraryBack } from './library.js';
 import { doorView, itemIcon } from './door.js';
 import { kitchenBack, wareSvg } from './kitchen.js';
 import { classroomBack } from './school.js';
@@ -108,6 +110,11 @@ const I = {
   mic: `<rect x="38" y="8" width="24" height="44" rx="12" fill="#5a6b80"/><path d="M42 18h16M42 26h16M42 34h16" stroke="#8a9ab0" stroke-width="3"/><path d="M28 40Q28 64 50 64Q72 64 72 40" stroke="#ffd34d" stroke-width="6" fill="none"/><path d="M50 64V84M36 88H64" stroke="#ffd34d" stroke-width="6" stroke-linecap="round"/><path d="M80 20q8 -6 10 4q-2 8 -10 4ZM84 24V6l8 -2" fill="#ff5c8a" stroke="#ff5c8a" stroke-width="3"/><path d="M10 30q8 -6 10 4q-2 8 -10 4ZM14 34V16l8 -2" fill="#5fa8e8" stroke="#5fa8e8" stroke-width="3"/>`,
   breath: `<circle cx="50" cy="50" r="40" fill="#cfefff" stroke="#7cc8e8" stroke-width="5"/><path d="M30 50Q50 30 70 50Q50 70 30 50Z" fill="#7cc8e8"/>`,
   go: `<circle cx="50" cy="50" r="40" fill="#5ed17a"/><path d="M38 28L72 50L38 72Z" fill="#fff"/>`,
+  // 消防
+  alarm: `<circle cx="50" cy="50" r="36" fill="#f4f6fa" stroke="#c9d0d6" stroke-width="5"/><circle cx="50" cy="50" r="18" fill="#fff" stroke="#c9d0d6" stroke-width="3"/><circle cx="50" cy="50" r="5" fill="#e5383b"/><path d="M80 32Q90 50 80 68M87 28Q99 50 87 72" stroke="#ff9f43" stroke-width="4" fill="none"/>`,
+  extinguisher: `<rect x="34" y="28" width="32" height="64" rx="12" fill="#e5383b"/><rect x="40" y="16" width="20" height="14" rx="3" fill="#333"/><path d="M58 20H76V30" stroke="#333" stroke-width="5" fill="none"/><path d="M60 26Q80 24 82 44" stroke="#333" stroke-width="5" fill="none"/><rect x="38" y="50" width="24" height="18" rx="3" fill="#fff"/>`,
+  exit: `<rect x="20" y="10" width="60" height="80" rx="6" fill="#3fbf7f"/><circle cx="46" cy="30" r="7" fill="#fff"/><path d="M44 40L56 50L48 62L58 76M44 46L34 56M48 62L36 72" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none"/>`,
+  crawl: `<circle cx="74" cy="56" r="10" fill="#ffd9b8"/><path d="M30 62H64" stroke="#ff8fb0" stroke-width="16" stroke-linecap="round"/><path d="M36 70L30 86M58 70L62 86M24 66L12 80" stroke="#555" stroke-width="6" stroke-linecap="round"/><path d="M0 90H100" stroke="#c89a6a" stroke-width="6"/><rect x="0" y="0" width="100" height="30" fill="#6a6a72" opacity=".5"/>`,
   // 遊樂園
   ferris: `<circle cx="50" cy="42" r="30" fill="none" stroke="#5fa8e8" stroke-width="6"/>${[0, 72, 144, 216, 288].map((r) => `<path d="M50 42L${(50 + 30 * Math.cos(r * Math.PI / 180)).toFixed(1)} ${(42 + 30 * Math.sin(r * Math.PI / 180)).toFixed(1)}" stroke="#5fa8e8" stroke-width="3"/><circle cx="${(50 + 30 * Math.cos(r * Math.PI / 180)).toFixed(1)}" cy="${(42 + 30 * Math.sin(r * Math.PI / 180)).toFixed(1)}" r="7" fill="${['#e5484d', '#ffc400', '#3fbf7f', '#ff8fb0', '#9b85f0'][r / 72]}"/>`).join('')}<path d="M50 42L30 92M50 42L70 92" stroke="#8a5a2b" stroke-width="6" stroke-linecap="round"/><circle cx="50" cy="42" r="7" fill="#ffd34d"/>`,
   meetpoint: `<path d="M30 92V12" stroke="#8a5a2b" stroke-width="7" stroke-linecap="round"/><path d="M33 14H80L68 30L80 46H33Z" fill="#ff5c93"/><circle cx="55" cy="30" r="7" fill="#fff"/><ellipse cx="50" cy="92" rx="34" ry="6" fill="#000" opacity=".12"/>`,
@@ -137,6 +144,8 @@ export function backFor(kind, ph, wx) {
     case 'shop': return marketBack(ph);
     case 'bath': return bathRoomBack(ph, { tub: true });
     case 'fun': return amuseBack(ph, wx);
+    case 'firecheck': return fireBack(ph);
+    case 'read': return libraryBack(ph);
     case 'ride': return `<svg viewBox="0 0 1200 900">${CABIN}<g>${roadSvg(ph, wx)}</g>${MIRROR}</svg>`;
     default: return '';
   }

@@ -15,12 +15,12 @@ import { turnsOn, passTurn, freeTurns } from '../core/turns.js';
 
 const HOST = 'kiki';
 // 招牌動作與聲音
-const MOVE = { dudu: 'waddle', kiki: 'hop', bobo: 'bounce', mian: 'sway', gugu: 'flap', doudou: 'wag', pupu: 'bounce', tiaotiao: 'flip', yuanyuan: 'hop', lili: 'spin', gaogao: 'sway' };
-const SND = { dudu: 'squeak', kiki: 'boing', bobo: 'drum', mian: 'baa', gugu: 'ding', doudou: 'boing', pupu: 'horn', tiaotiao: 'whoosh', yuanyuan: 'trumpet', lili: 'coin', gaogao: 'ding' };
+const MOVE = { dudu: 'waddle', kiki: 'hop', bobo: 'bounce', mian: 'sway', gugu: 'flap', doudou: 'wag', pupu: 'bounce', tiaotiao: 'flip', yuanyuan: 'hop', lili: 'spin', gaogao: 'sway', yongyong: 'hop' };
+const SND = { dudu: 'squeak', kiki: 'boing', bobo: 'drum', mian: 'baa', gugu: 'ding', doudou: 'boing', pupu: 'horn', tiaotiao: 'whoosh', yuanyuan: 'trumpet', lili: 'coin', gaogao: 'ding', yongyong: 'horn' };
 // 小明星徽章：一起做的種類 → 圖示
 export const HABITS = [
   ['sleep', 'moon'], ['out', 'shoes'], ['meal', 'bowl'], ['brush', 'toothbrush'], ['wash', 'hands'], ['bag', 'bag'], ['homework', 'homework'],
-  ['gym', 'bunny'], ['ride', 'redcar'], ['outing', 'park'], ['doctor', 'steth'], ['shop', 'cart'], ['bath', 'bathtub'], ['fun', 'ferris'], ['quake', 'quake'],
+  ['gym', 'bunny'], ['ride', 'redcar'], ['outing', 'park'], ['doctor', 'steth'], ['shop', 'cart'], ['bath', 'bathtub'], ['fun', 'ferris'], ['firecheck', 'alarm'], ['read', 'book'], ['quake', 'quake'],
 ];
 const tierOf = (n) => BADGE_TIERS.filter((t) => n >= t).length;
 
@@ -216,7 +216,7 @@ export function mountHall(stage, { profile, onExit }) {
 
   // ---------- 集滿印章：明星派對 ----------
   async function party(due) {
-    const pos = STARS.map((_, i) => (i < 6 ? [70 + i * 180, 140] : [160 + (i - 6) * 180, 320]));
+    const pos = STARS.map((_, i) => (i < 6 ? [70 + i * 180, 140] : [70 + (i - 6) * 180, 320]));
     const ov = el(`<div class="hf-party">
       ${STARS.map((id, i) => `<div class="hf-pc" style="left:${pos[i][0]}px;top:${pos[i][1]}px;animation-delay:${(i % 4) * 0.12}s"><svg viewBox="0 0 240 320" width="100%" height="100%">${characterSvg(id)}</svg></div>`).join('')}
       <div class="hf-pkids">${due.map((k) => `<div class="hf-pkid${useBody() ? ' body' : ''}">${CROWN}${useBody() ? kidFigure(k, { w: 150 }) : avatarSvg(k, 150)}</div>`).join('')}</div></div>`);

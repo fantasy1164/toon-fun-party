@@ -24,9 +24,9 @@ export function nextCharacter() {
 // 每個房間有哪些「一起做」
 export const TOGETHER = {
   bedroom: ['sleep'], door: ['out'], kitchen: ['meal'], bathroom: ['brush', 'wash', 'bath'],
-  school: ['bag', 'homework'], farm: ['gym'], car: ['ride'], park: ['outing'], clinic: ['doctor'], market: ['shop'], amuse: ['fun'],
+  school: ['bag', 'homework'], farm: ['gym'], car: ['ride'], park: ['outing'], clinic: ['doctor'], market: ['shop'], amuse: ['fun'], fire: ['firecheck'], library: ['read'],
 };
-const ROOM_HOST = { bedroom: 'mian', door: 'kiki', kitchen: 'bobo', school: 'gugu', farm: 'doudou', car: 'pupu', park: 'tiaotiao', clinic: 'yuanyuan', market: 'lili', amuse: 'gaogao' };
+const ROOM_HOST = { bedroom: 'mian', door: 'kiki', kitchen: 'bobo', school: 'gugu', farm: 'doudou', car: 'pupu', park: 'tiaotiao', clinic: 'yuanyuan', market: 'lili', amuse: 'gaogao', fire: 'yongyong', library: 'gugu' };
 // host：陪的角色（null＝廁所輪替）；reward：算哪個場景的每日獎勵；series：送哪一系列的禮物
 const MODES = {
   sleep: { host: 'mian', reward: 'bedroom', series: 'mian', track: 'bedroom', icon: 'moon' },
@@ -43,6 +43,8 @@ const MODES = {
   shop: { host: 'lili', reward: 'market', series: 'lili', track: 'market', icon: 'cart' },
   bath: { host: 'dudu', reward: 'bath', series: 'dudu', track: 'bath', icon: 'bathtub' },
   fun: { host: 'gaogao', reward: 'amuse', series: 'gaogao', track: 'amuse', icon: 'ferris' },
+  firecheck: { host: 'yongyong', reward: 'fire', series: 'yongyong', track: 'fire', icon: 'alarm' },
+  read: { host: 'gugu', reward: 'library', series: 'gugu', track: 'study', icon: 'book' },
 };
 export const MEAL_MIN = 25;   // 吃飯盤子時鐘幾分鐘走完
 export const LULLABY_MIN = 10;
@@ -733,6 +735,47 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     await finish();
   }
 
+  // ---------- 陪檢查家裡（勇勇）：找警報器、滅火器、逃生出口，約好集合點，練習低姿勢爬 ----------
+  async function runFirecheck() {
+    await say('fc_hello');
+    await checkLine();
+    await runSteps([
+      { icon: 'alarm', line: 'fc_alarm' },
+      { icon: 'extinguisher', line: 'fc_ext' },
+      { icon: 'exit', line: 'fc_exit' },
+      { icon: 'meetpoint', line: 'fc_meet' },
+      { icon: 'crawl', line: 'fc_crawl', per: true },
+    ]);
+    await say('fc_end');
+    await celebrate();
+    await finish();
+  }
+
+  // ---------- 陪看書（咕咕老師）：選一本書，跟爸媽一起看，每兩分鐘提醒一下 ----------
+  async function runRead() {
+    await say('rd_hello');
+    await checkLine();
+    await runSteps([{ icon: 'book', line: 'rd_pick' }]);
+    await say('rd_start');
+    card.classList.add('hidden');
+    musicLevel(0.3, 2);
+    const total = 10 * 60000;
+    const pool = ['rd_r1', 'rd_r2', 'rd_r3'];
+    let next = 2 * 60000;
+    let n = 0;
+    const t = timer(total, (e) => {
+      if (e >= next) { next += 2 * 60000; sfx('sparkle'); sayBg(pool[n++ % pool.length]); }
+    });
+    const ok = oneOk({ nudge: false });
+    const r = await Promise.race([t, ok.then(() => 'ok')]);
+    guard();
+    if (r === 'ok') t.stop(); else ok.cancel();
+    musicLevel(1, 1);
+    await say('rd_end');
+    await celebrate();
+    await finish();
+  }
+
   // ---------- 陪看醫生 ----------
   async function runDoctor() {
     await say('tdc_hello');
@@ -872,7 +915,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     await finish();
   }
 
-  const RUN = { doctor: runDoctor, shop: runShop, bath: runBath, outing: runOuting, fun: runFun, sleep: runSleep, out: runOut, meal: runMeal, wash: runWash, bag: runBag, homework: runHomework, gym: runGym, ride: runRide };
+  const RUN = { doctor: runDoctor, shop: runShop, bath: runBath, outing: runOuting, fun: runFun, firecheck: runFirecheck, read: runRead, sleep: runSleep, out: runOut, meal: runMeal, wash: runWash, bag: runBag, homework: runHomework, gym: runGym, ride: runRide };
 
   function destroy() {
     if (!alive) return;
