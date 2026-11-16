@@ -8,7 +8,7 @@ import { phase, hour, currentSlot } from '../core/clock.js';
 import { state, save, hasClaimed, claim, addItem } from '../core/store.js';
 import * as weather from '../core/weather.js';
 import {
-  seatsFor, SEAT_COLORS, WARE_IDS, wareSvg, FOODS, FOOD_IDS, GROUPS, foodSvg, PLATE_SPOT,
+  seatsFor, SEAT_COLORS, WARE_IDS, wareSvg, FOODS, MENUS, foodSvg, PLATE_SPOT,
   kitchenBack, seatedChars, tableFront, placeSettings, SINK, PLATE, KNIFE,
 } from '../art/kitchen.js';
 import { avatarSvg } from '../art/characters.js';
@@ -238,6 +238,19 @@ export function mountKitchen(stage, { profile, onExit }) {
   }
 
   // ---------- 活動二：裝一盤均衡的飯 ----------
+  // 早餐還是午晚餐：看現在是哪一餐的時段；不在時段內的話，早上 4–10 點算早餐
+  const breakfast = (() => {
+    const s = currentSlot(REWARD_SLOTS.kitchen);
+    if (s) return s === 'breakfast';
+    const h = hour();
+    return h >= 4 && h < 10;
+  })();
+  const MENU = MENUS[breakfast ? 'breakfast' : 'meal'];
+  const FOOD_IDS = MENU.foods;
+  const GROUPS = MENU.groups;
+  const EASY_SET = MENU.easy;
+  const foodsClass = `counter foods${FOOD_IDS.length > 9 ? ' many' : ''}`;
+
   async function runMeal() {
     if (!tableSet) {
       // 還沒擺餐具就直接擺好
@@ -257,7 +270,7 @@ export function mountKitchen(stage, { profile, onExit }) {
       const c = centerOf(charNode('dudu'));
       burst(c.x, c.y, { n: 10, kind: 'bubble', spread: 120 });
     }
-    await say('bobo', 'k_meal');
+    await say('bobo', breakfast ? 'k_meal_bf' : 'k_meal2');
     if (!hard && !two) await say('bobo', 'k_meal_easy');
     guard();
 
@@ -268,10 +281,9 @@ export function mountKitchen(stage, { profile, onExit }) {
     let needEncourage = false;
     let encouraged = false;
 
-    counter.className = 'counter foods';
+    counter.className = foodsClass;
     counter.innerHTML = FOOD_IDS.map((f) => `<button class="food-btn" data-f="${f}">${foodSvg(f, 92)}</button>`).join('') +
       (hard ? `<button class="round-btn eat hidden">${EAT_ICON}</button>` : '');
-    const EASY_SET = ['rice', 'broccoli', 'egg', 'apple'];
     const glowEasy = () => {
       const next = EASY_SET.find((f) => !onPlateFoods.includes(f));
       $$('.food-btn', counter).forEach((b) => b.classList.toggle('glow', b.dataset.f === next));
@@ -352,7 +364,7 @@ export function mountKitchen(stage, { profile, onExit }) {
           // 吃太多零食：肚子痛
           charNode('bobo').classList.add('ouch');
           sfx('wrong');
-          await say('bobo', 'k_tummy');
+          await say('bobo', breakfast ? 'k_tummy_bf' : 'k_tummy');
           charNode('bobo').classList.remove('ouch');
           removeJunk();
           busy = false;
@@ -429,7 +441,6 @@ export function mountKitchen(stage, { profile, onExit }) {
   // 一起玩：一人一個盤子，輪流放菜。輪到誰就用誰的難度（妍卉自己判斷、向澤跟著亮亮的放）
   async function fillTogether() {
     const ids = profile.members;
-    const EASY_SET = ['rice', 'broccoli', 'egg', 'apple'];
     const st = Object.fromEntries(ids.map((id) => [id, {
       foods: [],
       g: $(`.plate-pos[data-id="${id}"]`, root),
@@ -444,7 +455,7 @@ export function mountKitchen(stage, { profile, onExit }) {
     let meatSaid = false;
     await say('bobo', 'k_both_plate');
     guard();
-    counter.className = 'counter foods';
+    counter.className = foodsClass;
     counter.innerHTML = FOOD_IDS.map((f) => `<button class="food-btn" data-f="${f}">${foodSvg(f, 92)}</button>`).join('');
     let turn = whoseTurn() || ids[0];
     const showTurn = () => {
@@ -479,7 +490,7 @@ export function mountKitchen(stage, { profile, onExit }) {
           // 零食不能當飯吃
           sfx('wrong');
           flash(b, 'nope');
-          await say('bobo', 'k_tummy');
+          await say('bobo', breakfast ? 'k_tummy_bf' : 'k_tummy');
           busy = false;
           return;
         }

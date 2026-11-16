@@ -42,16 +42,33 @@ export const FOODS = {
   fish: { g: 'protein', svg: `<path d="M8 50C24 24 60 24 74 50C60 76 24 76 8 50Z" fill="#ff9f6b"/><path d="M70 50L94 30V70Z" fill="#ff7f4b"/><circle cx="26" cy="46" r="5" fill="#1d2433"/><path d="M40 38v24M52 36v28" stroke="#ff7f4b" stroke-width="4"/>` },
   apple: { g: 'fruit', svg: `<path d="M50 28C30 14 10 30 14 56C18 82 40 92 50 84C60 92 82 82 86 56C90 30 70 14 50 28Z" fill="#e5484d"/><path d="M50 28Q48 14 56 6" stroke="#7a4a1e" stroke-width="5" fill="none"/><path d="M54 18Q70 8 76 20Q64 26 54 18Z" fill="#3aa36a"/><ellipse cx="32" cy="46" rx="6" ry="10" fill="#fff" opacity=".4"/>` },
   banana: { g: 'fruit', svg: `<path d="M14 30Q24 84 84 72Q90 66 82 64Q36 66 26 26Z" fill="#ffd34d" stroke="#e0a800" stroke-width="3"/><path d="M22 24l-6 -8" stroke="#7a4a1e" stroke-width="6" stroke-linecap="round"/>` },
+  // 早餐（11/17）
+  toast: { g: 'grain', svg: `<path d="M16 42Q14 14 50 14Q86 14 84 42Q84 50 76 52V88H24V52Q16 50 16 42Z" fill="#d99a4e"/><path d="M24 42Q24 22 50 22Q76 22 76 42Q76 48 70 50V82H30V50Q24 48 24 42Z" fill="#fbe3b0"/><path d="M38 44h4M54 38h4M46 60h4M60 66h4M36 70h4" stroke="#ecc98a" stroke-width="4" stroke-linecap="round"/>` },
+  milk: { g: 'dairy', svg: `<path d="M26 12H74L67 92H33Z" fill="#e6f3fb" stroke="#a9c9de" stroke-width="4" stroke-linejoin="round"/><path d="M29 32H71L66 88H34Z" fill="#fff"/><path d="M29 32Q40 38 50 32Q60 26 71 32" fill="none" stroke="#e6eef3" stroke-width="3"/><path d="M38 44V76" stroke="#f2f6f9" stroke-width="6" stroke-linecap="round"/>` },
+  // 午晚餐（11/17）
+  tofu: { g: 'protein', svg: `${[[10, 38], [52, 30], [30, 60]].map(([x, y]) => `<rect x="${x}" y="${y}" width="38" height="30" rx="6" fill="#8a5426"/><rect x="${x + 4}" y="${y + 4}" width="30" height="22" rx="4" fill="#b07440"/><path d="M${x + 8} ${y + 10}h22M${x + 8} ${y + 18}h22" stroke="#9a6232" stroke-width="2"/>`).join('')}` },
+  sprouts: { g: 'veg', svg: `${[[22, 'M22 84Q16 56 30 34'], [38, 'M36 86Q34 58 44 30'], [52, 'M52 86Q58 58 50 26'], [66, 'M66 84Q74 58 62 32'], [78, 'M78 80Q86 56 76 38']].map(([, d]) => `<path d="${d}" fill="none" stroke="#c9bd8a" stroke-width="10" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#fbf6dc" stroke-width="6" stroke-linecap="round"/>`).join('')}${[[30, 33], [44, 29], [50, 25], [62, 31], [76, 37]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="7" ry="5" fill="#f2d43a" stroke="#d1b020" stroke-width="2"/>`).join('')}` },
   candy: { g: 'junk', svg: `<circle cx="50" cy="50" r="22" fill="#ec5fa0"/><path d="M28 50L8 34V66Z" fill="#ff9fc4"/><path d="M72 50L92 34V66Z" fill="#ff9fc4"/><path d="M40 36Q50 50 40 64M54 34Q64 50 54 66" stroke="#fff" stroke-width="4" fill="none"/>` },
   chips: { g: 'junk', svg: `<path d="M20 12H80L76 90H24Z" fill="#e5484d"/><path d="M20 12L26 4H74L80 12Z" fill="#c9302c"/><circle cx="50" cy="52" r="18" fill="#ffd34d"/><path d="M42 50q8 -10 16 0" stroke="#e0a800" stroke-width="4" fill="none"/>` },
 };
-export const FOOD_IDS = ['rice', 'broccoli', 'carrot', 'egg', 'fish', 'apple', 'banana', 'candy', 'chips'];
-export const GROUPS = ['grain', 'veg', 'protein', 'fruit'];
+// 早餐：麵包、荷包蛋、牛奶、水果；午晚餐：飯、青菜、魚或豆干、水果（11/17 John：早餐和午晚餐要分開）
+export const MENUS = {
+  breakfast: {
+    foods: ['toast', 'egg', 'milk', 'apple', 'banana', 'candy', 'chips'],
+    groups: ['grain', 'protein', 'dairy', 'fruit'],
+    easy: ['toast', 'egg', 'milk', 'banana'],
+  },
+  meal: {
+    foods: ['rice', 'broccoli', 'sprouts', 'carrot', 'fish', 'tofu', 'apple', 'banana', 'candy', 'chips'],
+    groups: ['grain', 'veg', 'protein', 'fruit'],
+    easy: ['rice', 'broccoli', 'fish', 'apple'],
+  },
+};
 export function foodSvg(id, size = 100) {
   return `<svg viewBox="0 0 100 100" width="${size}" height="${size}">${FOODS[id].svg}</svg>`;
 }
 // 食物在盤子上的位置（相對盤子中心）
-export const PLATE_SPOT = { grain: [-66, -58], veg: [66, -58], protein: [-66, 60], fruit: [66, 60], junk: [0, 0] };
+export const PLATE_SPOT = { grain: [-66, -58], veg: [66, -58], dairy: [66, -58], protein: [-66, 60], fruit: [66, 60], junk: [0, 0] };
 
 // ---------- 場景 ----------
 function windowArt(ph, wx) {

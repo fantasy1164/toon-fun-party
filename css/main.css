@@ -1603,3 +1603,8 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .parent .sync input[data-sy="url"] { width: min(100%, 640px); display: block; margin-top: 4px; }
 .parent .sync input[data-sy="key"] { width: 14em; }
 .parent .sync input[data-sy="dev"] { width: 8em; }
+
+/* 廚房：午晚餐 10 樣食物，按鈕小一點才放得下（11/17） */
+.kitchen .counter.foods.many { gap: 10px; }
+.kitchen .counter.foods.many .food-btn { width: 90px; height: 90px; padding: 4px; }
+.kitchen .counter.foods.many .food-btn svg { width: 82px; height: 82px; }

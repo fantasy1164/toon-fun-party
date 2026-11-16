@@ -112,6 +112,8 @@ export function showMap(stage, profile, zone = 'city') {
       };
       put(car, pts[0], 0, 0);
       car.classList.remove('hidden');
+      // 先讓瀏覽器把車放到起點，再開始移動；不然會從上一次的位置斜斜飛過來（例如火車從房子飛到鐵軌）
+      void car.offsetWidth;
       sfx(snd);
       await follow([car], pts, ms, put);
     }

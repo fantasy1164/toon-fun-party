@@ -56,6 +56,12 @@ Object.assign(LINES, {
   k_set_done: { bobo: '餐具擺好了！好整齊喔！' },
   k_meal: { bobo: '來裝一盤好吃又健康的飯！要有飯、青菜、肉或蛋，還有水果。' },
   k_meal_easy: { bobo: '亮亮的食物，一個一個放進盤子裡！' },
+  // 11/17 早餐和午晚餐分開（舊的 k_meal 不再使用）
+  k_meal_bf: { bobo: '早餐時間！來裝一盤營養早餐：要有麵包、荷包蛋、牛奶，還有水果。' },
+  k_meal2: { bobo: '來裝一盤好吃又健康的飯！要有飯、青菜、魚或豆干，還有水果。' },
+  k_tummy_bf: { bobo: '哎喲，肚子好痛……零食吃太多了。早餐要吃麵包、蛋和牛奶才對。' },
+  f_toast: { bobo: '吐司！' }, f_milk: { bobo: '牛奶！' }, f_tofu: { bobo: '豆干！' }, f_sprouts: { bobo: '豆芽菜！' },
+  en_toast: { bobo: 'Toast！' }, en_milk: { bobo: 'Milk！' }, en_tofu: { bobo: 'Tofu！' }, en_sprouts: { bobo: 'Bean sprouts！' },
   f_rice: { bobo: '白飯！' }, f_broccoli: { bobo: '花椰菜！' }, f_carrot: { bobo: '紅蘿蔔！' }, f_egg: { bobo: '荷包蛋！' }, f_fish: { bobo: '魚！' },
   f_apple: { bobo: '蘋果！' }, f_banana: { bobo: '香蕉！' }, f_candy: { bobo: '糖果……' }, f_chips: { bobo: '洋芋片……' },
   en_rice: { bobo: 'Rice！' }, en_broccoli: { bobo: 'Broccoli！' }, en_carrot: { bobo: 'Carrot！' }, en_egg: { bobo: 'Egg！' }, en_fish: { bobo: 'Fish！' },
