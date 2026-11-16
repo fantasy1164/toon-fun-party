@@ -9,8 +9,8 @@ import { state, save } from '../core/store.js';
 import { avatarSvg, kidFigure, useBody } from '../art/characters.js';
 import * as weather from '../core/weather.js';
 import * as fest from '../core/festival.js';
-import { mapBack, suburbBack, mountainBack, homeMini, amuseExt, stationExt, libraryExt, dentalExt, fireExt, beachExt, trailExt, ZONES, ZONE_START, ZONE_CARD, walkPath, ridePath, MAP_CAR, MAP_BUS, MAP_TRAIN } from '../art/map.js';
-import { schoolExt, farmExt, parkExt, GARAGE_CAR } from '../art/hub.js';
+import { mapBack, suburbBack, mountainBack, homeMini, amuseExt, stationExt, libraryExt, garageExt, dentalExt, fireExt, beachExt, trailExt, ZONES, ZONE_START, ZONE_CARD, walkPath, ridePath, MAP_CAR, MAP_BUS, MAP_TRAIN } from '../art/map.js';
+import { schoolExt, farmExt, parkExt } from '../art/hub.js';
 import { clinicExt, theaterExt, marketExt } from '../art/town.js';
 import { theaterNews } from './town.js';
 import { quakeDue, runQuake } from './quake.js';
@@ -50,7 +50,7 @@ export function showMap(stage, profile, zone = 'city') {
     const pos = ([x, y, w, h]) => `left:${x}px;top:${y}px;width:${w}px;height:${h}px`;
     const wx = weather.current();
     const art = {
-      home: () => homeMini(ph, { newyear: !!ny }), car: () => GARAGE_CAR, station: () => stationExt(ph),
+      home: () => homeMini(ph, { newyear: !!ny }), car: () => garageExt(ph), station: () => stationExt(ph),
       school: () => schoolExt(ph), library: () => libraryExt(ph), park: () => parkExt(ph), clinic: () => clinicExt(ph), dental: () => dentalExt(ph),
       theater: () => theaterExt(ph, { party: profile.members.some((id) => state.profiles[id].partyDue > 0) }), market: () => marketExt(ph), fire: () => fireExt(ph),
       farm: () => farmExt(ph), amuse: () => amuseExt(ph, open), beach: () => beachExt(ph, beachOpen()), trail: () => trailExt(ph),

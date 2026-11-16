@@ -160,13 +160,46 @@ export function stationExt(ph) {
     <g transform="translate(22 150)"><rect width="60" height="26" rx="8" fill="#e5484d"/><rect x="6" y="5" width="14" height="10" rx="2" fill="#d6f4ff"/><rect x="26" y="5" width="14" height="10" rx="2" fill="#d6f4ff"/></g>
   </svg>`;
 }
+// 圖書館（11/17 重畫）：三角山牆＋柱子的老式建築、打開的書招牌、大窗戶裡看得到一排排彩色書背、門口台階
 export function libraryExt(ph) {
-  const w = night(ph) ? '#ffd34d' : '#d6f4ff';
-  return `<svg viewBox="0 0 280 250"><path d="M10 90L140 16L270 90Z" fill="#8a6fd0"/><rect x="30" y="88" width="220" height="150" fill="#f3ecff"/>
-    ${[50, 98, 170, 218].map((x) => `<rect x="${x}" y="96" width="14" height="130" fill="#e0d4ff"/>`).join('')}
-    <rect x="114" y="150" width="52" height="88" rx="24" fill="#6a4fb0"/>
-    <g transform="translate(140 58)"><path d="M0 0Q-18 -10 -34 -6V22Q-18 18 0 26Z" fill="#ff6b8a"/><path d="M0 0Q18 -10 34 -6V22Q18 18 0 26Z" fill="#ff8fa8"/></g>
-    <rect x="60" y="114" width="40" height="30" rx="4" fill="${w}"/><rect x="180" y="114" width="40" height="30" rx="4" fill="${w}"/>
+  const n = night(ph);
+  const glass = n ? '#ffe08a' : '#e6f4ff';
+  const spines = ['#e5484d', '#3a7bd5', '#ffb300', '#4caf50', '#8a6fd0', '#ff8fa8', '#26a69a'];
+  // 窗戶裡的書架：兩層，每層一排彩色書背
+  const shelf = (x) => [0, 1].map((r) => {
+    const y = 138 + r * 28;
+    return `${Array.from({ length: 6 }, (_, i) => `<rect x="${x + 3 + i * 5.3}" y="${y - 20 + (i % 3) * 2}" width="4.4" height="${20 - (i % 3) * 2}" fill="${spines[(i + r * 3 + (x > 100 ? 2 : 0)) % 7]}"/>`).join('')}<rect x="${x}" y="${y}" width="38" height="3" fill="#8a6a4a"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 280 250">
+    <rect x="22" y="86" width="236" height="140" fill="#f4ecdc"/>
+    <path d="M8 90L140 20L272 90Z" fill="#b8a2e8"/><path d="M8 90L140 20L272 90Z" fill="none" stroke="#7e64c4" stroke-width="8" stroke-linejoin="round"/>
+    <rect x="14" y="86" width="252" height="12" rx="3" fill="#7e64c4"/>
+    <g transform="translate(140 62)"><path d="M0 -4Q-16 -14 -34 -10V18Q-16 14 0 24Z" fill="#fff" stroke="#e5484d" stroke-width="4"/><path d="M0 -4Q16 -14 34 -10V18Q16 14 0 24Z" fill="#fff" stroke="#e5484d" stroke-width="4"/><path d="M-26 0H-8M-26 8H-8M8 0H26M8 8H26" stroke="#c9b8ef" stroke-width="3"/></g>
+    ${[34, 92, 174, 232].map((x) => `<rect x="${x}" y="100" width="16" height="118" fill="#fffaf0" stroke="#d9cdb4" stroke-width="2"/><rect x="${x - 3}" y="98" width="22" height="6" fill="#e6dcc6"/><rect x="${x - 3}" y="212" width="22" height="6" fill="#e6dcc6"/>`).join('')}
+    <rect x="52" y="112" width="38" height="66" rx="4" fill="${glass}"/>${shelf(52)}<rect x="52" y="112" width="38" height="66" rx="4" fill="none" stroke="#7e64c4" stroke-width="4"/>
+    <rect x="190" y="112" width="38" height="66" rx="4" fill="${glass}"/>${shelf(190)}<rect x="190" y="112" width="38" height="66" rx="4" fill="none" stroke="#7e64c4" stroke-width="4"/>
+    <path d="M114 222V160Q114 134 140 134Q166 134 166 160V222Z" fill="#6a4fb0"/><path d="M140 136V222" stroke="#5a3f9a" stroke-width="3"/><circle cx="132" cy="182" r="3" fill="#ffd34d"/><circle cx="148" cy="182" r="3" fill="#ffd34d"/>
+    <rect x="96" y="222" width="88" height="8" fill="#d9cdb4"/><rect x="86" y="230" width="108" height="8" fill="#cfc2a6"/><rect x="76" y="238" width="128" height="8" fill="#c4b698"/>
+  </svg>`;
+}
+// 車庫（11/17 重畫）：跟家一樣的屋頂和牆，捲門拉起一半，看得到噗噗的車頭
+export function garageExt(ph) {
+  const n = night(ph);
+  return `<svg viewBox="0 0 226 190">
+    <path d="M6 64L113 10L220 64Z" fill="#e5734f"/><path d="M6 64L113 10L220 64" fill="none" stroke="#c9562f" stroke-width="10" stroke-linejoin="round"/>
+    <rect x="18" y="60" width="190" height="130" fill="#fff4e0"/>
+    <rect x="34" y="76" width="158" height="114" fill="${n ? '#2e323c' : '#4a4f5a'}"/>
+    ${n ? '<rect x="96" y="80" width="34" height="6" rx="3" fill="#ffe680"/>' : ''}
+    <g class="carbody">
+      <path d="M48 190V150Q52 122 74 118H152Q174 122 178 150V190Z" fill="#ff6b5c"/>
+      <path d="M68 146Q74 126 90 126H136Q152 126 158 146Z" fill="#d6f4ff"/>
+      <g class="pupu-mini"><ellipse cx="113" cy="140" rx="15" ry="11" fill="#9d8fd0"/><circle cx="107" cy="137" r="2.5" fill="#333"/><circle cx="119" cy="137" r="2.5" fill="#333"/><ellipse cx="113" cy="144" rx="6" ry="3" fill="#7d6fb0"/></g>
+      <circle cx="66" cy="164" r="9" fill="#fff6a8" stroke="#e0b800" stroke-width="3"/><circle cx="160" cy="164" r="9" fill="#fff6a8" stroke="#e0b800" stroke-width="3"/>
+      <rect x="92" y="160" width="42" height="12" rx="4" fill="#d94a3c"/><rect x="50" y="178" width="126" height="10" rx="4" fill="#c9c9c9"/>
+    </g>
+    <g fill="#d9dde3" stroke="#b9bfc8" stroke-width="2">${Array.from({ length: 5 }, (_, i) => `<rect x="34" y="${76 + i * 9}" width="158" height="9"/>`).join('')}</g>
+    <rect x="98" y="114" width="30" height="5" rx="2" fill="#8d939e"/>
+    <rect x="28" y="70" width="170" height="8" rx="3" fill="#c9562f"/>
   </svg>`;
 }
 export function dentalExt(ph) {
