@@ -139,6 +139,13 @@ const SFX = {
   note: (t) => tone([523, 587, 659, 784, 880, 1047][Math.floor(Math.random() * 6)], t, 0.35, { type: 'triangle', gain: 0.22 }),
   coin: (t) => { tone(988, t, 0.08, { type: 'square', gain: 0.08 }); tone(1319, t + 0.08, 0.25, { type: 'square', gain: 0.08 }); },
   squeak: (t) => tone(1200, t, 0.18, { type: 'sine', to: 1800, gain: 0.15 }),
+  // ---- 歡樂島的動物叫聲（11/17） ----
+  neigh: (t) => { for (let i = 0; i < 8; i++) tone(620 - i * 30 + (i % 2) * 60, t + i * 0.06, 0.08, { type: 'sawtooth', gain: 0.07 }); tone(300, t + 0.5, 0.3, { type: 'sawtooth', to: 200, gain: 0.06 }); },
+  hum: (t) => { tone(260, t, 0.6, { type: 'sine', to: 300, gain: 0.18, attack: 0.1 }); tone(520, t, 0.6, { type: 'triangle', to: 600, gain: 0.05, attack: 0.1 }); },
+  growl: (t) => { tone(80, t, 0.8, { type: 'sawtooth', to: 65, gain: 0.12, attack: 0.1 }); noise(t, 0.8, { freq: 220, q: 2, gain: 0.18 }); },
+  meow: (t) => tone(700, t, 0.45, { type: 'triangle', to: 950, gain: 0.14, attack: 0.05 }),
+  monkey: (t) => [0, 0.16, 0.32, 0.5, 0.62].forEach((d, i) => tone(i < 3 ? 500 + i * 120 : 1100, t + d, 0.12, { type: 'triangle', to: i < 3 ? 700 + i * 120 : 1400, gain: 0.14 })),
+  penguin: (t) => [0, 0.18, 0.36].forEach((d, i) => { tone(330 + i * 40, t + d, 0.16, { type: 'square', to: 280, gain: 0.08 }); noise(t + d, 0.14, { freq: 700, q: 3, gain: 0.1 }); }),
 };
 
 export function sfx(name) {
@@ -344,6 +351,18 @@ const TRACKS = {
     style: 'song', bpm: 108, lead: 'triangle', leadGain: 0.16,
     melody: seq('E5 . D5 . C5 . D5 . E5 . E5 . E5 . . .  D5 . D5 . D5 . . . E5 . G5 . G5 . . .  E5 . D5 . C5 . D5 . E5 . E5 . E5 . C5 .  D5 . D5 . E5 . D5 . C5 . . . . . . .'),
     bass: seq('C3 . G3 . C3 . G3 . C3 . G3 . C3 . G3 .  G2 . D3 . G2 . D3 . C3 . G3 . C3 . G3 .  C3 . G3 . C3 . G3 . A2 . E3 . A2 . E3 .  G2 . D3 . G2 . D3 . C3 . G3 . C3 . . .'),
+  },
+  // ---- 歡樂島動物園：輕快的探險歌（木琴感） ----
+  zoo: {
+    style: 'bg', bpm: 120, lead: 'triangle', leadGain: 0.19,
+    melody: seq('C5 . E5 G5 A5 . G5 .  E5 . C5 . D5 . . .  E5 . G5 A5 C6 . A5 .  G5 . E5 . G5 . . .  F5 . A5 . G5 . E5 .  D5 . E5 C5 D5 . . .  C5 . E5 G5 A5 . G5 E5  D5 . B4 . C5 . . .'),
+    bass: seq('C3 . G3 . F2 . C3 .  A2 . E3 . G2 . D3 .  C3 . G3 . F2 . C3 .  C3 . G2 . C3 . . .  F2 . C3 . C3 . G2 .  G2 . D3 . G2 . D3 .  C3 . G3 . F2 . C3 .  G2 . D3 . C3 . . .'),
+  },
+  // ---- 郵輪：搖搖晃晃的海上華爾滋感 ----
+  sea: {
+    style: 'bg', bpm: 104, lead: 'sine', leadGain: 0.2,
+    melody: seq('E5 . . G5 . . A5 . G5 . E5 .  D5 . . E5 . . C5 . . . . .  E5 . . G5 . . C6 . A5 . G5 .  A5 . . G5 . . E5 . . . . .'),
+    bass: seq('C3 . G3 . C3 . A2 . E3 . A2 .  F2 . C3 . F2 . G2 . D3 . G2 .  C3 . G3 . C3 . A2 . E3 . A2 .  F2 . C3 . G2 . C3 . . . . .'),
   },
   bath: {
     style: 'song', bpm: 112, lead: 'triangle', leadGain: 0.2,

@@ -29,6 +29,10 @@ import { mountFire } from './scenes/fire.js';
 import { mountDental } from './scenes/dental.js';
 import { mountLibrary } from './scenes/library.js';
 import { mountHike } from './scenes/hike.js';
+import { mountZoo } from './scenes/zoo.js';
+import { mountSnack } from './scenes/snack.js';
+import { mountGift } from './scenes/gift.js';
+import { mountCruise } from './scenes/cruise.js';
 import { chooseMode, mountTogether } from './scenes/together.js';
 import { setupTurns, turnsScene } from './core/turns.js';
 import { treeScreen, christmasMorning } from './ui/xmas.js';
@@ -142,6 +146,7 @@ async function goMap() {
     return;
   }
   if (r.room === 'trip') { startTrip(r.dest, r.by); return; }
+  if (r.room === 'ship') { startShip(); return; }
   enterRoom(r.room, 'map');
 }
 
@@ -156,7 +161,10 @@ async function goHouse() {
 }
 const goBack = (from) => (from === 'house' ? goHouse() : goMap());
 
-const MOUNT = { door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear, theater: mountHall, clinic: mountClinic, market: mountMarket, amuse: mountAmuse, fire: mountFire, dental: mountDental, library: mountLibrary, trail: mountHike };
+// 歡樂島：8 個展示區、遊園車、美食街、紀念品店
+const zooArea = (area) => (stage2, opts) => mountZoo(stage2, { ...opts, area });
+const ZOO_MOUNT = Object.fromEntries(['kids', 'taiwan', 'rain', 'africa', 'desert', 'aus', 'penguin', 'panda'].map((a) => [a, zooArea(a)]));
+const MOUNT = { ...ZOO_MOUNT, tram: (stage2, opts) => mountZoo(stage2, { ...opts, tour: true }), snack: mountSnack, gift: mountGift, door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear, theater: mountHall, clinic: mountClinic, market: mountMarket, amuse: mountAmuse, fire: mountFire, dental: mountDental, library: mountLibrary, trail: mountHike };
 
 function startScene(make) {
   if (state.session.usedMs === 0) warned = false;
@@ -197,6 +205,21 @@ function startTrip(dest, by = 'car') {
       stage.querySelector('.playclock')?.remove();
       if (closedReason()) { route(); return; }
       enterRoom(dest, 'map');
+    },
+  }));
+}
+
+// 坐郵輪去歡樂島：到了換成島的地圖
+function startShip() {
+  const exitHome = sceneExit('map');
+  startScene(() => mountCruise(stage, {
+    profile,
+    onExit: (why) => {
+      scene = null;
+      stage.querySelector('.playclock')?.remove();
+      if (why === 'arrive') zone = 'island';
+      if (why === 'arrive' || why === 'home') { if (closedReason()) route(); else goMap(); return; }
+      exitHome(why);
     },
   }));
 }

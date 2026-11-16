@@ -1,5 +1,20 @@
 // 虛擬收藏品：每位角色一個系列，每件畫在 100x100 的框內。
+import { ANIMALS } from './animals.js';
+
+// 動物娃娃（歡樂島紀念品店，一次只能選一隻）：動物縮小，加上娃娃的標籤和縫線
+const plush = (id, dy = 0) => `<circle cx="50" cy="54" r="44" fill="#fff6fb"/><g transform="translate(2 ${2 + dy}) scale(.48)">${ANIMALS[id].svg()}</g>
+  <g transform="translate(70 70) rotate(-12)"><rect width="22" height="16" rx="4" fill="#ff7fa8"/><path d="M11 4Q5 0 4 5Q4 9 11 13Q18 9 18 5Q17 0 11 4Z" fill="#fff"/></g>`;
+export const PLUSH_IDS = ['panda', 'koala', 'penguin', 'giraffe', 'lion', 'elephant', 'bear', 'leopardcat', 'kangaroo', 'zebra', 'meerkat', 'llama'];
+
 export const ITEMS = {
+  ...Object.fromEntries(PLUSH_IDS.map((id) => [`zp_${id}`, plush(id)])),
+  // 森森園長的動物園系列
+  sen_binoc: `<g transform="rotate(-8 50 50)"><rect x="16" y="30" width="28" height="42" rx="10" fill="#333a48"/><rect x="56" y="30" width="28" height="42" rx="10" fill="#333a48"/><rect x="40" y="40" width="20" height="14" fill="#555c6a"/><circle cx="30" cy="70" r="11" fill="#9fd0ff" stroke="#222" stroke-width="3"/><circle cx="70" cy="70" r="11" fill="#9fd0ff" stroke="#222" stroke-width="3"/><path d="M20 30Q50 4 80 30" stroke="#8a5a2b" stroke-width="4" fill="none"/></g>`,
+  sen_hat: `<ellipse cx="50" cy="66" rx="44" ry="12" fill="#d8c08a"/><path d="M18 66Q20 22 50 20Q80 22 82 66Z" fill="#e6d2a0"/><path d="M20 56Q50 48 80 56L82 66Q50 58 18 66Z" fill="#4f8a4f"/><path d="M66 50Q76 38 86 42Q80 54 68 56Z" fill="#6cc070"/>`,
+  sen_tram: `<g transform="translate(4 30) scale(.42)"><rect x="0" y="10" width="64" height="44" rx="10" fill="#3fae6a"/><rect x="4" y="0" width="56" height="8" rx="4" fill="#ffd34d"/><rect x="70" y="10" width="64" height="44" rx="10" fill="#3fae6a"/><rect x="74" y="0" width="56" height="8" rx="4" fill="#ffd34d"/><rect x="140" y="10" width="70" height="44" rx="10" fill="#3fae6a"/><rect x="144" y="0" width="62" height="8" rx="4" fill="#ffd34d"/>${[16, 48, 86, 118, 156, 194].map((x) => `<circle cx="${x}" cy="58" r="9" fill="#333"/>`).join('')}</g>`,
+  sen_paw: `<ellipse cx="50" cy="60" rx="30" ry="26" fill="#9aa0aa"/>${[[24, 30], [42, 22], [60, 22], [78, 30]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="7" fill="#9aa0aa"/>`).join('')}<path d="M34 64Q50 74 66 64" stroke="#7a808a" stroke-width="4" fill="none"/>`,
+  sen_leaf: `<path d="M50 90V40" stroke="#6cbf4a" stroke-width="8"/><path d="M50 60Q20 50 18 20Q46 24 50 56Z" fill="#7cd05a"/><path d="M50 50Q78 40 84 12Q56 18 50 46Z" fill="#5aa84a"/><path d="M44 70h12" stroke="#4a9a34" stroke-width="3"/>`,
+  sen_book: `<path d="M50 24Q30 14 10 20V80Q30 74 50 84Z" fill="#4f8a4f"/><path d="M50 24Q70 14 90 20V80Q70 74 50 84Z" fill="#6cbf6a"/><path d="M50 24V84" stroke="#2f6a2f" stroke-width="4"/><g transform="translate(56 28) scale(.15)">${ANIMALS.panda.svg()}</g><g transform="translate(14 30) scale(.14)">${ANIMALS.giraffe.svg()}</g>`,
   // 嘟嘟的乾淨系列
   dudu_bubble: `<circle cx="50" cy="52" r="34" fill="#bfeeff" stroke="#6cc7ea" stroke-width="5"/><path d="M32 40a22 22 0 0 1 18-12" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>`,
   dudu_brush: `<rect x="44" y="34" width="12" height="58" rx="6" fill="#ff7fa8"/><rect x="38" y="10" width="24" height="30" rx="6" fill="#fff" stroke="#9fd8ee" stroke-width="4"/><path d="M44 16v18M50 16v18M56 16v18" stroke="#9fd8ee" stroke-width="3"/>`,
@@ -125,6 +140,8 @@ export const SERIES = {
   lili: ['lili_cart', 'lili_ecobag', 'lili_coin', 'lili_milk', 'lili_acorn', 'lili_register'],
   yongyong: ['yong_helmet', 'yong_hose', 'yong_truck', 'yong_ext', 'yong_alarm', 'yong_badge'],
   gaogao: ['gao_ticket', 'gao_balloon', 'gao_horse', 'gao_ferris', 'gao_popcorn', 'gao_cap'],
+  sensen: ['sen_binoc', 'sen_hat', 'sen_tram', 'sen_paw', 'sen_leaf', 'sen_book'],
+  plush: PLUSH_IDS.map((id) => `zp_${id}`),
   kiki: ['kiki_leaf', 'kiki_ball', 'kiki_kite', 'kiki_car', 'kiki_star', 'kiki_mush'],
 };
 

@@ -2,6 +2,7 @@
 // 生活區近的地方走路、遠的坐公車；跨區坐火車；郊區坐噗噗的車；山區從車站走到步道口。舞台 1200x900。
 import { weatherLayer, skyColors } from './bathroom.js';
 import { characterSvg } from './characters.js';
+import { ISLAND, ISLAND_START, islandPath } from './island.js';
 
 export const ROAD_Y = 720;
 const WALK_Y = ROAD_Y - 40;   // 人行道
@@ -27,20 +28,26 @@ export const ZONES = {
     farm: { box: [60, 230, 300, 288], door: [210, 520], by: 'car' },
     amuse: { box: [760, 60, 400, 326], door: [960, 388], by: 'car' },
     beach: { box: [40, 600, 340, 210], door: [210, 612], by: 'car' },
+    // 碼頭（11/17）：坐郵輪去歡樂島
+    pier: { box: [935, 556, 260, 230], door: [1010, 712], by: 'walk' },
   },
   mountain: {
     station: { box: [450, 650, 300, 178], door: [600, 650] },
     trail: { box: [120, 150, 400, 330], door: [330, 480], by: 'walk' },
   },
+  // 歡樂島（11/17）：整座島是動物園
+  island: ISLAND,
 };
 // 小孩出發的地方：生活區是家門口，郊區、山區是車站旁邊的月台
-export const ZONE_START = { city: [600, 566], suburb: [800, 790], mountain: [800, 790] };
+export const ZONE_START = { city: [600, 566], suburb: [800, 790], mountain: [800, 790], island: ISLAND_START };
 
 // 走路的路線（生活區從家門口出發；其他區從車站出發）
 export function walkPath(zone, dest) {
   const Z = ZONES[zone];
   const d = Z[dest].door;
   if (zone === 'mountain') return [ZONE_START.mountain, [800, 560], [330, 560], d];
+  if (zone === 'island') return islandPath(dest);
+  if (zone === 'suburb') return [ZONE_START.suburb, [d[0], 790], d];
   const start = [Z.home.door[0], Z.home.door[1] + 8];
   if (dest === 'car') return [start, [600, 600], [870, 600], d];
   if (dest === 'station') return [start, [600, WALK_Y], [440, WALK_Y], [440, 600], [440, 330], [190, 330], d];
@@ -120,9 +127,9 @@ export function suburbBack(ph, wx) {
     ${[0, 1, 2, 3, 4, 5].map((i) => `<path d="M${i * 220 - 60} 900Q${i * 220 + 40} 600 ${i * 220 + 160} 420" stroke="${n ? '#3a6446' : '#b2dc8c'}" stroke-width="40" fill="none" opacity=".5"/>`).join('')}
     <!-- 海 -->
     <path d="M0 640Q200 600 400 640V900H0Z" fill="${n ? '#24466a' : '#6fc3ec'}"/><path d="M0 660Q200 620 400 660" stroke="#fff" stroke-width="6" fill="none" opacity=".7"/>
-    <path d="M800 790V560H210V520M800 560H960V400M420 560V640" stroke="${road}" stroke-width="30" fill="none" stroke-linejoin="round"/>
+    <path d="M800 790H1010V716M800 790V560H210V520M800 560H960V400M420 560V640" stroke="${road}" stroke-width="30" fill="none" stroke-linejoin="round"/>
     ${rails('M-20 840H1220', n)}
-    ${tree(420, 330, 1, n)}${tree(700, 300, 0.8, n)}${tree(1120, 560, 1.1, n)}${tree(820, 760, 1, n)}${tree(1080, 820, 1, n)}
+    ${tree(420, 330, 1, n)}${tree(700, 300, 0.8, n)}${tree(880, 470, 1, n)}${tree(820, 760, 1, n)}${tree(1080, 820, 1, n)}
     ${weatherLayer(wx, ph, 0, 0, 1200, 900)}
   </svg>`;
 }

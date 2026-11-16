@@ -17,6 +17,8 @@ import { quakeDue, runQuake } from './quake.js';
 import { santaPop } from './xmas.js';
 import { bdGreet } from './hub.js';
 import { ICON } from './screens.js';
+import { islandBack, areaExt, tramExt, snackExt, giftExt, pierExt, MAP_SHIP, AREAS } from '../art/island.js';
+import { ZOO_HOURS } from '../config.js';
 import { HUB_BALLOONS } from '../art/party.js';
 import { HUB_NY } from '../art/newyear.js';
 
@@ -25,6 +27,18 @@ export function amuseOpen() {
   const day = new Date(`${dateKey()}T12:00:00`).getDay();
   const h = hour();
   return ([0, 6].includes(day) || !!fest.newYear()) && h >= 9 && h < 19;
+}
+
+// 歡樂島動物園：照臺北市立動物園，每天 9–17 點（16 點停止入園），7、8 月週六到 21 點（20 點停止入園），除夕休園。
+// entry：還能不能進去（坐船過去）；不然是園區還開著沒（已經在島上的人）
+export function zooOpen({ entry = false } = {}) {
+  const d = new Date(`${dateKey()}T12:00:00`);
+  if (fest.newYear()?.stage === 'eve') return false;
+  const summerSat = d.getDay() === 6 && [6, 7].includes(d.getMonth());
+  const H = ZOO_HOURS;
+  const end = entry ? (summerSat ? H.summerSatLastEntry : H.lastEntry) : (summerSat ? H.summerSatClose : H.close);
+  const h = hour();
+  return h >= H.open && h < end;
 }
 
 // 今天去過哪裡（第二次就快轉）
@@ -54,10 +68,16 @@ export function showMap(stage, profile, zone = 'city') {
       school: () => schoolExt(ph), library: () => libraryExt(ph), park: () => parkExt(ph), clinic: () => clinicExt(ph), dental: () => dentalExt(ph),
       theater: () => theaterExt(ph, { party: profile.members.some((id) => state.profiles[id].partyDue > 0) }), market: () => marketExt(ph), fire: () => fireExt(ph),
       farm: () => farmExt(ph), amuse: () => amuseExt(ph, open), beach: () => beachExt(ph, beachOpen()), trail: () => trailExt(ph),
+      pier: () => pierExt(ph, { closed: zone === 'suburb' && !zooOpen({ entry: true }), side: zone === 'island' ? 'island' : 'suburb' }),
+      tram: () => tramExt(ph), snack: () => snackExt(ph), gift: () => giftExt(ph),
+      ...Object.fromEntries(Object.keys(AREAS).map((a) => [a, () => areaExt(a, ph)])),
     };
-    const closed = { amuse: !open, beach: !beachOpen() };
+    const zooUp = zooOpen();
+    const closed = zone === 'island'
+      ? Object.fromEntries(['tram', 'snack', 'gift', ...Object.keys(AREAS)].map((k) => [k, !zooUp]))
+      : { amuse: !open, beach: !beachOpen(), pier: zone === 'suburb' && !zooOpen({ entry: true }) };
     const glow = city ? { park: weekend && !night, theater: theaterNews(profile), home: bids.length || ny } : { amuse: open };
-    const back = city ? mapBack(ph, wx, { december: dec }) : zone === 'suburb' ? suburbBack(ph, wx) : mountainBack(ph, wx);
+    const back = city ? mapBack(ph, wx, { december: dec }) : zone === 'suburb' ? suburbBack(ph, wx) : zone === 'island' ? islandBack(ph, wx) : mountainBack(ph, wx);
     const kidsHtml = profile.members.map((id) => (useBody()
       ? `<div class="mw-kid" data-id="${id}">${kidFigure(id, { w: 58 })}</div>`
       : `<div class="mw-kid head" data-id="${id}">${avatarSvg(id, 54)}</div>`)).join('');
@@ -73,7 +93,7 @@ export function showMap(stage, profile, zone = 'city') {
         <button class="round-btn home">${ICON.home}</button>
       </div>`);
     stage.replaceChildren(node);
-    playMusic(city ? 'lobby' : zone === 'suburb' ? 'farm' : 'park');
+    playMusic(city ? 'lobby' : zone === 'suburb' ? 'farm' : zone === 'island' ? 'zoo' : 'park');
     let done = false;
     turnsScene(node);
 
@@ -117,6 +137,10 @@ export function showMap(stage, profile, zone = 'city') {
       sfx(snd);
       await follow([car], pts, ms, put);
     }
+    // 郵輪：郊區碼頭往右開出去；島上的碼頭往下開走
+    const shipOut = () => (zone === 'island'
+      ? vehicle(MAP_SHIP, [[600, 880], [600, 1060]], 1100, 250, 170, 'horn')
+      : vehicle(MAP_SHIP, [[1060, 740], [1420, 740]], 1100, 250, 170, 'horn'));
     const trainOut = () => vehicle(MAP_TRAIN, [[city ? 190 : 640, city ? 300 : 840], [city ? -260 : 1460, city ? 300 : 840]], 1300, 220, 80, 'horn');
 
     async function travel(room) {
@@ -137,6 +161,15 @@ export function showMap(stage, profile, zone = 'city') {
       return { room };
     }
 
+    // 坐郵輪去歡樂島（第一次是郵輪場景，同一天第二次快轉）
+    async function takeShip() {
+      const trips = tripsToday();
+      const again = trips.seen.includes('ship');
+      if (!again) { trips.seen.push('ship'); save(); return { room: 'ship', zone: 'island' }; }
+      await shipOut();
+      return { room: 'zone', zone: 'island' };
+    }
+
     // 坐火車去別的區
     async function takeTrain(to) {
       const trips = tripsToday();
@@ -153,7 +186,8 @@ export function showMap(stage, profile, zone = 'city') {
         sfx('wrong');
         btn.classList.add('nope');
         setTimeout(() => btn.classList.remove('nope'), 500);
-        speak('kiki', room === 'beach' ? 'map_beach_closed' : 'map_amuse_closed', { name: profile.name, who: profile.id });
+        const line = room === 'beach' ? 'map_beach_closed' : room === 'amuse' ? 'map_amuse_closed' : 'map_zoo_closed';
+        speak(zone === 'island' ? 'sensen' : 'kiki', line, { name: profile.name, who: profile.id });
         return;
       }
       if (room === 'station') {
@@ -169,9 +203,19 @@ export function showMap(stage, profile, zone = 'city') {
       if (room === 'back') {
         sfx('tap');
         if (city) { resolve({ room }); return; }
-        // 郊區、山區按回家：坐火車快快回生活區
-        await trainOut();
+        // 郊區、山區按回家：坐火車快快回生活區（歡樂島先坐船）
+        if (zone === 'island') await shipOut(); else await trainOut();
         resolve({ room: 'zone', zone: 'city' });
+        return;
+      }
+      // 碼頭：郊區坐船去歡樂島；島上坐船回郊區
+      if (room === 'pier') {
+        sfx('fanfare');
+        if (zone === 'island') { await shipOut(); resolve({ room: 'zone', zone: 'suburb' }); return; }
+        node.classList.add('walking');
+        await follow(walkers, walkPath(zone, 'pier'), 1200, place);
+        node.classList.remove('walking');
+        resolve(await takeShip());
         return;
       }
       sfx('fanfare');
@@ -199,7 +243,8 @@ export function showMap(stage, profile, zone = 'city') {
     }));
     onTap($('.map-zones', node), (e) => { if (e.target.classList.contains('map-zones')) $('.map-zones', node).classList.add('hidden'); });
 
-    const pickLine = async () => { await callTurn('kiki'); if (!done) speak('kiki', city ? 'map_pick' : `map_pick_${zone}`, { name: profile.name, who: profile.id }); };
+    const guide = zone === 'island' ? 'sensen' : 'kiki';
+    const pickLine = async () => { await callTurn(guide); if (!done) speak(guide, city ? 'map_pick' : `map_pick_${zone}`, { name: profile.name, who: profile.id }); };
     if (!city) { pickLine(); return; }
     // 生活區第一次進來的問候：生日、過年、聖誕老公公、地震演習、遊樂園有開、週末去公園
     const x = dec ? fest.xmas() : null;

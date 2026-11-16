@@ -39,6 +39,7 @@ export const GUESTS = {
   lili: { id: 'lili', name: '栗栗', tts: { pitch: 1.45, rate: 1.05 } },
   gaogao: { id: 'gaogao', name: '高高', tts: { pitch: 1.1, rate: 1.0 } },
   yongyong: { id: 'yongyong', name: '勇勇', tts: { pitch: 0.8, rate: 0.98 } },
+  sensen: { id: 'sensen', name: '森森園長', tts: { pitch: 0.85, rate: 0.9 } },
   // 首頁喊標題的兩個小朋友
   kidgirl: { id: 'kidgirl', name: '小女孩', tts: { pitch: 1.9, rate: 1.15 } },
   kidboy: { id: 'kidboy', name: '小男孩', tts: { pitch: 1.7, rate: 1.15 } },
@@ -65,10 +66,20 @@ export const REWARD_SLOTS = {
   hike: { day: [7, 17] },
   bus: { day: [7, 20] },
   train: { day: [7, 20] },
+  // 歡樂島動物園（11/17）：坐船、遊園車或逛展區、美食攤、紀念品店各一次
+  ship: { day: [8, 17] },
+  zoo: { day: [9, 17] },
+  snack: { day: [9, 17] },
+  gift: { day: [9, 17] },
 };
 
+// 歡樂島動物園的開放時間：照臺北市立動物園（2026-11 查一次，之後不再查）
+// 每天 9:00–17:00，16:00 停止入園；7、8 月週六延長到 21:00（20:00 停止入園）；農曆除夕休園。
+// （每年 6 月的歲修休園日期不固定，遊戲裡不做；室內館輪流週一休館也不做）
+export const ZOO_HOURS = { open: 9, close: 17, lastEntry: 16, summerSatClose: 21, summerSatLastEntry: 20 };
+
 // 明星牆：每位角色一塊星星牌（照這個順序）
-export const STARS = ['dudu', 'kiki', 'bobo', 'mian', 'gugu', 'doudou', 'pupu', 'tiaotiao', 'yuanyuan', 'lili', 'gaogao', 'yongyong'];
+export const STARS = ['dudu', 'kiki', 'bobo', 'mian', 'gugu', 'doudou', 'pupu', 'tiaotiao', 'yuanyuan', 'lili', 'gaogao', 'yongyong', 'sensen'];
 // 好朋友星星：一起做幾次集滿
 export const FRIEND_MAX = 5;
 // 小明星徽章：累計幾次變銅、銀、金

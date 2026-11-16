@@ -1608,3 +1608,157 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .kitchen .counter.foods.many { gap: 10px; }
 .kitchen .counter.foods.many .food-btn { width: 90px; height: 90px; padding: 4px; }
 .kitchen .counter.foods.many .food-btn svg { width: 82px; height: 82px; }
+
+/* 明星劇場：13 位明星，一排 7 塊，牌子縮小（11/17） */
+.hall .hf-plaque { width: 158px; }
+.hall .hf-plaque > svg { width: 158px; height: auto; }
+
+/* ===================== 歡樂島動物園（11/17） ===================== */
+/* 動物：眨眼、呼吸、搖尾巴、動耳朵、點頭 */
+.an { overflow: visible; display: block; }
+.an .an-eye { transform-box: fill-box; transform-origin: center; animation: anBlink 4.6s infinite; animation-delay: var(--d, 0s); }
+.an .an-breath { transform-box: fill-box; transform-origin: 50% 100%; animation: anBreath 2.6s ease-in-out infinite alternate; animation-delay: var(--d, 0s); }
+.an .an-tail { transform-box: fill-box; transform-origin: 100% 0%; animation: anWag 1.5s ease-in-out infinite alternate; animation-delay: var(--d, 0s); }
+.an-meerkat .an-tail, .an-macaque .an-tail, .an-rabbit .an-tail { transform-origin: 0% 50%; }
+.an .an-ear { transform-box: fill-box; transform-origin: 50% 100%; animation: anEar 5.5s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.an .an-head { transform-box: fill-box; transform-origin: 30% 100%; animation: anHead 6s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.an .an-trunk { transform-box: fill-box; transform-origin: 20% 0%; animation: anWag 2.2s ease-in-out infinite alternate; }
+.an .an-joey { transform-box: fill-box; transform-origin: 50% 100%; animation: anJoey 4s ease-in-out infinite; }
+@keyframes anBlink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes anBreath { from { transform: scaleY(1); } to { transform: scaleY(1.03) scaleX(1.01); } }
+@keyframes anWag { from { transform: rotate(-8deg); } to { transform: rotate(10deg); } }
+@keyframes anEar { 0%, 80%, 100% { transform: rotate(0); } 84% { transform: rotate(-14deg); } 88% { transform: rotate(6deg); } }
+@keyframes anHead { 0%, 70%, 100% { transform: rotate(0); } 78% { transform: rotate(-4deg); } 86% { transform: rotate(3deg); } }
+@keyframes anJoey { 0%, 60%, 100% { transform: translateY(0); } 70%, 90% { transform: translateY(-6px); } }
+
+.zoo .zo-animals { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.zoo .zo-an { position: absolute; padding: 0; border: 0; background: none; pointer-events: auto; transition: left .6s ease-in-out, top .6s ease-in-out, opacity .4s, filter .3s; }
+.zoo .zo-an > svg { width: 100%; height: 100%; }
+.zoo .zo-an.react > svg { animation: anReact .7s ease-out; }
+.zoo .zo-an.happy > svg { animation: anHappy .9s ease-in-out; }
+.zoo .zo-an.scared > svg { animation: anScared .9s ease-in-out; }
+.zoo .zo-an.nope > svg { animation: shakehead .4s; }
+.zoo .zo-an.jump > svg { animation: anJump .6s ease-out; }
+.zoo .zo-an.eating .an-head { animation: anEat .4s ease-in-out infinite alternate; }
+.zoo .zo-an.glow-an { filter: drop-shadow(0 0 10px var(--glow, #ffd000)) drop-shadow(0 0 4px var(--glow, #ffd000)); }
+.zoo .zo-an.met { filter: none; }
+.zoo .zo-an.big { transform: scale(1.9); transform-origin: 50% 100%; z-index: 3; transition: transform .5s, left .6s, top .6s; }
+.zoo .zo-an.touching > svg { transform: scaleY(.97); }
+.zoo .zo-an.stroke-hint::after { content: ''; position: absolute; left: 30%; top: 40%; width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 255, 255, .7); box-shadow: 0 0 0 6px rgba(255, 211, 77, .8); animation: strokeHint 1.6s ease-in-out infinite; pointer-events: none; }
+.zoo .zo-an.hiding { opacity: .92; }
+.zoo .zo-an.away { opacity: 0; pointer-events: none; }
+.zoo .zo-an.found { z-index: 6; filter: drop-shadow(0 0 12px #ffd34d); }
+.zoo .zo-an.tallview { transform: scale(1.5); transform-origin: 50% 100%; }
+@keyframes anReact { 0% { transform: translateY(0); } 35% { transform: translateY(-26px) rotate(-3deg); } 70% { transform: translateY(0) scaleY(.94); } 100% { transform: none; } }
+@keyframes anHappy { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg) translateY(-8px); } 75% { transform: rotate(6deg) translateY(-8px); } }
+@keyframes anScared { 0% { transform: none; } 20% { transform: translateX(-12px) scale(.92); } 40% { transform: translateX(12px) scale(.92); } 60% { transform: translateX(-8px) scale(.94); } 100% { transform: none; } }
+@keyframes anJump { 0% { transform: none; } 40% { transform: translateY(-70px) scaleY(1.06); } 80% { transform: translateY(0) scaleY(.92); } 100% { transform: none; } }
+@keyframes anEat { from { transform: rotate(0); } to { transform: rotate(6deg) translateY(4px); } }
+@keyframes strokeHint { 0% { transform: translateX(-60px); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateX(80px); opacity: 0; } }
+
+/* 遊園車 */
+.zoo .zo-tram { position: absolute; left: -720px; top: 620px; width: 660px; height: 210px; z-index: 6; pointer-events: none; }
+.zoo .zo-tram > svg { pointer-events: auto; }
+.zoo .zo-tram.hidden { display: none; }
+.zoo .zo-tram .zo-riders { position: absolute; left: 40px; top: 30px; display: none; gap: 120px; }
+.zoo .zo-tram.full .zo-riders { display: flex; }
+.zoo .zo-rider { width: 74px; height: 74px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 5px #fff; animation: bob .5s ease-in-out infinite alternate; }
+.zoo.driving .zo-tram svg { animation: bob .25s ease-in-out infinite alternate; }
+.zoo .p-layer { transition: opacity .35s; }
+.zoo.swap .p-layer, .zoo.swap .zo-animals { opacity: 0; }
+.kit .kt-kid.gone, .kit .p-char.gone { opacity: 0; pointer-events: none; }
+.kit .kt-kid.jump, .kit .kt-kid.jump { animation: anJump .6s ease-out; }
+
+/* 望遠鏡：整片變暗，只看得到圓圓的鏡頭 */
+.zoo .zo-binoc { position: absolute; inset: 0; z-index: 7; background: rgba(10, 18, 30, .88); --x: 600px; --y: 450px;
+  -webkit-mask-image: radial-gradient(circle 120px at var(--x) var(--y), transparent 96%, #000 100%);
+  mask-image: radial-gradient(circle 120px at var(--x) var(--y), transparent 96%, #000 100%); touch-action: none; }
+.zoo .zo-binoc.hidden { display: none; }
+.zoo .zo-binoc::after { content: ''; position: absolute; left: calc(var(--x) - 126px); top: calc(var(--y) - 126px); width: 240px; height: 240px; border-radius: 50%; border: 6px solid #333a48; pointer-events: none; }
+.zoo .zo-hint { position: absolute; width: 80px; height: 80px; border-radius: 50%; border: 5px dashed #ffd34d; animation: pulse .6s ease-in-out infinite alternate; pointer-events: none; }
+.zoo .zo-flash { position: absolute; inset: 0; z-index: 8; background: #fff; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.zoo .zo-flash.on { opacity: .9; transition: none; }
+
+/* 奇奇做錯事 */
+.kit .p-char.feeding svg, .kit .p-char.knocking svg { animation: kikiKnock .3s ease-in-out infinite alternate; }
+.kit .p-char.flashing svg { animation: pulse .2s ease-in-out 3 alternate; }
+.kit .p-char.shouting svg { animation: kikiShout .25s ease-in-out infinite alternate; }
+.kit .p-char.climbing svg { animation: jump .35s ease-out infinite alternate; }
+.kit .p-char.crying svg { animation: kikiCry .4s ease-in-out infinite alternate; }
+@keyframes kikiKnock { from { transform: rotate(0); } to { transform: rotate(6deg) translateX(6px); } }
+@keyframes kikiShout { from { transform: scale(1); } to { transform: scale(1.06) translateY(-4px); } }
+@keyframes kikiCry { from { transform: rotate(-4deg); } to { transform: rotate(4deg) translateY(3px); } }
+
+/* 關卡道具 */
+.zoo .zo-sink.water svg path:nth-of-type(2) { animation: pulse .3s ease-in-out infinite alternate; }
+.zoo .zo-sink.water::after { content: ''; position: absolute; left: 124px; top: 40px; width: 10px; height: 70px; background: linear-gradient(#bfe6fb, #7cc8ea); border-radius: 5px; }
+.zoo .zo-slot { opacity: .35; }
+.zoo .zo-slot.placed { opacity: 1; animation: popin .3s; }
+.zoo .zo-shadow.drop { animation: dropIn .35s ease-out; }
+@keyframes dropIn { from { transform: translateY(-80px); opacity: 0; } to { transform: none; opacity: 1; } }
+.zoo .zo-meer { transform-origin: 50% 100%; }
+.zoo .zo-meer.up { animation: meerUp .5s ease-out; }
+.zoo .zo-meer.counted { filter: none; animation: none; }
+@keyframes meerUp { from { transform: translateY(80px) scaleY(.3); opacity: 0; } to { transform: none; opacity: 1; } }
+.zoo .zo-num, .zoo .zo-jump .zo-num { position: absolute; left: 50%; top: -30px; transform: translateX(-50%); font: 900 54px/1 system-ui, sans-serif; color: #ff7a1a; text-shadow: 0 3px 0 #fff, 0 0 8px #fff; pointer-events: none; animation: popin .3s; }
+.zoo .zo-baby.pop { animation: popin .4s; }
+.zoo .zo-baby { transition: left .7s ease-in-out, top .7s ease-in-out; }
+.zoo .zo-food { transition: left .8s ease-in-out, top .8s ease-in-out; }
+
+/* ===================== 郵輪 ===================== */
+.cruise .cr-deck { position: absolute; inset: 0; z-index: 1; opacity: 0; pointer-events: none; transition: opacity .5s; box-shadow: 0 0 0 var(--bleed, 0px) #e8dcc6; }
+.cruise.on-deck .cr-deck { opacity: 1; }
+.cruise .cr-deckback, .cruise .cr-deckback svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cruise .cr-sea { position: absolute; left: 0; top: 380px; width: 1200px; height: 220px; overflow: hidden; }
+.cruise .cr-strip { display: flex; width: 4800px; height: 220px; }
+.cruise .cr-strip svg { width: 2400px; height: 220px; flex: none; }
+.cruise.moving .cr-strip { animation: btScroll 5s linear infinite; }
+.cruise .cr-rail { position: absolute; left: 0; top: 380px; width: 1200px; height: 220px; }
+.cruise .cr-far { position: absolute; left: 1300px; top: 250px; transition: left 3s ease-out; }
+.cruise.near .cr-far { left: 640px; }
+.cruise .cr-gang { position: absolute; left: 470px; top: 520px; z-index: 3; pointer-events: auto; }
+.cruise.on-deck .cr-gang { display: none; }
+.cruise .cr-vest { position: absolute; left: 14px; top: 66px; width: 102px; pointer-events: none; opacity: 0; transform: translateY(-60px); transition: all .4s; }
+.cruise .cr-vest.head { left: -4px; top: 74px; }
+.cruise .kt-kid.vest-on .cr-vest, .cruise .cr-vest { opacity: 1; transform: none; }
+.cruise .cr-buckle.clicked { animation: pulse .2s 2 alternate; }
+.cruise .cr-dolphin { animation: dolphinJump 2.4s ease-in-out infinite; }
+.cruise .cr-dolphin.seen { animation: none; opacity: 0; transition: opacity .3s; }
+@keyframes dolphinJump { 0%, 100% { transform: translateY(120px) rotate(20deg); opacity: 0; } 20% { opacity: 1; } 50% { transform: translateY(-30px) rotate(-10deg); opacity: 1; } 80% { opacity: 1; } }
+.cruise .cr-gull { pointer-events: none; transition: transform .8s ease-in, opacity .8s; }
+.cruise .cr-gull.land { animation: gullLand .8s ease-out; }
+.cruise .cr-gull.fly { transform: translate(400px, -400px) rotate(-20deg); opacity: 0; }
+@keyframes gullLand { from { transform: translate(300px, -300px); } to { transform: none; } }
+
+/* ===================== 美食街 ===================== */
+.snack .sn-stall { width: 200px; height: 200px; background: rgba(255, 255, 255, .85); border-radius: 50%; padding: 20px; }
+.snack .sn-food { transition: transform .2s; }
+.snack .sn-food.sizzle { animation: pulse .15s ease-in-out infinite alternate; }
+.snack .sn-pay { position: absolute; left: 0; right: 0; top: 260px; z-index: 8; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.snack .sn-pay.hidden { display: none; }
+.snack .sn-coins { display: flex; gap: 24px; align-items: center; }
+.snack .sn-coin { padding: 0; border: 0; background: none; pointer-events: auto; transition: transform .3s, opacity .3s; }
+.snack .sn-coin.in { transform: translateY(-120px) scale(.6); opacity: .5; }
+.snack .sn-bin { transition: transform .2s; }
+.snack .sn-bin.gulp { transform: scale(1.08); }
+.snack .sn-trash { transition: left .6s ease-in-out, top .6s ease-in-out; }
+.snack .sn-trash.marked svg { filter: drop-shadow(0 0 8px #2f9a5f); }
+.snack .sn-litter.drop { animation: dropIn .4s ease-out; }
+.snack .sn-mark { animation: popin .5s; }
+
+/* ===================== 紀念品店 ===================== */
+.gift .gf-shelf { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.gift .gf-plush { position: absolute; padding: 0; border: 0; background: none; pointer-events: auto; transition: opacity .3s, transform .3s; }
+.gift .gf-plush.glow svg { filter: drop-shadow(0 0 10px var(--glow, #ffd000)); animation: pulse .7s ease-in-out infinite alternate; }
+.gift .gf-plush.taken { opacity: .15; pointer-events: none; }
+.gift .gf-hug { position: absolute; left: 470px; top: 600px; z-index: 6; display: flex; gap: 4px; pointer-events: none; }
+.gift .gf-held { pointer-events: auto; transition: transform .5s, opacity .5s; animation: popin .3s; }
+.gift .gf-held.glow svg { filter: drop-shadow(0 0 10px var(--glow, #ffd000)); animation: pulse .6s ease-in-out infinite alternate; }
+.gift .gf-held.back { transform: translateY(-300px) scale(.5); opacity: 0; pointer-events: none; }
+.gift .gf-balloon svg { transition: transform 1.6s ease-in-out; transform: scale(.55); transform-origin: 50% 80%; }
+.gift .gf-balloon.in svg { transform: scale(1.1); }
+.gift .gf-mine { position: absolute; right: -40px; bottom: 10px; pointer-events: none; animation: popin .4s; }
+
+/* ===================== 歡樂島地圖、郊區碼頭 ===================== */
+.map.zone-island .room.out > svg { overflow: visible; }
+.map .map-pier.closed > svg, .map.zone-island .room.closed > svg { filter: grayscale(.6) brightness(.9); }

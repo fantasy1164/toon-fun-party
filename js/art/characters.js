@@ -379,12 +379,59 @@ function yongyong(extra = '') {
   </g>`;
 }
 
+// 陸龜 森森園長：動物園園長，學識淵博、喜歡大自然、和藹可親。卡其色探險帽、圓眼鏡、口袋背心、脖子掛望遠鏡
+function sensen(extra = '') {
+  const scute = (x, y, r) => `<path d="M${x - r} ${y}L${x - r / 2} ${y - r * 0.86}H${x + r / 2}L${x + r} ${y}L${x + r / 2} ${y + r * 0.86}H${x - r / 2}Z" fill="#a8743a" stroke="#7a4f22" stroke-width="4"/>`;
+  return `
+  <g class="char sensen">
+    <ellipse cx="120" cy="312" rx="98" ry="11" fill="#000" opacity=".12"/>
+    <!-- 背上的殼（從前面看得到邊） -->
+    <ellipse cx="120" cy="214" rx="104" ry="92" fill="#8a5a2a"/>
+    ${scute(48, 190, 26)}${scute(192, 190, 26)}${scute(60, 250, 22)}${scute(180, 250, 22)}${scute(120, 136, 24)}
+    <path d="M18 222Q24 300 120 304Q216 300 222 222" fill="none" stroke="#c9944e" stroke-width="10"/>
+    <!-- 腳 -->
+    <rect x="76" y="266" width="36" height="42" rx="16" fill="#9cb86a"/><rect x="128" y="266" width="36" height="42" rx="16" fill="#9cb86a"/>
+    <path d="M80 304h8M92 306h8M132 306h8M144 304h8" stroke="#6f8c45" stroke-width="5" stroke-linecap="round"/>
+    <!-- 手 -->
+    <g class="arm arm-l"><ellipse cx="58" cy="222" rx="17" ry="36" fill="#9cb86a" transform="rotate(26 58 222)"/><circle cx="44" cy="252" r="14" fill="#9cb86a"/></g>
+    <g class="arm arm-r"><ellipse cx="182" cy="222" rx="17" ry="36" fill="#9cb86a" transform="rotate(-26 182 222)"/><circle cx="196" cy="252" r="14" fill="#9cb86a"/>
+      <path d="M196 252Q214 230 208 206Q192 214 194 240Z" fill="#5aa86a"/><path d="M196 248Q204 228 204 212" stroke="#3f8a4f" stroke-width="2" fill="none"/></g>
+    <!-- 肚子和背心 -->
+    <ellipse cx="120" cy="226" rx="58" ry="64" fill="#e8d9a0"/>
+    ${[196, 220, 244, 268].map((y) => `<path d="M76 ${y}Q120 ${y + 8} 164 ${y}" stroke="#cdb977" stroke-width="3" fill="none"/>`).join('')}
+    <path d="M66 176Q120 160 174 176L170 282Q150 290 140 280V188H100V280Q90 290 70 282Z" fill="#c9a86a"/>
+    <rect x="76" y="220" width="22" height="20" rx="4" fill="#b8955a"/><rect x="142" y="220" width="22" height="20" rx="4" fill="#b8955a"/>
+    <path d="M76 226h22M142 226h22" stroke="#9a7a42" stroke-width="3"/>
+    <!-- 望遠鏡 -->
+    <path d="M100 176Q120 214 140 176" fill="none" stroke="#5a3f22" stroke-width="4"/>
+    <g transform="translate(120 206)"><rect x="-22" y="-8" width="18" height="24" rx="6" fill="#333a48"/><rect x="4" y="-8" width="18" height="24" rx="6" fill="#333a48"/><rect x="-6" y="-2" width="12" height="8" fill="#555c6a"/><circle cx="-13" cy="18" r="6" fill="#9fd0ff"/><circle cx="13" cy="18" r="6" fill="#9fd0ff"/></g>
+    <!-- 脖子、頭 -->
+    <rect x="98" y="138" width="44" height="40" rx="18" fill="#9cb86a"/>
+    <path d="M102 150Q120 158 138 150M104 164Q120 170 136 164" stroke="#86a456" stroke-width="3" fill="none"/>
+    <ellipse cx="120" cy="104" rx="58" ry="50" fill="#a9c476"/>
+    <circle cx="80" cy="124" r="11" fill="#ff9fb0" opacity=".55"/><circle cx="160" cy="124" r="11" fill="#ff9fb0" opacity=".55"/>
+    ${eyes(98, 142, 100, '#a9c476')}
+    <g fill="none" stroke="#6a4a2a" stroke-width="4"><circle cx="98" cy="100" r="18"/><circle cx="142" cy="100" r="18"/><path d="M116 98Q120 94 124 98M80 96L66 90M160 96L174 90"/></g>
+    <path d="M84 76Q98 70 110 78M130 78Q142 70 156 76" stroke="#f4f0e2" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <ellipse cx="114" cy="122" rx="3" ry="2" fill="#5a6a3a"/><ellipse cx="126" cy="122" rx="3" ry="2" fill="#5a6a3a"/>
+    <path class="mouth" d="M104 132Q120 146 136 132" fill="none" stroke="#5a3a22" stroke-width="5" stroke-linecap="round"/>
+    <!-- 探險帽 -->
+    <ellipse cx="120" cy="62" rx="80" ry="16" fill="#d8c08a"/>
+    <path d="M70 62Q72 14 120 12Q168 14 170 62Z" fill="#e6d2a0"/>
+    <path d="M72 50Q120 40 168 50L170 62Q120 52 70 62Z" fill="#4f8a4f"/>
+    <path d="M150 44Q164 30 176 34Q170 48 152 50Z" fill="#6cc070"/><path d="M152 48Q162 40 172 36" stroke="#3f8a4f" stroke-width="2" fill="none"/>
+    <path d="M90 30Q120 22 150 30" stroke="#f4ead0" stroke-width="5" fill="none" stroke-linecap="round"/>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
 export const NIGHTCAP = {
   dudu: `<g class="cap"><path d="M64 60Q96 -14 176 44L180 60Q120 40 62 74Z" fill="#7a8cff"/><path d="M62 66Q120 44 182 62" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/><circle cx="182" cy="40" r="13" fill="#fff"/></g>`,
   kiki: `<g class="cap"><path d="M70 56Q100 -4 168 34L170 50Q120 36 70 66Z" fill="#7a8cff"/><path d="M70 60Q120 40 172 52" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="174" cy="32" r="12" fill="#fff"/></g>`,
 };
 
-const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao, yuanyuan, lili, gaogao, yongyong };
+const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao, yuanyuan, lili, gaogao, yongyong, sensen };
 
 // 回傳可放進 <svg> 的角色群組，x、y 為左上角，s 為縮放。
 export function characterSvg(id, { x = 0, y = 0, s = 1, extra = '' } = {}) {
