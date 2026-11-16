@@ -1,5 +1,6 @@
 // 家長頁面：遊玩時間、今日領獎、時間設定、備份。這一頁給大人看，所以有文字。
 import { el } from '../core/dom.js';
+import { syncConfig, setSyncConfig, syncNow, syncStatus, onSyncStatus, configured, deviceName } from '../core/sync.js';
 import { state, save, exportData, importData, stampedToday, cardInfo, redeem, restoreDaysAgo, clearAll, snapshotDays } from '../core/store.js';
 import { dateKey, now, hour, testSettings, TEST_KEY, testing } from '../core/clock.js';
 import { REASONS, reasonIcon, shapeSvg, ensureInkFilter } from '../art/stamps.js';
@@ -92,6 +93,35 @@ function testSection() {
     <span class="note c-msg"></span>`;
 }
 
+function syncText(st = syncStatus()) {
+  const hm = (t) => new Date(t).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+  const last = st.last ? `（上次同步 ${new Date(st.last).toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })} ${hm(st.last)}）` : '';
+  if (!configured()) return '還沒設定。設定後，進度會存到你的 Google 雲端硬碟「明星總動員存檔」資料夾，每台裝置打開遊戲時自動載入最新進度。';
+  switch (st.kind) {
+    case 'test': return '測試模式中，暫停同步（恢復真實時間後繼續）。';
+    case 'busy': return '同步中…';
+    case 'ok': return `<b style="color:#1a8a3a">✓ 已同步</b>${last}`;
+    case 'dirty': return `有新進度，稍後自動上傳${last}`;
+    case 'error': return `<b style="color:#c9462c">✗ 同步失敗：${st.msg}</b>，有網路時會自動再試${last}`;
+    default: return `已設定${last}`;
+  }
+}
+
+const attr = (v) => String(v || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+function syncSection() {
+  const c = syncConfig();
+  return `
+    <p class="note sync-st">${syncText()}</p>
+    <label>雲端網址 <input data-sy="url" value="${attr(c.url)}" placeholder="https://script.google.com/macros/s/……/exec" autocomplete="off" autocapitalize="off" spellcheck="false" ></label>
+    <label>家庭密碼 <input data-sy="key" type="password" value="${attr(c.key)}" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    <label>這台的名字 <input data-sy="dev" value="${attr(c.dev || deviceName())}" autocomplete="off"></label>
+    <button data-act="sy-save">儲存並同步</button>
+    <button class="quiet" data-act="sy-now">立即同步</button>
+    <button class="quiet" data-act="sy-pull">用雲端進度覆蓋這台</button>
+    <p class="note">每台裝置設定一次。之後打開遊戲會自動載入最新進度；玩的時候、離開 app 時自動上傳。兩台在沒網路時各自玩過，連上後會合併（印章、收藏、徽章都不會少）。
+      雲端硬碟的「舊版本」資料夾每天留一份，可以找回以前的進度。「用雲端進度覆蓋這台」：這台的進度不要了、直接換成雲端的（例如這台之前測試過）。</p>`;
+}
+
 export function openParent(onClose, { onStamp } = {}) {
   ensureInkFilter();
   const k = dateKey();
@@ -116,7 +146,7 @@ export function openParent(onClose, { onStamp } = {}) {
       <h2>生日</h2>
       <label>妍卉 <input type="date" data-bd="yh" value="${fest.birthday('yh')}"></label>
       <label>向澤 <input type="date" data-bd="xz" value="${fest.birthday('xz')}"></label>
-      <p class="note">生日只存在這台 iPad。生日當天選房間畫面會出現「派對」房間；另一個小孩進去會偷偷幫壽星做生日卡。</p>
+      <p class="note">生日跟著遊戲進度一起存（有設定雲端同步就會同步到其他裝置）。生日當天選房間畫面會出現「派對」房間；另一個小孩進去會偷偷幫壽星做生日卡。</p>
       <button class="quiet" data-act="mic">允許麥克風（吹蠟燭、圖書館輕聲說話用）</button>
       <span class="mic-meter"><i></i></span> <span class="note mic-msg"></span>
       <p class="note">麥克風只用來偵測吹氣的音量，不錄音、不上傳。iPad 主畫面 app 的麥克風授權通常只在這次開啟期間有效，生日當天把 iPad 交給小孩前先按一次；沒有允許的話，吹蠟燭會改成用點的。</p>
@@ -146,8 +176,11 @@ export function openParent(onClose, { onStamp } = {}) {
       <p class="note">${resting ? `角色正在休息，到 ${new Date(state.session.restUntil).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })} 為止。` : '角色目前沒有在休息。'}</p>
       <button data-act="wake" class="quiet">立刻結束休息</button>
 
+      <h2>雲端同步</h2>
+      <div class="sync">${syncSection()}</div>
+
       <h2>備份</h2>
-      <p class="note">進度只存在這台 iPad。按「產生備份」後把文字複製到備忘錄保存；要還原時貼回來再按「還原」。</p>
+      <p class="note">進度存在這台裝置（有設定雲端同步的話，也會存到 Google 雲端硬碟）。按「產生備份」後把文字複製到備忘錄保存；要還原時貼回來再按「還原」。</p>
       <textarea spellcheck="false"></textarea><br>
       <button data-act="export" class="quiet">產生備份</button>
       <button data-act="import" class="quiet">還原</button>
@@ -162,6 +195,10 @@ export function openParent(onClose, { onStamp } = {}) {
     </div>`);
   document.getElementById('stage').appendChild(node);
   const ta = node.querySelector('textarea');
+  const off = onSyncStatus((st) => {
+    if (!node.isConnected) { off(); return; }
+    node.querySelector('.sync-st').innerHTML = syncText(st);
+  });
   const msg = node.querySelector('.msg');
 
   node.addEventListener('change', (e) => {
@@ -228,6 +265,26 @@ export function openParent(onClose, { onStamp } = {}) {
       return;
     }
     if (act === 'sync-test') { location.href = 'sync-test.html'; return; }
+    if (act === 'sy-save' || act === 'sy-now' || act === 'sy-pull') {
+      const st = node.querySelector('.sync-st');
+      if (act === 'sy-save') {
+        const v = (k) => node.querySelector(`[data-sy="${k}"]`).value;
+        setSyncConfig({ url: v('url'), key: v('key'), dev: v('dev') });
+        if (!configured()) { st.innerHTML = '<b style="color:#c9462c">網址要是 https://script.google.com/macros/s/……/exec，家庭密碼至少 8 碼。</b>'; return; }
+      }
+      if (act === 'sy-pull' && !e.target.classList.contains('armed')) {
+        node.querySelectorAll('.armed').forEach((b) => b.classList.remove('armed'));
+        e.target.classList.add('armed');
+        st.innerHTML = '這台的進度會被雲端的取代。確定的話，再按一次同一個按鈕。';
+        return;
+      }
+      e.target.classList.remove('armed');
+      syncNow({ mode: act === 'sy-pull' ? 'pull' : 'auto' }).then(({ changed }) => {
+        // 進度換成雲端的（或合併了）：重新開始，畫面才會是新的
+        if (changed) { st.innerHTML = '已載入雲端進度，重新開始…'; setTimeout(() => location.reload(), 700); }
+      });
+      return;
+    }
     if (act === 't-quake') {
       state.quakeForce = true;
       save();

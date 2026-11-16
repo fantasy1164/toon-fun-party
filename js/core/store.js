@@ -1,4 +1,4 @@
-// 遊戲進度：全部存在這台裝置的 localStorage。
+// 遊戲進度：存在這台裝置的 localStorage；有設定雲端同步時，由 sync.js 另外上傳到家長的 Google 雲端硬碟。
 import { DEFAULT_SETTINGS, CARD_SIZE } from '../config.js';
 import { dateKey } from './clock.js';
 
@@ -23,22 +23,25 @@ function blank() {
 
 let rawAtLoad = null;
 
+function normalize(s) {
+  const b = blank();
+  return {
+    ...b, ...s,
+    profiles: {
+      yh: { ...blankProfile(), ...(s.profiles?.yh || {}) },
+      xz: { ...blankProfile(), ...(s.profiles?.xz || {}) },
+    },
+    session: { ...b.session, ...(s.session || {}) },
+    settings: { ...b.settings, ...(s.settings || {}) },
+  };
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
     rawAtLoad = raw;
     if (!raw) return blank();
-    const s = JSON.parse(raw);
-    const b = blank();
-    return {
-      ...b, ...s,
-      profiles: {
-        yh: { ...blankProfile(), ...(s.profiles?.yh || {}) },
-        xz: { ...blankProfile(), ...(s.profiles?.xz || {}) },
-      },
-      session: { ...b.session, ...(s.session || {}) },
-      settings: { ...b.settings, ...(s.settings || {}) },
-    };
+    return normalize(JSON.parse(raw));
   } catch {
     return blank();
   }
@@ -47,18 +50,61 @@ function load() {
 export const state = load();
 
 // 印章卡從 10／5 格改成 20 格：舊卡如果已經集滿（獎品已記在 owed），就從新卡開始，避免同一批章算兩次
-for (const id of ['yh', 'xz']) {
-  const p = state.profiles[id];
-  if (p.cardV !== 2) {
-    if (p.card.length >= { yh: 10, xz: 5 }[id]) p.card = [];
-    p.cardV = 2;
+function migrate() {
+  for (const id of ['yh', 'xz']) {
+    const p = state.profiles[id];
+    if (p.cardV !== 2) {
+      if (p.card.length >= { yh: 10, xz: 5 }[id]) p.card = [];
+      p.cardV = 2;
+    }
   }
+}
+migrate();
+
+// ---------- 雲端同步用 ----------
+// 存檔後通知 sync.js（有變更要上傳）
+const savedHooks = [];
+export function onSaved(fn) { savedHooks.push(fn); }
+
+// 雲端同步的狀態（sync.js 讀寫）；清除、回復、還原後要讓雲端改成以這台為準
+export const SYNC_META_KEY = 'tfp-sync-meta';
+export const SYNC_CFG_KEY = 'tfp-sync';
+function forceCloudFromHere() {
+  let m = {};
+  try { m = JSON.parse(localStorage.getItem(SYNC_META_KEY) || '{}') || {}; } catch { m = {}; }
+  localStorage.setItem(SYNC_META_KEY, JSON.stringify({ ...m, force: true, dirty: true, at: Date.now() }));
+}
+
+// 用另一份進度（雲端的或合併後的）取代目前的進度。
+// 保留原本的物件，只換內容：場景裡拿著 state.profiles.yh 的程式也會看到新資料。
+export function replaceState(next) {
+  const n = normalize(next);
+  for (const k of Object.keys(state)) if (!(k in n)) delete state[k];
+  for (const [k, v] of Object.entries(n)) {
+    if (k === 'profiles') {
+      for (const id of Object.keys(v)) {
+        const p = state.profiles[id] || (state.profiles[id] = {});
+        for (const pk of Object.keys(p)) if (!(pk in v[id])) delete p[pk];
+        Object.assign(p, v[id]);
+      }
+    } else {
+      state[k] = v;
+    }
+  }
+  migrate();
+  if (frozen) return;
+  try {
+    snapshotIfNeeded();
+    const json = JSON.stringify(state);
+    localStorage.setItem(KEY, json);
+    lastSaved = json;
+  } catch { /* 忽略 */ }
 }
 
 // ---------- 每日快照：每天第一次存檔前，先把「今天開始時」的進度存一份，保留 35 天 ----------
 const SNAP_KEY = 'tfp-snaps';
 let frozen = false;               // 清除或回復後、重新載入前，不再存檔
-let lastSaved = rawAtLoad || JSON.stringify(state);
+let lastSaved = JSON.stringify(state);   // 用整理過的進度比較，載入後沒改就不算有變更
 
 function realDayKey(t = Date.now()) {
   const d = new Date(t);
@@ -87,9 +133,11 @@ export function save() {
   try {
     snapshotIfNeeded();
     const json = JSON.stringify(state);
+    if (json === lastSaved) return;   // 沒有變（例如離開 app 時的存檔）：不用通知雲端
     localStorage.setItem(KEY, json);
     lastSaved = json;
-  } catch { /* 存不進去就算了，不要讓遊戲中斷 */ }
+  } catch { return; /* 存不進去就算了，不要讓遊戲中斷 */ }
+  for (const fn of savedHooks) { try { fn(); } catch { /* 忽略 */ } }
 }
 
 export function snapshotDays() {
@@ -112,15 +160,17 @@ export function restoreDaysAgo(n) {
   for (const x of keys) if (x > k) delete snaps[x];
   snaps[realDayKey()] = json;
   writeSnaps(snaps);
+  forceCloudFromHere();
   return k;
 }
 
-// 全部清除，回到第一次打開的狀態
+// 全部清除，回到第一次打開的狀態。雲端同步的連線設定保留，雲端進度也會改成清除後的樣子。
 export function clearAll() {
   frozen = true;
   const keys = [];
   for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i));
-  keys.filter((k) => k === KEY || k.startsWith('tfp-')).forEach((k) => localStorage.removeItem(k));
+  keys.filter((k) => (k === KEY || k.startsWith('tfp-')) && k !== SYNC_CFG_KEY && k !== SYNC_META_KEY).forEach((k) => localStorage.removeItem(k));
+  forceCloudFromHere();
 }
 
 export function addPlayTime(memberIds, ms) {
@@ -234,4 +284,5 @@ export function importData(text) {
   if (!s || typeof s !== 'object' || !s.profiles) throw new Error('bad data');
   frozen = true;  // 避免重新載入前，舊進度又被存回去
   localStorage.setItem(KEY, JSON.stringify(s));
+  forceCloudFromHere();
 }

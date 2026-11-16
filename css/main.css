@@ -1596,3 +1596,10 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .hike.peek .hk-critter { opacity: 1; }
 .hike .hk-critter.seen svg { animation: bob 1s ease-in-out infinite alternate; }
 .hike.top .hk-critter { display: none; }
+
+/* 家長頁：雲端同步 */
+.parent .sync label { display: block; margin: 8px 0; }
+.parent .sync input { font: inherit; font-size: 18px; padding: 8px 12px; border-radius: 10px; border: 1px solid #d8cdb4; background: #fff; box-sizing: border-box; }
+.parent .sync input[data-sy="url"] { width: min(100%, 640px); display: block; margin-top: 4px; }
+.parent .sync input[data-sy="key"] { width: 14em; }
+.parent .sync input[data-sy="dev"] { width: 8em; }

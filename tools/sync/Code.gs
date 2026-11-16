@@ -3,7 +3,7 @@
  *
  * 部署在家長自己的 Google 帳號底下，進度存在自己的 Google 雲端硬碟：
  *   我的雲端硬碟／明星總動員存檔／progress.json
- *   我的雲端硬碟／明星總動員存檔／舊版本／（最近 30 份，可手動回復）
+ *   我的雲端硬碟／明星總動員存檔／舊版本／（每天第一次存檔前留一份「當天開始時」的進度，保留 30 天）
  *
  * 部署步驟見同資料夾的 README.md。
  * 唯一要改的是下面這行：家庭密碼（8 碼以上，英數混合）。
@@ -12,7 +12,7 @@ const FAMILY_PASS = '請改成你的家庭密碼';
 
 const FOLDER = '明星總動員存檔';
 const OLD_FOLDER = '舊版本';
-const KEEP = 30;          // 舊版本保留幾份
+const KEEP = 30;          // 舊版本保留幾天
 const MAX_FAILS = 10;     // 10 分鐘內密碼錯幾次就暫停
 const MAX_BYTES = 2e6;    // 存檔上限 2 MB
 
@@ -65,7 +65,7 @@ function handle(q) {
       if (!text || text.length > MAX_BYTES) return { ok: false, err: 'size' };
       const f = findFile(folder, slot);
       if (f) {
-        if (slot === 'progress.json') keepOld(folder, f, q.dev);
+        if (slot === 'progress.json') keepOld(folder, f);
         f.setContent(text);
       } else {
         folder.createFile(slot, text, 'application/json');
@@ -85,12 +85,12 @@ function handle(q) {
   }
 }
 
-// 覆蓋前先把舊的複製一份到「舊版本」，只留最近 KEEP 份
-function keepOld(folder, file, dev) {
+// 每天第一次覆蓋前，把舊的複製一份到「舊版本」（＝當天開始時的進度），只留最近 KEEP 天
+function keepOld(folder, file) {
   const old = getFolder(OLD_FOLDER, folder);
-  const stamp = Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyyMMdd-HHmmss');
-  const tag = String(dev || '').replace(/[^\w一-鿿-]/g, '').slice(0, 20);
-  file.makeCopy('progress-' + stamp + (tag ? '-' + tag : '') + '.json', old);
+  const name = 'progress-' + Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyy-MM-dd') + '.json';
+  if (old.getFilesByName(name).hasNext()) return;
+  file.makeCopy(name, old);
   const all = [];
   const it = old.getFiles();
   while (it.hasNext()) all.push(it.next());

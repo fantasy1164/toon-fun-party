@@ -35,6 +35,7 @@ import { treeScreen, christmasMorning } from './ui/xmas.js';
 import * as fest from './core/festival.js';
 import { pickStamp, stampSession } from './ui/stamps.js';
 import * as weather from './core/weather.js';
+import { syncNow, setupSync } from './core/sync.js';
 
 setMusicVolume(state.settings.musicVol);
 
@@ -306,14 +307,19 @@ async function boot() {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
   loadVoiceManifest();
+  // 雲端進度：開機就去抓，最多等 6 秒（沒網路就先用這台的，之後再合併）
+  const synced = syncNow({ timeout: 6000 });
+  // 離開很久再回來，別台玩過的話重新開始，載入最新進度
+  setupSync({ onReplaced: () => location.reload() });
   weather.refresh();
   setInterval(() => weather.refresh(), 10 * 60 * 1000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) weather.refresh(); });
   // 用一般瀏覽器打開：先教爸媽加到主畫面
   if (needInstallGuide()) await showInstallGuide();
   await showSplash(stage);
-  unlock();
+  unlock();      // 要在點擊的當下解鎖聲音，所以等雲端放在後面
   primeTts();
+  await synced;
   route();
 }
 boot();
