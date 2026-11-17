@@ -13,7 +13,7 @@ import { state, save } from '../core/store.js';
 import * as weather from '../core/weather.js';
 import { ANIMALS, animalSvg, PANGOLIN_BALL, KOALA_SLEEP } from '../art/animals.js';
 import { AREAS } from '../art/island.js';
-import { setupCamera } from '../core/camera.js';
+import { cameraFor, NO_CAM } from '../core/camera.js';
 import { areaBack, WALKWAY, foreArt, TRAM_BIG, FOOD, RULE, NUM, ANIMAL_CARD, FOOT_PANEL, ELE_PRINT, KID_PRINT, KID_SHADOW, SINK, SOAP, TOWEL, SPEAKER, JUMP_BTN, BUCKET } from '../art/zoo.js';
 import { makeScene, charDiv } from './party.js';
 import { pickCard, tapOne, tapEach, hardNow, giveReward, moveTo, kidNode, shuffle } from './kit.js';
@@ -96,13 +96,13 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
   const animalsLayer = $('.zo-animals', root);
   // 立體感：舞台攝影機（三層景深、鏡頭、光影、傾斜）
   const night = ph === 'night' || ph === 'dusk';
-  const cam = setupCamera(root, {
+  const cam = cameraFor(root, {
+    preset: 'outdoor',
     back: $('.p-layer', root),
     mid: [animalsLayer],
-    front: [$('.zo-tram', root), $('.kt-things', root), ...$$('.p-char', root), ...$$('.kt-kid', root)],
     frontArt: WALKWAY(night),
     foreArt: foreArt(night),
-  });
+  }) || NO_CAM;
   let here = stops[0];
   let exploring = false;
 

@@ -1765,10 +1765,17 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .map .map-pier.closed > svg, .map.zone-island .room.closed > svg { filter: grayscale(.6) brightness(.9); }
 
 /* ===================== 立體感：舞台攝影機（11/17） ===================== */
-.cam .cam-layer { position: absolute; inset: 0; pointer-events: none; }
+/* world：畫面裡的東西包在一起跟著鏡頭動；isolation 讓裡面的前後順序跟原本一樣 */
+.cam .cam-world { position: absolute; inset: 0; isolation: isolate; will-change: translate, scale; }
+.cam .cam-world > .p-layer, .cam .cam-world > .f-layer, .cam .cam-world > .s-layer, .cam .cam-world > .k-layer.back, .cam .cam-world > .h-back { will-change: translate, scale; }
+.cam .bleed { will-change: translate, scale; }
 .cam .cam-ground, .cam .cam-ground svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.cam .cam-fore { position: absolute; inset: 0; z-index: 8; pointer-events: none; will-change: translate, scale; }
 .cam .cam-fore svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.cam .cam-fore, .cam .cam-light { pointer-events: none; }
-.cam .cam-light { position: absolute; inset: -60px calc(-60px - var(--bleed, 0px)); z-index: 4; mix-blend-mode: soft-light; transition: background 2s; }
+.cam .cam-light { position: absolute; inset: -80px calc(-80px - var(--bleed, 0px)); z-index: 4; pointer-events: none; mix-blend-mode: soft-light; transition: background 2s; }
+/* 蓋整個畫面的半透明層：鏡頭移動時邊邊不要露出來 */
+.cam .cam-world > .light, .cam .cam-world > .darkness, .cam .cam-world > .dim, .cam .cam-world > .hf-lights, .cam .cam-world > .am-night {
+  top: -80px; bottom: -80px; left: calc(-80px - var(--bleed, 0px)); right: calc(-80px - var(--bleed, 0px));
+}
 /* 影子跟著太陽 */
-.cam .zo-an > svg, .cam .p-char > svg, .cam .kt-kid.body > svg, .cam .zo-tram > svg { filter: drop-shadow(var(--sh-x, 0) var(--sh-y, 6px) 5px rgba(0, 0, 0, var(--sh-a, .2))); }
+.cam .zo-an > svg, .cam .p-char > svg, .cam .kt-kid.body > svg, .cam .zo-tram > svg, .cam .pk-kid > svg { filter: drop-shadow(var(--sh-x, 0) var(--sh-y, 6px) 5px rgba(0, 0, 0, var(--sh-a, .2))); }

@@ -170,8 +170,9 @@ export function openParent(onClose, { onStamp } = {}) {
       <p class="note">下次進場景時換成新的樣子。可以兩種都讓孩子玩幾天，看他們喜歡哪一種。</p>
 
       <h2>畫面立體感</h2>
+      <label><input type="checkbox" data-cam ${s.camera !== false ? 'checked' : ''}> 鏡頭運鏡（景深、鏡頭推拉、光影）</label>
       <label><input type="checkbox" data-tilt ${s.tilt !== false ? 'checked' : ''}> 傾斜 iPad 時畫面跟著動</label>
-      <p class="note">開著的話，每次打開 app 第一次點螢幕時，iPad 會問能不能使用「動作與方向」，按允許即可。孩子容易分心或頭暈就關掉。</p>
+      <p class="note">下次進場景時生效。傾斜開著的話，每次打開 app 第一次點螢幕時，iPad 會問能不能使用「動作與方向」，按允許即可。孩子容易分心或頭暈就關掉。</p>
 
       <h2>時間設定</h2>
       <label>每次可玩 <input type="number" data-k="sessionMin" min="1" max="60" value="${s.sessionMin}"> 分鐘</label>
@@ -209,6 +210,11 @@ export function openParent(onClose, { onStamp } = {}) {
   node.addEventListener('change', (e) => {
     if (e.target.dataset?.xmas === 'real') { fest.setRealGift(e.target.checked); return; }
     if (e.target.dataset?.bd) { fest.setBirthday(e.target.dataset.bd, e.target.value); return; }
+    if ('cam' in (e.target.dataset || {})) {
+      state.settings.camera = e.target.checked;
+      save();
+      return;
+    }
     if ('tilt' in (e.target.dataset || {})) {
       state.settings.tilt = e.target.checked;
       save();

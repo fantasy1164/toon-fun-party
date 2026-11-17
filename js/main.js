@@ -40,7 +40,7 @@ import * as fest from './core/festival.js';
 import { pickStamp, stampSession } from './ui/stamps.js';
 import * as weather from './core/weather.js';
 import { syncNow, setupSync } from './core/sync.js';
-import { requestTilt } from './core/camera.js';
+import { requestTilt, setupStageCamera } from './core/camera.js';
 
 setMusicVolume(state.settings.musicVol);
 
@@ -62,6 +62,7 @@ window.addEventListener('resize', fit);
 window.addEventListener('orientationchange', () => setTimeout(fit, 200));
 fit();
 setupBleed(stage);
+setupStageCamera(stage);
 
 // ---------- 防止 iPad 的縮放、捲動、長按選單 ----------
 const inParent = (e) => e.target.closest?.('.parent, .install');
