@@ -1,5 +1,5 @@
 // 進入點：畫面縮放、開場、選人、進場景、角色下班與睡覺時間。
-import { STAGE_W, STAGE_H } from './config.js';
+import { STAGE_W, STAGE_H, PROFILES } from './config.js';
 import { state, save, addPlayTime } from './core/store.js';
 import { isAsleep, testing, dateKey, hour, testSettings } from './core/clock.js';
 import { unlock, sfx, setMusicVolume } from './core/audio.js';
@@ -34,6 +34,7 @@ import { mountSnack } from './scenes/snack.js';
 import { mountGift } from './scenes/gift.js';
 import { mountCruise } from './scenes/cruise.js';
 import { chooseMode, mountTogether } from './scenes/together.js';
+import { mountEnglish, englishOpen } from './scenes/english.js';
 import { setupTurns, turnsScene } from './core/turns.js';
 import { treeScreen, christmasMorning } from './ui/xmas.js';
 import * as fest from './core/festival.js';
@@ -111,9 +112,14 @@ async function route() {
   leaveScene();
   const reason = closedReason();
   if (reason) {
-    showClosed(stage, { reason, onParent: parentGate });
-    // 休息結束或天亮後自動回到選人畫面
-    closedTimer = setInterval(() => { if (!closedReason() && !document.querySelector('.parent')) route(); }, 5000);
+    // 晚上 20:00–21:30：睡覺或休息畫面也可以進去複習英文
+    const en = englishOpen();
+    showClosed(stage, { reason, onParent: parentGate, onEnglish: en ? startEnglish : null });
+    // 休息結束、天亮或英文時間開始／結束，自動重畫
+    closedTimer = setInterval(() => {
+      if (document.querySelector('.parent')) return;
+      if (!closedReason() || englishOpen() !== en) route();
+    }, 5000);
     return;
   }
   const chosen = await showProfiles(stage, { onParent: parentGate });
@@ -184,6 +190,14 @@ function sceneExit(from) {
   };
 }
 
+// 英文複習：從睡覺／休息畫面進去，兩個人照星期幾的順序聽
+function startEnglish() {
+  clearInterval(closedTimer);
+  hush();
+  profile = PROFILES.both;
+  scene = mountEnglish(stage, { profile, onExit: () => { scene = null; profile = null; route(); } });
+}
+
 async function enterRoom(room, from) {
   // 先選：玩遊戲，還是跟角色一起做
   const choice = await chooseMode(stage, room, profile);
@@ -191,6 +205,8 @@ async function enterRoom(room, from) {
   if (closedReason()) { route(); return; }
   const mount = MOUNT[room] || mountBathroom;
   const onExit = sceneExit(from);
+  // 英文複習自己排順序（不用輪流頭像）
+  if (choice.kind === 'english') { scene = mountEnglish(stage, { profile, onExit }); return; }
   startScene(() => (choice.mode === 'together' && choice.kind !== 'brush'
     ? mountTogether(stage, { profile, onExit, kind: choice.kind, host: choice.host })
     : mount(stage, { profile, onExit, charId: choice.host, together: choice.kind === 'brush' })));

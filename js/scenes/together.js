@@ -15,6 +15,7 @@ import { ICON, openCabinet } from '../ui/screens.js';
 import { sceneWeather } from './door.js';
 import { callTurn, passTurn, turnsOn, turnsScene, freeTurns } from '../core/turns.js';
 import { LIST_POOL } from '../art/market.js';
+import { englishOpen } from './english.js';
 
 // 廁所固定由嘟嘟負責（11/14 起每個場景一位負責的角色）
 export function nextCharacter() {
@@ -45,6 +46,8 @@ const MODES = {
   fun: { host: 'gaogao', reward: 'amuse', series: 'gaogao', track: 'amuse', icon: 'ferris' },
   firecheck: { host: 'yongyong', reward: 'fire', series: 'yongyong', track: 'fire', icon: 'alarm' },
   read: { host: 'gugu', reward: 'library', series: 'gugu', track: 'study', icon: 'book' },
+  // 英文複習：晚上 20:00–21:30 才出現在臥室（scenes/english.js）
+  english: { host: 'mian', track: 'bedroom', icon: 'abc' },
 };
 export const MEAL_MIN = 25;   // 吃飯盤子時鐘幾分鐘走完
 export const LULLABY_MIN = 10;
@@ -66,6 +69,7 @@ function hostSvg(id) {
 // ---------- 進房間先選：玩遊戲，還是一起做 ----------
 export function chooseMode(stage, room, profile) {
   const kinds = (TOGETHER[room] || []).filter((k) => k !== 'homework' || profile.level === 'hard');
+  if (room === 'bedroom' && englishOpen()) kinds.push('english');
   if (!kinds.length) return Promise.resolve({ mode: 'game' });
   const host = room === 'bathroom' ? nextCharacter() : ROOM_HOST[room];
   const ph = phase();

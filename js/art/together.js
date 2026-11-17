@@ -15,6 +15,17 @@ import { clinicBack } from './clinic.js';
 import { bathRoomBack } from './bath.js';
 
 const I = {
+  // 英文複習：ABC 積木＋耳機
+  abc: `<path d="M18 40A32 32 0 0 1 82 40" fill="none" stroke="#5a4a8a" stroke-width="7" stroke-linecap="round"/>
+    <rect x="8" y="38" width="16" height="26" rx="7" fill="#7b61ff"/><rect x="76" y="38" width="16" height="26" rx="7" fill="#7b61ff"/>
+    <rect x="22" y="50" width="20" height="20" rx="4" fill="#ff6b8a"/><rect x="42" y="62" width="20" height="20" rx="4" fill="#4fc3f7"/><rect x="58" y="48" width="20" height="20" rx="4" fill="#ffd34d"/>
+    <text x="32" y="65" font-size="15" font-weight="900" text-anchor="middle" fill="#fff" font-family="sans-serif">A</text>
+    <text x="52" y="77" font-size="15" font-weight="900" text-anchor="middle" fill="#fff" font-family="sans-serif">B</text>
+    <text x="68" y="63" font-size="15" font-weight="900" text-anchor="middle" fill="#a0761a" font-family="sans-serif">C</text>`,
+  note: `<path d="M38 70V24L80 14V60" fill="none" stroke="#7b61ff" stroke-width="8" stroke-linejoin="round"/><ellipse cx="28" cy="72" rx="14" ry="11" fill="#7b61ff"/><ellipse cx="70" cy="62" rx="14" ry="11" fill="#7b61ff"/>`,
+  talk: `<path d="M10 20H62A8 8 0 0 1 70 28V50A8 8 0 0 1 62 58H34L20 70V58H10A8 8 0 0 1 2 50V28A8 8 0 0 1 10 20Z" fill="#4fc3f7"/>
+    <path d="M44 44H90A8 8 0 0 1 98 52V72A8 8 0 0 1 90 80H84V90L72 80H44A8 8 0 0 1 36 72V52A8 8 0 0 1 44 44Z" fill="#ffd34d"/>
+    <circle cx="22" cy="39" r="4" fill="#fff"/><circle cx="36" cy="39" r="4" fill="#fff"/><circle cx="50" cy="39" r="4" fill="#fff"/>`,
   // 玩遊戲：遊戲手把
   game: `<rect x="8" y="30" width="84" height="46" rx="23" fill="#4f7cff"/><rect x="8" y="30" width="84" height="46" rx="23" fill="none" stroke="#2f56c8" stroke-width="4"/>
     <rect x="22" y="47" width="22" height="8" rx="3" fill="#fff"/><rect x="29" y="40" width="8" height="22" rx="3" fill="#fff"/>

@@ -9,6 +9,7 @@ import { listen } from '../core/mic.js';
 import * as fest from '../core/festival.js';
 import { setMusicVolume, playMusic } from '../core/audio.js';
 import { drillDay } from './quake.js';
+import { englishSection, englishChange, englishClick } from './englishParent.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
@@ -160,6 +161,8 @@ export function openParent(onClose, { onStamp } = {}) {
       <h2>天氣</h2>
       <div class="wx">${weatherSection()}</div>
 
+      ${englishSection()}
+
       <h2>聲音</h2>
       <span>音樂大小</span>
       ${[['low', '小'], ['mid', '中'], ['high', '大']].map(([v, t]) => `<label><input type="radio" name="mv" data-mv="${v}" ${(s.musicVol || 'mid') === v ? 'checked' : ''}> ${t}</label>`).join('')}
@@ -208,6 +211,7 @@ export function openParent(onClose, { onStamp } = {}) {
   const msg = node.querySelector('.msg');
 
   node.addEventListener('change', (e) => {
+    if (englishChange(e, node)) return;
     if (e.target.dataset?.xmas === 'real') { fest.setRealGift(e.target.checked); return; }
     if (e.target.dataset?.bd) { fest.setBirthday(e.target.dataset.bd, e.target.value); return; }
     if ('cam' in (e.target.dataset || {})) {
@@ -238,6 +242,7 @@ export function openParent(onClose, { onStamp } = {}) {
     if (!Number.isNaN(v)) { state.settings[key] = v; save(); }
   });
   node.addEventListener('click', (e) => {
+    if (englishClick(e, node)) return;
     const chip = e.target.closest?.('.chip');
     if (chip && !chip.disabled) {
       chip.classList.toggle('on');

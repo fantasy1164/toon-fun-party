@@ -2,6 +2,7 @@
 import { PROFILES, CHARACTERS } from '../config.js';
 import { el, $, $$, onTap, wait, pick, burst, centerOf } from '../core/dom.js';
 import { sfx, playMusic, stopMusic } from '../core/audio.js';
+import { tgIcon } from '../art/together.js';
 import { speak, hush, cheer } from '../core/voice.js';
 import { opBack, CURTAIN_L, CURTAIN_R, START_STAR, logoSvg, DECOR, POPPER, opCast, OP_SND, confettiRain } from '../art/opening.js';
 import { phase } from '../core/clock.js';
@@ -212,9 +213,17 @@ function restArt(ph) {
     <rect x="460" y="560" width="120" height="80" rx="8" fill="#5fc3e8" transform="rotate(-8 520 600)"/>` };
 }
 
-export function showClosed(stage, { reason, onParent }) {
+// 晚上 20:00–21:30：睡覺／休息畫面右下角有英文複習的入口（棉棉＋ABC）
+function englishEntry(node, onEnglish) {
+  if (!onEnglish) return;
+  const b = el(`<button class="round-btn en-entry">${tgIcon('abc', 150)}<div class="mini"><svg viewBox="-40 -20 320 360">${characterSvg('mian')}</svg></div></button>`);
+  node.appendChild(b);
+  onTap(b, (e) => { e?.stopPropagation?.(); sfx('tap'); onEnglish(); });
+}
+
+export function showClosed(stage, { reason, onParent, onEnglish = null }) {
   const ph = phase();
-  if (reason === 'rest') return showRest(stage, { onParent, ph });
+  if (reason === 'rest') return showRest(stage, { onParent, ph, onEnglish });
   const eveNight = fest.isDecember() && fest.day() === 24;
   const stars = Array.from({ length: 14 }, (_, i) =>
     `<circle class="star" style="animation-delay:${(i % 5) * 0.3}s" cx="${80 + (i * 83) % 1080}" cy="${60 + (i * 137) % 360}" r="${3 + (i % 3)}" fill="#fff"/>`).join('');
@@ -229,6 +238,7 @@ export function showClosed(stage, { reason, onParent }) {
       ${fest.isDecember() && fest.day() <= 25 ? `<div class="closed-tree">${TREE_ICON}</div>` : ''}
     </div>`);
   node.appendChild(lockButton(onParent));
+  englishEntry(node, onEnglish);
   stage.replaceChildren(node);
   stopMusic();
   let last = 0;
@@ -243,7 +253,7 @@ export function showClosed(stage, { reason, onParent }) {
 }
 
 // 角色下班休息中：角色醒著在玩或休息，右上角的餅乾越來越小，吃完就可以再玩
-function showRest(stage, { onParent, ph }) {
+function showRest(stage, { onParent, ph, onEnglish = null }) {
   const art = restArt(ph);
   const node = el(`
     <div class="screen closed resting ${art.cls}">
@@ -252,6 +262,7 @@ function showRest(stage, { onParent, ph }) {
       ${fest.isDecember() && fest.day() <= 25 ? `<div class="closed-tree">${TREE_ICON}</div>` : ''}
     </div>`);
   node.appendChild(lockButton(onParent));
+  englishEntry(node, onEnglish);
   stage.replaceChildren(node);
   stopMusic();
   const tick = setInterval(() => {

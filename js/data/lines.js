@@ -1530,3 +1530,19 @@ Object.assign(LINES, {
   gf_gift: { sensen: '娃娃放進你的陳列櫃了！' },
   gf_mission: { sensen: '{name}，下次跟爸爸媽媽去買東西，也要記得只選一個喔。' },
 });
+
+// ---------- 英文複習（棉棉，11/17） ----------
+Object.assign(LINES, {
+  en_hello: { mian: '睡覺前……我們一起來複習英文吧。' },
+  en_first_xz: { mian: '今天向澤先聽喔。' },
+  en_first_yh: { mian: '今天妍卉先聽喔。' },
+  en_play: { mian: '按這個大大的按鈕，開始聽吧。' },
+  en_video: { mian: '按影片中間，開始看吧。' },
+  en_all_heard: { mian: '今天的都聽完了……請爸爸媽媽來看看。' },
+  en_good_xz: { mian: '向澤好棒！英文聽得好認真。' },
+  en_good_yh: { mian: '妍卉好棒！英文學得好認真。' },
+  en_none: { mian: '爸爸媽媽還沒選要聽哪些喔……請爸爸媽媽幫忙。' },
+  en_offline: { mian: '好像沒有網路……今天先不能聽喔。' },
+  en_bye: { mian: '英文複習完了……晚安，好好睡喔。' },
+  en_late: { mian: '九點半了……該睡覺囉。晚安。' },
+});
