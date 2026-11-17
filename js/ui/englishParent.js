@@ -105,28 +105,42 @@ async function loadThumbs(node) {
   }
 }
 
-// 每一首試著讀一下長度，讀得到就是連結還在
-async function checkLinks(node) {
+// 每一首試著靜音播一下，讀得到長度就是可以播。
+// iOS 沒有點擊就不會載入音檔，所以三個播放器都在按下「檢查連結」的當下先開始播，之後換網址繼續用。
+function checkLinks(node) {
   const msg = node.querySelector('.en-check-msg');
   node.querySelectorAll('.en-g').forEach((d) => { d.open = true; });
-  let ok = 0;
-  let bad = 0;
-  const one = (t) => new Promise((resolve) => {
-    const a = new Audio();
-    a.preload = 'metadata';
-    const st = node.querySelector(`.en-st[data-i="${t.i}"]`);
-    const end = (good) => { a.removeAttribute('src'); a.load(); if (good) ok++; else bad++; st.textContent = good ? '✓' : '✗ 播不出來'; st.className = `en-st ${good ? 'ok' : 'bad'}`; msg.textContent = `檢查中 ${ok + bad}/${ROCKET.length}`; resolve(); };
-    const timer = setTimeout(() => end(false), 15000);
-    a.onloadedmetadata = () => { clearTimeout(timer); end(true); };
-    a.onerror = () => { clearTimeout(timer); end(false); };
-    a.src = t.url;
-  });
-  // 跟遊戲裡播放時一樣：不附上來源（課程網站有防盜連）
   noReferrer(true);
   const queue = [...ROCKET];
-  await Promise.all(Array.from({ length: 4 }, async () => { while (queue.length) await one(queue.shift()); }));
-  noReferrer(false);
-  msg.textContent = bad ? `${ok} 首正常，${bad} 首播不出來（請告訴 Claude 是哪幾首）` : `全部 ${ok} 首都正常`;
+  let ok = 0;
+  let bad = 0;
+  const mark = (t, good) => {
+    if (good) ok++; else bad++;
+    const st = node.querySelector(`.en-st[data-i="${t.i}"]`);
+    st.textContent = good ? '✓' : '✗ 播不出來';
+    st.className = `en-st ${good ? 'ok' : 'bad'}`;
+    msg.textContent = `檢查中 ${ok + bad}/${ROCKET.length}`;
+  };
+  const worker = (a) => new Promise((done) => {
+    let t = null;
+    let timer = 0;
+    const next = () => {
+      clearTimeout(timer);
+      t = queue.shift();
+      if (!t) { a.pause(); a.removeAttribute('src'); a.load(); done(); return; }
+      timer = setTimeout(() => { mark(t, false); next(); }, 15000);
+      a.src = t.url;
+      a.play().catch(() => {});
+    };
+    a.addEventListener('loadedmetadata', () => { a.pause(); mark(t, true); next(); });
+    a.addEventListener('error', () => { if (a.getAttribute('src')) { mark(t, false); next(); } });
+    next();
+  });
+  const players = Array.from({ length: 3 }, () => { const a = new Audio(); a.muted = true; a.playsInline = true; a.preload = 'auto'; return a; });
+  Promise.all(players.map(worker)).then(() => {
+    noReferrer(false);
+    msg.textContent = bad ? `${ok} 首正常，${bad} 首播不出來（請告訴 Claude 是哪幾首）` : `全部 ${ok} 首都正常`;
+  });
 }
 
 // 家長頁的 change／click 交給這裡；處理了回傳 true

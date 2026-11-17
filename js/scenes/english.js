@@ -181,7 +181,10 @@ export function mountEnglish(stage, { profile, onExit }) {
     // 這一首放不出來：跳下一首
     if (pos < picks.length - 1) setTimeout(() => { if (alive) loadTrack(pos + 1, heard); }, 800);
   });
-  onTap(playBtn, () => {
+  // iOS：播放 mp3 一定要在手指離開螢幕（click）的當下開始，按下去（pointerdown）的時候會被拒絕
+  const onClick = (node, fn) => node.addEventListener('click', (e) => { e.preventDefault(); fn(e); });
+  au.playsInline = true;
+  onClick(playBtn, () => {
     if (au.paused) { sfx('tap'); au.play().catch(() => setPlaying(false)); } else { au.pause(); }
   });
 
@@ -229,8 +232,8 @@ export function mountEnglish(stage, { profile, onExit }) {
     if (kind === 'audio') loadTrack(n, true);
     else if (yt) { pos = n; markDots(); yt.playVideoAt(picks[pos]); }
   }
-  onTap($('.en-prev', root), () => go(-1));
-  onTap($('.en-next', root), () => go(1));
+  onClick($('.en-prev', root), () => go(-1));
+  onClick($('.en-next', root), () => go(1));
 
   // ---------- 家長按住勾勾：這個人聽完了 ----------
   let doneWait = null;
