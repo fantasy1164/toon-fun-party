@@ -13,7 +13,8 @@ import { state, save } from '../core/store.js';
 import * as weather from '../core/weather.js';
 import { ANIMALS, animalSvg, PANGOLIN_BALL, KOALA_SLEEP } from '../art/animals.js';
 import { AREAS } from '../art/island.js';
-import { areaBack, TRAM_BIG, FOOD, RULE, NUM, ANIMAL_CARD, FOOT_PANEL, ELE_PRINT, KID_PRINT, KID_SHADOW, SINK, SOAP, TOWEL, SPEAKER, JUMP_BTN, BUCKET } from '../art/zoo.js';
+import { setupCamera } from '../core/camera.js';
+import { areaBack, WALKWAY, foreArt, TRAM_BIG, FOOD, RULE, NUM, ANIMAL_CARD, FOOT_PANEL, ELE_PRINT, KID_PRINT, KID_SHADOW, SINK, SOAP, TOWEL, SPEAKER, JUMP_BTN, BUCKET } from '../art/zoo.js';
 import { makeScene, charDiv } from './party.js';
 import { pickCard, tapOne, tapEach, hardNow, giveReward, moveTo, kidNode, shuffle } from './kit.js';
 import { turnsOn, passTurn, freeTurns } from '../core/turns.js';
@@ -93,6 +94,15 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
     return n;
   }
   const animalsLayer = $('.zo-animals', root);
+  // 立體感：舞台攝影機（三層景深、鏡頭、光影、傾斜）
+  const night = ph === 'night' || ph === 'dusk';
+  const cam = setupCamera(root, {
+    back: $('.p-layer', root),
+    mid: [animalsLayer],
+    front: [$('.zo-tram', root), $('.kt-things', root), ...$$('.p-char', root), ...$$('.kt-kid', root)],
+    frontArt: WALKWAY(night),
+    foreArt: foreArt(night),
+  });
   let here = stops[0];
   let exploring = false;
 
@@ -117,6 +127,8 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
     const id = n.dataset.id;
     sfx(ANIMALS[id].sound);
     react(n);
+    const r = ctl.rectOf(n);
+    cam.look(r.x + r.w / 2, r.y + r.h / 2);
     if (!exploring || n.classList.contains('met')) return;
     n.classList.add('met');
     n.classList.remove('glow-an');
@@ -176,6 +188,7 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
   async function driveTo(a) {
     sfx('ding');
     root.classList.add('driving');
+    cam.panOut();
     await tramTo(1300, 1500);
     root.classList.add('swap');
     await pause(350);
@@ -187,6 +200,7 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
     tram.style.left = '-720px';
     void tram.offsetWidth;
     root.classList.remove('swap');
+    cam.panIn();
     await tramTo(140, 1500);
     root.classList.remove('driving');
   }
@@ -239,6 +253,7 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
   }
   // 輕輕摸兔子
   async function stPet() {
+    cam.hold(true);
     const r = animalNode('rabbit');
     await moveTo(r, [600, 700], 600);
     r.classList.add('big');
@@ -269,6 +284,7 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
     }
     await host('zs_pet_ok');
     r.classList.remove('big');
+    cam.hold(false);
   }
   // 摸完動物要洗手
   async function stWash() {
@@ -316,6 +332,7 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
     const grass = targets.map((id) => thing('zo-grass', `<svg viewBox="0 0 240 120" width="260" height="130">${Array.from({ length: 16 }, (_, i) => `<path d="M${i * 15 + 6} 120Q${i * 15 + (i % 2 ? 20 : -6)} 50 ${i * 15 + 10} ${10 + (i % 3) * 12}" stroke="${['#3f8a4f', '#4f9a4f', '#2e7a40'][i % 3]}" stroke-width="10" fill="none" stroke-linecap="round"/>`).join('')}</svg>`, [spots[id][0] - 130, spots[id][1] - 110]));
     grass.forEach((g) => { g.style.pointerEvents = 'none'; });
     await host('zs_find');
+    cam.hold(true);
     const bin = $('.zo-binoc', root);
     bin.classList.remove('hidden');
     const k = () => stage.getBoundingClientRect();
@@ -360,6 +377,7 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
       if (hard()) await host(`ze_${id}`);
     }
     bin.classList.add('hidden');
+    cam.hold(false);
     grass.forEach((g) => g.remove());
     await host('zs_find_ok');
     hideNodes.forEach((n) => n.classList.remove('found'));

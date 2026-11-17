@@ -40,6 +40,7 @@ import * as fest from './core/festival.js';
 import { pickStamp, stampSession } from './ui/stamps.js';
 import * as weather from './core/weather.js';
 import { syncNow, setupSync } from './core/sync.js';
+import { requestTilt } from './core/camera.js';
 
 setMusicVolume(state.settings.musicVol);
 
@@ -70,7 +71,8 @@ document.addEventListener('contextmenu', (e) => e.preventDefault());
 document.addEventListener('dblclick', (e) => e.preventDefault());
 document.addEventListener('pointerdown', unlock);
 // iOS 只把「放開手指／點擊」當成使用者操作，聲音與語音都要在這些事件裡啟動
-['touchend', 'pointerup', 'click'].forEach((t) => document.addEventListener(t, () => { unlock(); primeTts(); }, true));
+// 第一次點螢幕：解鎖聲音、問能不能用陀螺儀（立體感的傾斜視差；iOS 要在點擊當下問）
+['touchend', 'pointerup', 'click'].forEach((t) => document.addEventListener(t, () => { unlock(); primeTts(); requestTilt(); }, true));
 
 // ---------- 流程 ----------
 let scene = null;

@@ -92,6 +92,19 @@ export function areaBack(area, ph, wx) {
   }
 }
 
+// 立體感：前景的步道（跟背景一樣，但放在前面那層）、畫面最旁邊的近景花草
+export const WALKWAY = (n) => `<svg viewBox="0 0 1200 900" preserveAspectRatio="none">${walk(n)}</svg>`;
+export function foreArt(n) {
+  const leaf = n ? '#2a4a32' : '#3f8a3f';
+  const leaf2 = n ? '#24402c' : '#2f7a34';
+  const flower = n ? '#8a6a8a' : '#ff7fa8';
+  const tuft = (x, y, s, flip) => `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s})">
+    ${[-50, -25, 0, 25, 50].map((a, i) => `<path d="M0 0Q${a * 0.6} -60 ${a} -${110 + (i % 2) * 30}" stroke="${i % 2 ? leaf : leaf2}" stroke-width="16" fill="none" stroke-linecap="round"/>`).join('')}
+    <ellipse cx="-30" cy="-6" rx="60" ry="22" fill="${leaf2}"/>
+    ${[[-20, -120], [30, -100]].map(([fx, fy]) => `<g transform="translate(${fx} ${fy})">${[0, 72, 144, 216, 288].map((r) => `<ellipse cy="-10" rx="7" ry="12" fill="${flower}" transform="rotate(${r})"/>`).join('')}<circle r="6" fill="#ffd34d"/></g>`).join('')}</g>`;
+  return `<svg viewBox="0 0 1200 900" overflow="visible">${tuft(-10, 915, 1.1, false)}${tuft(1215, 915, 1.15, true)}</svg>`;
+}
+
 // 遊園車（大張，小孩坐在上面）
 export const TRAM_BIG = (n = false) => `<svg viewBox="0 0 220 70" width="660" height="210" overflow="visible">${tramSvg(0, 0, 1, n)}</svg>`;
 
