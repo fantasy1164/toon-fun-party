@@ -16,6 +16,20 @@ import { ICON } from '../ui/screens.js';
 import { ROCKET, YT_LIST, COURSES, trackKind } from '../data/english.js';
 
 export const englishOpen = (h = hour()) => h >= EN_HOURS.from && h < EN_HOURS.to;
+
+// 課程網站會擋「從別的網站來的」播放（防盜連），不附上來源就可以播。
+// YouTube 嵌入反而需要來源，所以只在播 mp3 時切成不附來源，播影片前切回來。
+export function noReferrer(on) {
+  let m = document.getElementById('en-noref');
+  if (!m) {
+    if (!on) return;
+    m = document.createElement('meta');
+    m.id = 'en-noref';
+    m.name = 'referrer';
+    document.head.appendChild(m);
+  }
+  m.content = on ? 'no-referrer' : 'strict-origin-when-cross-origin';
+}
 // 今天誰先聽
 export function englishOrder(members) {
   const first = EN_FIRST[now().getDay()];
@@ -105,7 +119,8 @@ export function mountEnglish(stage, { profile, onExit }) {
   // ---------- 播放器 ----------
   const au = new Audio();
   au.preload = 'auto';
-  cleanups.push(() => { au.pause(); au.removeAttribute('src'); au.load(); });
+  cleanups.push(() => { au.pause(); au.removeAttribute('src'); au.load(); noReferrer(false); });
+  let bad = 0;
   let yt = null;
   cleanups.push(() => { try { yt?.destroy(); } catch { /* 忽略 */ } yt = null; });
 
@@ -154,7 +169,15 @@ export function mountEnglish(stage, { profile, onExit }) {
   });
   au.addEventListener('error', () => {
     if (!alive || !au.getAttribute('src')) return;
-    $(`.en-dot[data-i="${pos}"]`, dots)?.classList.add('bad');
+    const dot = $(`.en-dot[data-i="${pos}"]`, dots);
+    if (dot && !dot.classList.contains('bad')) { dot.classList.add('bad'); bad++; }
+    // 全部都放不出來：請爸爸媽媽看看（網路或網站的問題）
+    if (bad >= picks.length) {
+      setPlaying(false);
+      doneBtn.classList.add('pulse');
+      if (!ending) speak('mian', 'en_offline', { node: hostIn });
+      return;
+    }
     // 這一首放不出來：跳下一首
     if (pos < picks.length - 1) setTimeout(() => { if (alive) loadTrack(pos + 1, heard); }, 800);
   });
@@ -241,6 +264,8 @@ export function mountEnglish(stage, { profile, onExit }) {
     kind = COURSES[id].kind;
     pos = 0;
     heard = false;
+    bad = 0;
+    noReferrer(kind === 'audio');
     who.innerHTML = `<div class="en-me">${avatarSvg(id, 150)}</div>${order.filter((k) => k !== id).map((k) => `<div class="en-next-kid">${avatarSvg(k, 70)}</div>`).join('')}`;
     who.style.setProperty('--glow', id === 'yh' ? '#ff8fb8' : '#6fd27a');
     audioBox.classList.add('hidden');

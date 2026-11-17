@@ -12,6 +12,7 @@
 import { state } from './store.js';
 import { hour, phase } from './clock.js';
 import { outdoorFore, indoorFore } from '../art/camfore.js';
+import { resumeAudio } from './audio.js';
 
 const SRC = 'svg[viewBox="0 0 1200 900"]';
 const C = { x: 600, y: 450 };
@@ -89,9 +90,12 @@ export async function requestTilt() {
   try {
     if (typeof DeviceOrientationEvent.requestPermission === 'function') {
       const p = await DeviceOrientationEvent.requestPermission();
+      // 權限視窗關掉後，iOS 會讓聲音停住：馬上恢復
+      resumeAudio();
+      setTimeout(resumeAudio, 500);
       if (p !== 'granted') { tilt.on = false; return; }
     }
-  } catch { tilt.on = false; return; }
+  } catch { resumeAudio(); tilt.on = false; return; }
   addEventListener('deviceorientation', onOrient);
 }
 

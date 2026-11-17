@@ -3,7 +3,7 @@ import { state, save } from '../core/store.js';
 import { now } from '../core/clock.js';
 import { EN_FIRST } from '../config.js';
 import { ROCKET, YT_LIST, YT_COUNT } from '../data/english.js';
-import { loadYT } from '../scenes/english.js';
+import { loadYT, noReferrer } from '../scenes/english.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const DAYS = '日一二三四五六';
@@ -121,8 +121,11 @@ async function checkLinks(node) {
     a.onerror = () => { clearTimeout(timer); end(false); };
     a.src = t.url;
   });
+  // 跟遊戲裡播放時一樣：不附上來源（課程網站有防盜連）
+  noReferrer(true);
   const queue = [...ROCKET];
   await Promise.all(Array.from({ length: 4 }, async () => { while (queue.length) await one(queue.shift()); }));
+  noReferrer(false);
   msg.textContent = bad ? `${ok} 首正常，${bad} 首播不出來（請告訴 Claude 是哪幾首）` : `全部 ${ok} 首都正常`;
 }
 

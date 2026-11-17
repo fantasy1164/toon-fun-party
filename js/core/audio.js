@@ -24,9 +24,20 @@ export function unlock() {
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
     const d = noiseBuf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    // iOS 跳出系統視窗（例如傾斜權限）或來電時聲音會被中斷（interrupted），結束後要自己叫回來
+    ctx.addEventListener('statechange', () => {
+      if (ctx.state !== 'running' && !document.hidden) setTimeout(resumeAudio, 300);
+    });
   }
   if (ctx.state !== 'running') ctx.resume().catch(() => {});
 }
+
+// 聲音被系統中斷後恢復（不是第一次解鎖）
+export function resumeAudio() {
+  if (ctx && ctx.state !== 'running' && !document.hidden) ctx.resume().catch(() => {});
+}
+// 每次點螢幕都檢查一次：點擊當下 iOS 一定允許恢復
+['touchend', 'pointerup'].forEach((t) => document.addEventListener(t, resumeAudio, { capture: true, passive: true }));
 
 document.addEventListener('visibilitychange', () => {
   if (!ctx) return;
