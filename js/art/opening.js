@@ -43,12 +43,14 @@ export const START_STAR = `<svg viewBox="0 0 200 200" width="260" height="260" o
 // 有字的標題：每個字不同顏色，白色描邊，一個一個跳出來
 const LOGO_COLORS = ['#ff4d6d', '#ff9f1c', '#ffcc00', '#2ec4b6', '#3a86ff', '#8338ec', '#ff5c8a', '#06d6a0', '#ff7b00'];
 export function logoSvg() {
+  // 三層字：深色粗外框、白色外框、彩色字（不用 paint-order：iPad 在鏡頭縮放時會忽略它，白框蓋到彩色字）
   const line = (txt, y, size, x0, gap, off) => [...txt].map((ch, i) => {
     const x = x0 + i * gap;
     const c = LOGO_COLORS[(i + off) % LOGO_COLORS.length];
     return `<g class="lg-ch" style="animation-delay:${((i + off) * 0.09).toFixed(2)}s;transform-origin:${x}px ${y}px">
       <text x="${x}" y="${y}" font-size="${size}" text-anchor="middle" stroke="#5a2a6a" stroke-width="${size * 0.2}" stroke-linejoin="round" fill="#5a2a6a">${ch}</text>
-      <text x="${x}" y="${y}" font-size="${size}" text-anchor="middle" stroke="#fff" stroke-width="${size * 0.1}" stroke-linejoin="round" fill="${c}" paint-order="stroke">${ch}</text></g>`;
+      <text x="${x}" y="${y}" font-size="${size}" text-anchor="middle" stroke="#fff" stroke-width="${size * 0.1}" stroke-linejoin="round" fill="#fff">${ch}</text>
+      <text x="${x}" y="${y}" font-size="${size}" text-anchor="middle" fill="${c}">${ch}</text></g>`;
   }).join('');
   const star = (x, y, r, c, d) => `<path class="lg-star" style="animation-delay:${d}s;transform-origin:${x}px ${y}px" d="M${x} ${y - r}L${x + r * 0.28} ${y - r * 0.3}L${x + r} ${y - r * 0.24}L${x + r * 0.44} ${y + r * 0.18}L${x + r * 0.6} ${y + r}L${x} ${y + r * 0.56}L${x - r * 0.6} ${y + r}L${x - r * 0.44} ${y + r * 0.18}L${x - r} ${y - r * 0.24}L${x - r * 0.28} ${y - r * 0.3}Z" fill="${c}" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>`;
   return `<svg viewBox="0 0 800 260" width="800" height="260" overflow="visible" font-family="'PingFang TC','Heiti TC','Noto Sans TC','Microsoft JhengHei',sans-serif" font-weight="900">
