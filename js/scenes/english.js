@@ -4,7 +4,7 @@
 // 只播原網站的連結，不複製檔案；不算遊玩時間；每人每天第一次聽完給棉棉一顆好朋友星星、累計英文徽章。
 import { EN_HOURS, EN_FIRST } from '../config.js';
 import { el, $, $$, wait, burst, centerOf, onTap } from '../core/dom.js';
-import { sfx, stopMusic } from '../core/audio.js';
+import { sfx, stopMusic, resumeAudio } from '../core/audio.js';
 import { speak, hush } from '../core/voice.js';
 import { hour, now, dateKey } from '../core/clock.js';
 import { state, save, recordHabit } from '../core/store.js';
@@ -232,10 +232,10 @@ export function mountEnglish(stage, { profile, onExit }) {
     if (!yt) return;
     const S = window.YT.PlayerState;
     if (e.data === S.PLAYING) { heard = true; hostIn.classList.add('listening'); learnTitle(); }
-    if (e.data === S.PAUSED) hostIn.classList.remove('listening');
+    if (e.data === S.PAUSED) { hostIn.classList.remove('listening'); resumeAudio(); }
     if (e.data === S.ENDED) {
       if (pos < picks.length - 1) { pos++; markDots(); yt.playVideoAt(picks[pos]); }
-      else { pos = picks.length; markDots(); hostIn.classList.remove('listening'); yt.stopVideo(); allHeard?.(); }
+      else { pos = picks.length; markDots(); hostIn.classList.remove('listening'); yt.stopVideo(); resumeAudio(); allHeard?.(); }
       return;
     }
     // 播放清單自己跳到下一支（不是家長選的）：跳回該播的那一支
@@ -293,14 +293,26 @@ export function mountEnglish(stage, { profile, onExit }) {
     ring.setAttribute('stroke-dasharray', `0 ${RING_C.toFixed(1)}`);
     doneBtn.classList.remove('holding');
   };
+  // 按滿 1.2 秒（圈圈滿了、叮一聲），放開手指的那一刻才算完成：iOS 只在放開時允許把被影片暫停的聲音叫回來
+  let holdReady = false;
   doneBtn.addEventListener('pointerdown', (e) => {
     e.preventDefault();
+    holdReady = false;
     holdStart = performance.now();
     doneBtn.classList.add('holding');
     holdRaf = requestAnimationFrame(holdPaint);
-    holdT = setTimeout(() => { holdOff(); sfx('ding'); doneWait?.(); }, HOLD_MS);
+    holdT = setTimeout(() => { holdReady = true; doneBtn.classList.add('ready'); sfx('ding'); }, HOLD_MS);
   });
-  ['pointerup', 'pointerleave', 'pointercancel'].forEach((t) => doneBtn.addEventListener(t, holdOff));
+  doneBtn.addEventListener('pointerup', () => {
+    const ok = holdReady;
+    holdReady = false;
+    doneBtn.classList.remove('ready');
+    holdOff();
+    if (!ok) return;
+    resumeAudio();
+    doneWait?.();
+  });
+  ['pointerleave', 'pointercancel'].forEach((t) => doneBtn.addEventListener(t, () => { holdReady = false; doneBtn.classList.remove('ready'); holdOff(); }));
   cleanups.push(holdOff);
 
   // ---------- 一個人的複習 ----------
@@ -356,6 +368,7 @@ export function mountEnglish(stage, { profile, onExit }) {
     au.pause();
     try { yt?.destroy(); } catch { /* 忽略 */ }
     yt = null;
+    resumeAudio();
     return heard;
   }
 

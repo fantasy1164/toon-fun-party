@@ -63,11 +63,14 @@ async function playFile(key, my) {
     buffers.set(key, buf);
   }
   if (my !== token) return true;
+  // 聲音引擎被系統暫停（例如 iOS 播 YouTube 影片後）時，onended 永遠不會來：先試著恢復，並設保險時間，絕不卡住
+  if (ctx.state !== 'running') ctx.resume().catch(() => {});
   await new Promise((res) => {
     const s = ctx.createBufferSource();
     s.buffer = buf;
     s.connect(getVoiceBus());
-    s.onended = res;
+    const safety = setTimeout(res, buf.duration * 1000 + 1500);
+    s.onended = () => { clearTimeout(safety); res(); };
     currentSource = s;
     s.start();
   });
