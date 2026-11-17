@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>立體感效能測試</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1d2433; font: 15px/1.4 -apple-system, "PingFang TC", sans-serif; color: #fff; }
+  #wrap { position: absolute; left: 0; top: 0; width: 1200px; height: 900px; transform-origin: 0 0; overflow: hidden; background: #8fd0f0; }
+  /* 舞台攝影機：perspective + 三層景深 */
+  #cam { position: absolute; inset: 0; perspective: 1200px; perspective-origin: 50% 45%; }
+  #world { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; }
+  .layer { position: absolute; inset: 0; transform-style: preserve-3d; }
+  .layer > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .zo-an { position: absolute; padding: 0; border: 0; background: none; }
+  .zo-an > svg { width: 100%; height: 100%; }
+  .shadow-f .zo-an > svg { filter: drop-shadow(14px 10px 6px rgba(0,0,0,.35)); }
+  #light { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: 0; }
+  #light.on { opacity: 1; animation: sunMove 6s linear infinite; }
+  @keyframes sunMove { 0% { background: linear-gradient(110deg, #fff6e0 0%, #ffd9a0 60%, #c9a0d0 100%); } 50% { background: linear-gradient(250deg, #fff6e0 0%, #ffd9a0 60%, #a0a8d8 100%); } 100% { background: linear-gradient(110deg, #fff6e0 0%, #ffd9a0 60%, #c9a0d0 100%); } }
+  #panel { position: absolute; right: 0; top: 0; bottom: 0; width: 340px; background: rgba(20, 26, 40, .92); padding: 12px 14px; box-sizing: border-box; overflow: auto; z-index: 10; }
+  #panel.min { width: 120px; }
+  #panel.min .full { display: none; }
+  button { font: inherit; border: 0; border-radius: 10px; padding: 9px 12px; margin: 3px 4px 3px 0; background: #ff9f43; color: #fff; }
+  button.quiet { background: #3a4458; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 8px; }
+  td, th { padding: 4px 3px; border-bottom: 1px solid #3a4458; text-align: left; }
+  .ok { color: #7be0a0; } .meh { color: #ffd34d; } .bad { color: #ff7a7a; }
+  #now { font: 600 22px/1.2 ui-monospace, Menlo, monospace; margin: 6px 0; }
+  .note { font-size: 12px; color: #aab4c8; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="cam"><div id="world">
+    <div class="layer" id="back"></div>
+    <div class="layer" id="mid"></div>
+    <div class="layer" id="front"></div>
+  </div></div>
+  <div id="light"></div>
+</div>
+<div id="panel">
+  <button class="quiet" id="toggle">收合</button>
+  <div class="full">
+    <div><b>立體感效能測試</b></div>
+    <div class="note" id="dev"></div>
+    <div id="now">-- fps</div>
+    <button id="all">全部測試（約 1 分鐘）</button>
+    <button class="quiet" id="gyro">陀螺儀視差（手動）</button>
+    <table id="res"><tr><th>測試</th><th>平均</th><th>掉幀</th><th>判斷</th></tr></table>
+    <p class="note">「平均」是每秒畫面數；「掉幀」是卡住的畫面比例（1% 以下很順）。iPhone 15 Pro 比 iPad mini 6 快約 1.5～2 倍，所以看 iPhone 時要留餘裕：遊戲實際只會用到「20 隻動物」那一級，「40 隻」和「陰影濾鏡」在 iPhone 上也很順的話，iPad 上一般用量就放心。</p>
+    <button class="quiet" id="copy">複製結果</button> <a href="./"><button class="quiet">回到遊戲</button></a>
+  </div>
+</div>
+<script type="module">
+import { areaBack } from './js/art/zoo.js';
+import { ANIMALS, animalSvg } from './js/art/animals.js';
+const $ = (id) => document.getElementById(id);
+const wrap = $('wrap'), world = $('world'), back = $('back'), mid = $('mid'), front = $('front');
+
+// 舞台縮放到螢幕（左邊放舞台，右邊是面板）
+function fit() {
+  const w = innerWidth - ($('panel').classList.contains('min') ? 120 : 340);
+  const s = Math.min(w / 1200, innerHeight / 900);
+  wrap.style.transform = `scale(${s})`;
+}
+addEventListener('resize', fit);
+$('toggle').onclick = () => { $('panel').classList.toggle('min'); $('toggle').textContent = $('panel').classList.contains('min') ? '展開' : '收合'; fit(); };
+fit();
+$('dev').textContent = `${screen.width}×${screen.height} @${devicePixelRatio}x｜${/iPad|Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1 ? 'iPad' : /iPhone/.test(navigator.userAgent) ? 'iPhone' : '其他'}｜${(navigator.userAgent.match(/OS (\d+_\d+)/) || [, '?'])[1].replace('_', '.')}`;
+
+// 場景：非洲區背景（後層）、動物（中層）、圍欄步道（前層，從背景切下面那條）
+const WX = { kind: 'clear' };
+const ids = Object.keys(ANIMALS);
+function scene({ animals = 4, layered = false } = {}) {
+  back.innerHTML = areaBack('africa', 'day', WX);
+  front.innerHTML = layered ? `<svg viewBox="0 0 1200 900"><defs><clipPath id="fc"><rect y="620" width="1200" height="280"/></clipPath></defs><g clip-path="url(#fc)">${areaBack('africa', 'day', WX).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</g></svg>` : '';
+  mid.innerHTML = Array.from({ length: animals }, (_, i) => {
+    const id = ids[i % ids.length];
+    const w = 150 + (i % 4) * 30;
+    const x = 40 + (i * 157) % 1000;
+    const y = 520 + (i % 3) * 60;
+    return `<div class="zo-an" style="left:${x}px;top:${y - w}px;width:${w}px;height:${w}px;--d:${(i * 0.37).toFixed(2)}s">${animalSvg(id, w)}</div>`;
+  }).join('');
+  back.style.transform = layered ? 'translateZ(-500px) scale(1.42)' : '';
+  mid.style.transform = layered ? 'translateZ(0)' : '';
+  front.style.transform = layered ? 'translateZ(160px) scale(.867)' : '';
+}
+
+// 量每幀時間
+let frames = [];
+let last = 0;
+let live = [];
+function loop(t) {
+  if (last) { const d = t - last; frames.push(d); live.push(d); if (live.length > 30) live.shift(); }
+  last = t;
+  if (live.length) $('now').textContent = `${(1000 / (live.reduce((a, b) => a + b, 0) / live.length)).toFixed(0)} fps`;
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+let camAnim = null;
+function camera(kind) {
+  cancelAnimationFrame(camAnim);
+  world.style.transform = '';
+  if (!kind) return;
+  const t0 = performance.now();
+  const step = (t) => {
+    const k = (t - t0) / 1000;
+    if (kind === 'pan') world.style.transform = `translate3d(${Math.sin(k * 1.2) * 120}px, 0, ${Math.sin(k * 0.8) * 150}px)`;
+    if (kind === 'orbit') world.style.transform = `translate3d(${Math.sin(k * 1.1) * 90}px, ${Math.sin(k * 0.7) * 20}px, 0) rotateY(${Math.sin(k * 1.1) * 4}deg)`;
+    camAnim = requestAnimationFrame(step);
+  };
+  camAnim = requestAnimationFrame(step);
+}
+
+const TESTS = [
+  { name: '靜態場景（基準）', set: () => { scene({ animals: 4 }); camera(null); } },
+  { name: '鏡頭推拉、平移', set: () => { scene({ animals: 4 }); camera('pan'); } },
+  { name: '三層景深＋鏡頭移動', set: () => { scene({ animals: 6, layered: true }); camera('orbit'); } },
+  { name: '20 隻動物同時動', set: () => { scene({ animals: 20, layered: true }); camera(null); } },
+  { name: '40 隻動物＋鏡頭', set: () => { scene({ animals: 40, layered: true }); camera('orbit'); } },
+  { name: '即時陰影濾鏡 ×12', set: () => { scene({ animals: 12, layered: true }); document.body.classList.add('shadow-f'); camera('orbit'); }, undo: () => document.body.classList.remove('shadow-f') },
+  { name: '光線隨時間變化', set: () => { scene({ animals: 8, layered: true }); $('light').classList.add('on'); camera('orbit'); }, undo: () => $('light').classList.remove('on') },
+];
+const results = [];
+// 掉幀：比正常一幀長 1.5 倍以上（60Hz 螢幕是超過 25 毫秒；ProMotion 120Hz 是超過 12.5 毫秒）
+function grade(fps, drop) {
+  if (drop <= 1) return ['很順', 'ok'];
+  if (drop <= 5) return ['可以', 'meh'];
+  return ['會卡', 'bad'];
+}
+async function run(t) {
+  t.set();
+  await new Promise((r) => setTimeout(r, 1200));   // 先暖身
+  frames = [];
+  await new Promise((r) => setTimeout(r, 6000));
+  const f = frames.slice().sort((a, b) => a - b);
+  const avg = f.reduce((a, b) => a + b, 0) / f.length;
+  const median = f[Math.floor(f.length / 2)] || 16.7;
+  const drop = (f.filter((d) => d > median * 1.5).length / Math.max(f.length, 1)) * 100;
+  t.undo?.();
+  camera(null);
+  const fps = 1000 / avg;
+  const [g, c] = grade(fps, drop);
+  results.push(`${t.name}：${fps.toFixed(0)} fps，掉幀 ${drop.toFixed(1)}%，${g}`);
+  $('res').insertAdjacentHTML('beforeend', `<tr><td>${t.name}</td><td>${fps.toFixed(0)}</td><td>${drop.toFixed(1)}%</td><td class="${c}">${g}</td></tr>`);
+}
+$('all').onclick = async () => {
+  $('all').disabled = true;
+  results.length = 0;
+  $('res').innerHTML = '<tr><th>測試</th><th>平均</th><th>掉幀</th><th>判斷</th></tr>';
+  for (const t of TESTS) await run(t);
+  $('all').disabled = false;
+  scene({ animals: 6, layered: true });
+};
+
+// 陀螺儀：傾斜裝置，鏡頭跟著動（iOS 要在點擊時授權）
+$('gyro').onclick = async () => {
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission) {
+      const p = await DeviceOrientationEvent.requestPermission();
+      if (p !== 'granted') { results.push('陀螺儀：沒有授權'); $('gyro').textContent = '陀螺儀：沒有授權'; return; }
+    }
+  } catch (e) { results.push(`陀螺儀：${e.message}`); return; }
+  scene({ animals: 8, layered: true });
+  camera(null);
+  let got = false;
+  addEventListener('deviceorientation', (e) => {
+    got = true;
+    const x = Math.max(-25, Math.min(25, e.gamma || 0));
+    const y = Math.max(-25, Math.min(25, (e.beta || 0) - 40));
+    world.style.transform = `translate3d(${x * 3}px, ${y * 1.5}px, 0) rotateY(${x * 0.15}deg)`;
+  });
+  setTimeout(() => { const msg = got ? '陀螺儀：有反應（請描述傾斜時順不順）' : '陀螺儀：沒有收到資料'; results.push(msg); $('gyro').textContent = msg; }, 2500);
+};
+
+$('copy').onclick = async () => {
+  const text = `[${$('dev').textContent}｜${navigator.userAgent}]\n${results.join('\n')}`;
+  try { await navigator.clipboard.writeText(text); $('copy').textContent = '已複製'; } catch { $('copy').textContent = '無法複製，請截圖'; }
+};
+scene({ animals: 6, layered: true });
+</script>
+</body>
+</html>
