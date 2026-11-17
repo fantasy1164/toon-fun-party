@@ -8,6 +8,9 @@ import { loadYT, noReferrer } from '../scenes/english.js';
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const DAYS = '日一二三四五六';
 const picked = (id) => new Set(state.settings.english?.[id] || []);
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// 播過的影片會記住標題（english.js 的 learnTitle）
+const titleOf = (i) => { const id = state.settings.enYtIds?.[i]; return (id && state.settings.enYtTitles?.[id]) || ''; };
 
 function groups() {
   const out = [];
@@ -43,9 +46,9 @@ export function englishSection() {
     <h3>妍卉：Max &amp; Mousy Book 2（YouTube） <span class="en-n" data-for="yh">已選 ${yh.size} 支</span></h3>
     <button class="quiet small" data-act="en-clear" data-id="yh">全部取消</button>
     <button class="quiet small" data-act="en-thumbs">${ids.length ? '重新載入縮圖' : '載入影片縮圖'}</button> <span class="note en-yt-msg"></span>
-    <p class="note">原本的 CD 網站只有 http，iPad 上不能在遊戲裡播放，所以用 YouTube 播放清單。</p>
+    <p class="note">原本的 CD 網站只有 http，iPad 上不能在遊戲裡播放，所以用 YouTube 播放清單。影片標題要在遊戲裡播過一次才會顯示在這裡。</p>
     <div class="en-yt-grid">
-      ${Array.from({ length: YT_COUNT }, (_, i) => `<label class="en-v"><input type="checkbox" data-en="yh" data-i="${i}" ${yh.has(i) ? 'checked' : ''}>${thumb(i)}<b>${i + 1}</b></label>`).join('')}
+      ${Array.from({ length: YT_COUNT }, (_, i) => `<label class="en-v"><input type="checkbox" data-en="yh" data-i="${i}" ${yh.has(i) ? 'checked' : ''}>${thumb(i)}<b>${i + 1}</b>${titleOf(i) ? `<small>${esc(titleOf(i))}</small>` : ''}</label>`).join('')}
     </div>
     <div class="en-yt-probe"></div>`;
 }

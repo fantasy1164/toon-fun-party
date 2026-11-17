@@ -77,13 +77,13 @@ export function mountEnglish(stage, { profile, onExit }) {
       <div class="tg-veil"></div>
       <div class="tg-host"><div class="tg-host-in o-pj">${mianSvg()}</div></div>
       <div class="en-who"></div>
-      <div class="en-video hidden"><div class="en-yt"></div></div>
-      <div class="en-audio hidden">
+      <div class="en-main hidden">
+        <div class="en-video hidden"><div class="en-yt"></div></div>
         <div class="en-now"></div>
-        <button class="round-btn en-play">${PLAY}</button>
+        <div class="en-row"><button class="round-btn en-prev">${PREV}</button><button class="round-btn en-play">${PLAY}</button><button class="round-btn en-next">${NEXT}</button></div>
+        <div class="en-bar"><i></i></div>
       </div>
-      <div class="en-ctrls hidden"><button class="round-btn en-prev">${PREV}</button><button class="round-btn en-next">${NEXT}</button></div>
-      <div class="en-dots"></div>
+      <div class="en-list hidden"></div>
       <button class="round-btn en-done"><svg class="en-ring" viewBox="0 0 160 160"><circle cx="80" cy="80" r="70"/></svg>${DONE}</button>
       <div class="hud"><button class="round-btn home">${ICON.home}</button></div>
       <div class="fade"></div>
@@ -92,12 +92,12 @@ export function mountEnglish(stage, { profile, onExit }) {
   stopMusic();
   const hostIn = $('.tg-host-in', root);
   const who = $('.en-who', root);
-  const audioBox = $('.en-audio', root);
+  const main = $('.en-main', root);
   const playBtn = $('.en-play', root);
   const nowBox = $('.en-now', root);
   const videoBox = $('.en-video', root);
-  const ctrls = $('.en-ctrls', root);
-  const dots = $('.en-dots', root);
+  const bar = $('.en-bar i', root);
+  const list = $('.en-list', root);
   const doneBtn = $('.en-done', root);
   const ring = $('.en-ring circle', root);
   ring.setAttribute('stroke-dasharray', `0 ${RING_C.toFixed(1)}`);
@@ -124,25 +124,67 @@ export function mountEnglish(stage, { profile, onExit }) {
   let yt = null;
   cleanups.push(() => { try { yt?.destroy(); } catch { /* 忽略 */ } yt = null; });
 
+  // iOS：播放 mp3 一定要在手指離開螢幕（click）的當下開始，按下去（pointerdown）的時候會被拒絕
+  const onClick = (node, fn) => node.addEventListener('click', (e) => { e.preventDefault(); fn(e); });
+
   let picks = [];     // 這個人今天要聽的
   let pos = 0;        // 現在第幾個
   let kind = 'audio';
   let heard = false;  // 有沒有真的開始聽
   let allHeard = null;
 
+  // 給家長看的曲目名稱（小孩看書，不看螢幕）
+  function label(i) {
+    if (kind === 'audio') { const t = ROCKET[picks[i]]; return `${t.disk} ${t.ver} ${t.no} · ${t.title}`; }
+    const n = picks[i];
+    const title = ytTitle(n);
+    return title ? `${n + 1}. ${title}` : `第 ${n + 1} 支`;
+  }
+  function iconOf(i) { return kind === 'audio' ? trackKind(ROCKET[picks[i]].title) : 'abc'; }
   function paintDots() {
-    dots.innerHTML = picks.map((p, i) => {
-      const ic = kind === 'audio' ? trackKind(ROCKET[p].title) : 'abc';
-      return `<div class="en-dot" data-i="${i}">${tgIcon(ic, 46)}<b>${i + 1}</b></div>`;
-    }).join('');
+    list.innerHTML = picks.map((p, i) => `<button class="en-li" data-i="${i}"><span class="ic">${tgIcon(iconOf(i), 34)}</span><span class="tx">${label(i)}</span></button>`).join('');
+    $$('.en-li', list).forEach((b) => onClick(b, () => { sfx('tap'); jump(+b.dataset.i); }));
     markDots();
   }
   function markDots() {
-    $$('.en-dot', dots).forEach((d, i) => {
+    $$('.en-li', list).forEach((d, i) => {
       d.classList.toggle('on', i === pos);
       d.classList.toggle('past', i < pos);
     });
+    const cur = picks[pos] != null ? pos : picks.length - 1;
+    nowBox.innerHTML = picks.length ? `<span class="ic">${tgIcon(iconOf(cur), 34)}</span><span class="tx">${label(cur)}</span>` : '';
+    nowBox.classList.toggle('done', pos >= picks.length);
+    $('.en-li.on', list)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
+  // YouTube 的影片標題：播過一次就記住（家長頁也看得到）
+  function ytTitle(n) {
+    const id = state.settings.enYtIds?.[n];
+    return (id && state.settings.enYtTitles?.[id]) || '';
+  }
+  function learnTitle() {
+    try {
+      const d = yt?.getVideoData?.();
+      const n = yt?.getPlaylistIndex?.();
+      if (!d?.title || !d.video_id || n == null || n < 0) return;
+      const ids = [...(state.settings.enYtIds || [])];
+      if (ids[n] !== d.video_id) { ids[n] = d.video_id; state.settings.enYtIds = ids; }
+      if (state.settings.enYtTitles?.[d.video_id] === d.title) return;
+      state.settings.enYtTitles = { ...(state.settings.enYtTitles || {}), [d.video_id]: d.title };
+      save();
+      const i = picks.indexOf(n);
+      const row = i >= 0 && $(`.en-li[data-i="${i}"] .tx`, list);
+      if (row) row.textContent = label(i);
+      markDots();
+    } catch { /* 忽略 */ }
+  }
+  // 進度條
+  const barTimer = setInterval(() => {
+    let f = 0;
+    if (kind === 'audio') f = au.duration ? au.currentTime / au.duration : 0;
+    else { try { const d = yt?.getDuration?.(); f = d ? yt.getCurrentTime() / d : 0; } catch { f = 0; } }
+    bar.style.width = `${Math.max(0, Math.min(1, f)) * 100}%`;
+  }, 400);
+  cleanups.push(() => clearInterval(barTimer));
   function setPlaying(on) {
     playBtn.innerHTML = on ? PAUSE : PLAY;
     playBtn.classList.toggle('glow', !on);
@@ -153,7 +195,6 @@ export function mountEnglish(stage, { profile, onExit }) {
   function loadTrack(i, autoplay) {
     pos = Math.max(0, Math.min(picks.length - 1, i));
     const t = ROCKET[picks[pos]];
-    nowBox.innerHTML = `${tgIcon(trackKind(t.title), 120)}<b>${pos + 1}</b>`;
     au.src = t.url;
     markDots();
     if (autoplay) au.play().catch(() => setPlaying(false));
@@ -169,7 +210,7 @@ export function mountEnglish(stage, { profile, onExit }) {
   });
   au.addEventListener('error', () => {
     if (!alive || !au.getAttribute('src')) return;
-    const dot = $(`.en-dot[data-i="${pos}"]`, dots);
+    const dot = $(`.en-li[data-i="${pos}"]`, list);
     if (dot && !dot.classList.contains('bad')) { dot.classList.add('bad'); bad++; }
     // 全部都放不出來：請爸爸媽媽看看（網路或網站的問題）
     if (bad >= picks.length) {
@@ -181,8 +222,6 @@ export function mountEnglish(stage, { profile, onExit }) {
     // 這一首放不出來：跳下一首
     if (pos < picks.length - 1) setTimeout(() => { if (alive) loadTrack(pos + 1, heard); }, 800);
   });
-  // iOS：播放 mp3 一定要在手指離開螢幕（click）的當下開始，按下去（pointerdown）的時候會被拒絕
-  const onClick = (node, fn) => node.addEventListener('click', (e) => { e.preventDefault(); fn(e); });
   au.playsInline = true;
   onClick(playBtn, () => {
     if (au.paused) { sfx('tap'); au.play().catch(() => setPlaying(false)); } else { au.pause(); }
@@ -192,7 +231,7 @@ export function mountEnglish(stage, { profile, onExit }) {
   function ytState(e) {
     if (!yt) return;
     const S = window.YT.PlayerState;
-    if (e.data === S.PLAYING) { heard = true; hostIn.classList.add('listening'); }
+    if (e.data === S.PLAYING) { heard = true; hostIn.classList.add('listening'); learnTitle(); }
     if (e.data === S.PAUSED) hostIn.classList.remove('listening');
     if (e.data === S.ENDED) {
       if (pos < picks.length - 1) { pos++; markDots(); yt.playVideoAt(picks[pos]); }
@@ -213,8 +252,8 @@ export function mountEnglish(stage, { profile, onExit }) {
     $('.en-yt', root).replaceChildren(box);
     await new Promise((resolve, reject) => {
       yt = new YT.Player(box, {
-        width: 768,
-        height: 432,
+        width: 600,
+        height: 338,
         host: 'https://www.youtube-nocookie.com',
         playerVars: { playsinline: 1, rel: 0, modestbranding: 1, listType: 'playlist', list: YT_LIST, index: picks[0] },
         events: {
@@ -226,11 +265,14 @@ export function mountEnglish(stage, { profile, onExit }) {
       setTimeout(() => reject(new Error('yt-timeout')), 15000);
     });
   }
-  function go(d) {
-    sfx('tap');
-    const n = Math.max(0, Math.min(picks.length - 1, Math.min(pos, picks.length - 1) + d));
+  function jump(n) {
+    n = Math.max(0, Math.min(picks.length - 1, n));
     if (kind === 'audio') loadTrack(n, true);
     else if (yt) { pos = n; markDots(); yt.playVideoAt(picks[pos]); }
+  }
+  function go(d) {
+    sfx('tap');
+    jump(Math.min(pos, picks.length - 1) + d);
   }
   onClick($('.en-prev', root), () => go(-1));
   onClick($('.en-next', root), () => go(1));
@@ -271,10 +313,13 @@ export function mountEnglish(stage, { profile, onExit }) {
     noReferrer(kind === 'audio');
     who.innerHTML = `<div class="en-me">${avatarSvg(id, 150)}</div>${order.filter((k) => k !== id).map((k) => `<div class="en-next-kid">${avatarSvg(k, 70)}</div>`).join('')}`;
     who.style.setProperty('--glow', id === 'yh' ? '#ff8fb8' : '#6fd27a');
-    audioBox.classList.add('hidden');
+    main.classList.add('hidden');
     videoBox.classList.add('hidden');
-    ctrls.classList.add('hidden');
-    dots.innerHTML = '';
+    list.classList.add('hidden');
+    list.innerHTML = '';
+    bar.style.width = '0%';
+    root.classList.toggle('mode-video', kind === 'video');
+    root.classList.toggle('mode-audio', kind === 'audio');
     const finished = new Promise((r) => { doneWait = r; });
     doneBtn.classList.remove('pulse');
     allHeard = () => { doneBtn.classList.add('pulse'); if (alive && !ending) speak('mian', 'en_all_heard', { node: hostIn }); };
@@ -285,9 +330,9 @@ export function mountEnglish(stage, { profile, onExit }) {
       return false;
     }
     paintDots();
+    main.classList.remove('hidden');
+    list.classList.remove('hidden');
     if (kind === 'audio') {
-      audioBox.classList.remove('hidden');
-      ctrls.classList.remove('hidden');
       loadTrack(0, false);
       setPlaying(false);
       if (!navigator.onLine) { await say('en_offline'); doneBtn.classList.add('pulse'); }
@@ -297,7 +342,6 @@ export function mountEnglish(stage, { profile, onExit }) {
       try {
         if (!navigator.onLine) throw new Error('offline');
         await setupVideo();
-        ctrls.classList.remove('hidden');
         await say('en_video');
       } catch (err) {
         guard();
