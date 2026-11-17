@@ -60,8 +60,8 @@ export function islandBack(ph, wx) {
     <defs><linearGradient id="isky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>
     <rect width="1200" height="900" fill="${sea}"/>
     ${[[80, 860], [300, 880], [880, 870], [1120, 850], [1160, 300], [20, 300]].map(([x, y]) => `<path d="M${x - 30} ${y}q15 -10 30 0t30 0" stroke="#fff" stroke-width="4" fill="none" opacity=".6"/>`).join('')}
-    <path d="M10 60Q20 10 120 14L1080 10Q1190 14 1192 80L1194 760Q1190 830 1100 836L760 840Q700 900 600 900Q500 900 440 840L100 836Q10 830 8 760Z" fill="${sand}"/>
-    <path d="M24 70Q30 26 120 28L1080 24Q1176 28 1178 86L1180 750Q1176 816 1096 820L740 822Q690 880 600 880Q510 880 460 822L104 820Q24 816 22 750Z" fill="${land}"/>
+    <path d="M10 60Q20 10 120 14L1080 10Q1190 14 1192 80L1194 760Q1190 830 1100 836L730 840Q700 812 600 812Q500 812 470 840L100 836Q10 830 8 760Z" fill="${sand}"/>
+    <path d="M24 70Q30 26 120 28L1080 24Q1176 28 1178 86L1180 750Q1176 816 1096 820L712 822Q684 800 600 800Q516 800 488 822L104 820Q24 816 22 750Z" fill="${land}"/>
     <!-- 遊園車的鐵軌（繞一圈） -->
     <rect x="290" y="268" width="620" height="472" rx="90" fill="none" stroke="${n ? '#4a4038' : '#b9a27a'}" stroke-width="20"/>
     <rect x="290" y="268" width="620" height="472" rx="90" fill="none" stroke="${n ? '#8a8070' : '#f4ead0'}" stroke-width="10" stroke-dasharray="3 9"/>
@@ -145,10 +145,9 @@ export function giftExt(ph) {
 export function pierExt(ph, { closed = false, side = 'suburb' } = {}) {
   const n = night(ph);
   return `<svg viewBox="0 0 260 230" overflow="visible">
-    ${side === 'suburb' ? `<path d="M14 66Q130 28 250 62Q266 150 246 222Q130 238 22 224Q2 150 14 66Z" fill="${n ? '#24466a' : '#6fc3ec'}"/><path d="M10 76q20 -8 40 0t40 0M150 90q20 -8 40 0t40 0" stroke="#fff" stroke-width="4" fill="none" opacity=".7"/>` : ''}
     <rect x="${side === 'suburb' ? 20 : 30}" y="${side === 'suburb' ? 150 : 40}" width="${side === 'suburb' ? 120 : 160}" height="26" fill="#b8895a"/>
     ${Array.from({ length: 6 }, (_, i) => `<rect x="${(side === 'suburb' ? 24 : 34) + i * 22}" y="${side === 'suburb' ? 172 : 62}" width="8" height="30" fill="#8a5a2b"/>`).join('')}
-    ${shipSvg(side === 'suburb' ? 96 : 40, side === 'suburb' ? 62 : -40, side === 'suburb' ? 0.62 : 0.5, n)}
+    <g class="moored">${side === 'suburb' ? shipSvg(96, 62, 0.62, n) : shipSvg(40, 77, 0.7, n)}</g>
     ${closed ? '<g transform="translate(40 110)"><rect width="56" height="40" rx="8" fill="#fff" stroke="#e5484d" stroke-width="5"/><path d="M14 10L42 30M42 10L14 30" stroke="#e5484d" stroke-width="6" stroke-linecap="round"/></g>' : ''}
   </svg>`;
 }

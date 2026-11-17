@@ -127,9 +127,13 @@ export function suburbBack(ph, wx) {
     ${[0, 1, 2, 3, 4, 5].map((i) => `<path d="M${i * 220 - 60} 900Q${i * 220 + 40} 600 ${i * 220 + 160} 420" stroke="${n ? '#3a6446' : '#b2dc8c'}" stroke-width="40" fill="none" opacity=".5"/>`).join('')}
     <!-- 海 -->
     <path d="M0 640Q200 600 400 640V900H0Z" fill="${n ? '#24466a' : '#6fc3ec'}"/><path d="M0 660Q200 620 400 660" stroke="#fff" stroke-width="6" fill="none" opacity=".7"/>
+    <!-- 海灣：碼頭在岸邊，郵輪往右開出海 -->
+    <path d="M1200 492Q1100 496 1056 566Q1022 626 1040 690Q1056 760 1022 832H1200Z" fill="${n ? '#e0c890' : '#f3dc9c'}" transform="translate(-14 0)"/>
+    <path d="M1200 500Q1104 504 1062 570Q1030 628 1046 690Q1062 760 1030 832H1200Z" fill="${n ? '#24466a' : '#6fc3ec'}"/>
+    <path d="M1090 560q18 -8 36 0t36 0M1110 780q18 -8 36 0t36 0M1150 640q14 -6 28 0" stroke="#fff" stroke-width="5" fill="none" opacity=".7"/>
     <path d="M800 790H1010V716M800 790V560H210V520M800 560H960V400M420 560V640" stroke="${road}" stroke-width="30" fill="none" stroke-linejoin="round"/>
     ${rails('M-20 840H1220', n)}
-    ${tree(420, 330, 1, n)}${tree(700, 300, 0.8, n)}${tree(880, 470, 1, n)}${tree(820, 760, 1, n)}${tree(1080, 820, 1, n)}
+    ${tree(420, 330, 1, n)}${tree(700, 300, 0.8, n)}${tree(880, 470, 1, n)}${tree(820, 760, 1, n)}${tree(960, 520, 0.9, n)}
     ${weatherLayer(wx, ph, 0, 0, 1200, 900)}
   </svg>`;
 }

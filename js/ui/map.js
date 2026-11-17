@@ -137,10 +137,13 @@ export function showMap(stage, profile, zone = 'city') {
       sfx(snd);
       await follow([car], pts, ms, put);
     }
-    // 郵輪：郊區碼頭往右開出去；島上的碼頭往下開走
-    const shipOut = () => (zone === 'island'
-      ? vehicle(MAP_SHIP, [[600, 880], [600, 1060]], 1100, 250, 170, 'horn')
-      : vehicle(MAP_SHIP, [[1060, 740], [1420, 740]], 1100, 250, 170, 'horn'));
+    // 郵輪：從停在碼頭的那艘船出發（同位置、同大小），郊區沿著海灣往右出海；島上往下開走
+    const shipOut = async () => {
+      const pier = $('.room[data-room="pier"]', node);
+      pier?.classList.add('ship-gone');
+      if (zone === 'island') await vehicle(MAP_SHIP, [[599, 871], [700, 905], [1320, 930]], 1500, 97, 66, 'horn');
+      else await vehicle(MAP_SHIP, [[1108, 713], [1200, 713], [1420, 713]], 1400, 155, 105, 'horn');
+    };
     const trainOut = () => vehicle(MAP_TRAIN, [[city ? 190 : 640, city ? 300 : 840], [city ? -260 : 1460, city ? 300 : 840]], 1300, 220, 80, 'horn');
 
     async function travel(room) {

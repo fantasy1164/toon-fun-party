@@ -1761,6 +1761,7 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 
 /* ===================== 歡樂島地圖、郊區碼頭 ===================== */
 .map.zone-island .room.out > svg { overflow: visible; }
+.map .room.ship-gone .moored { visibility: hidden; }
 .map .map-pier.closed > svg, .map.zone-island .room.closed > svg { filter: grayscale(.6) brightness(.9); }
 
 /* ===================== 立體感：舞台攝影機（11/17） ===================== */
