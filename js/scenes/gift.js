@@ -13,7 +13,7 @@ import { itemSvg } from '../art/items.js';
 import { avatarSvg } from '../art/characters.js';
 import { makeScene, charDiv } from './party.js';
 import { tapOne, hardNow, moveTo, kidNode, shuffle } from './kit.js';
-import { passTurn } from '../core/turns.js';
+import { passTurn, inTurnOrder } from '../core/turns.js';
 
 const HOST = 'sensen';
 
@@ -106,7 +106,7 @@ export function mountGift(stage, { profile, onExit }) {
   async function choose(kikiKeep) {
     await host('gf_your_turn');
     const picked = {};
-    for (const id of kids) {
+    for (const id of inTurnOrder(kids)) {
       await call();
       shopping = true;
       const free = $$('.gf-plush', root).filter((n) => !n.classList.contains('taken'));

@@ -9,7 +9,7 @@ import * as weather from '../core/weather.js';
 import { busStreet, busSvg, busInside, BUS_SCENERY, BELL, CARD_READER, STRAP, GRANDPA, BUNNY, TR, platformBack, TRAIN_SIDE, trainInside, trainScenery, seatSvg, ticketSvg, GATE } from '../art/transit.js';
 import { makeScene, charDiv } from './party.js';
 import { pickCard, tapOne, hardNow, giveReward, moveTo, kidNode, shuffle } from './kit.js';
-import { passTurn } from '../core/turns.js';
+import { passTurn, inTurnOrder } from '../core/turns.js';
 
 // 公車螢幕上的站（圖）
 const STOP_ICON = {
@@ -243,7 +243,7 @@ export function mountTrain(stage, { profile, onExit, to = 'suburb' }) {
   async function gate() {
     await say('pupu', 'tr_gate');
     const g = $('.tr-gate', root);
-    for (const id of kids) {
+    for (const id of inTurnOrder(kids)) {
       await tap(g);
       guard();
       sfx('ding');

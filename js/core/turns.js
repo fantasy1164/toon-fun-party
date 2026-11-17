@@ -24,6 +24,11 @@ export function turnsOn() { return ids.length > 1; }
 export function whoseTurn() { return turnsOn() ? cur : null; }
 export function turnSide() { return turnsOn() ? SIDE[cur] : null; }
 export function otherKid(id = cur) { return ids.find((x) => x !== id); }
+// 一個一個輪流做的時候，照唱名的順序（目前輪到的人先）
+export function inTurnOrder(list) {
+  if (!turnsOn() || !list.includes(cur)) return list;
+  return [cur, ...list.filter((x) => x !== cur)];
+}
 
 function paint() {
   const body = document.body;

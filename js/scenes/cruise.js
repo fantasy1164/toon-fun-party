@@ -7,6 +7,7 @@ import { speak } from '../core/voice.js';
 import { phase } from '../core/clock.js';
 import { cruisePierBack, GANGWAY, deckBack, seaStrip, RAILING, ISLAND_FAR, LIFE_VEST, BUCKLE, DOLPHIN, GULL, CR } from '../art/cruise.js';
 import { makeScene, charDiv } from './party.js';
+import { inTurnOrder } from '../core/turns.js';
 import { pickCard, tapOne, tapEach, hardNow, giveReward, moveTo, kidNode } from './kit.js';
 import { useBody } from '../art/characters.js';
 
@@ -46,7 +47,7 @@ export function mountCruise(stage, { profile, onExit }) {
   async function board() {
     await cap('cr_board');
     const g = $('.cr-gang', root);
-    for (const id of kids) {
+    for (const id of inTurnOrder(kids)) {
       await tap(g);
       guard();
       sfx('pop');
@@ -65,7 +66,7 @@ export function mountCruise(stage, { profile, onExit }) {
   // ---------- 救生衣：每個人扣好三個扣子 ----------
   async function vest() {
     await cap('cr_vest');
-    for (const id of kids) {
+    for (const id of inTurnOrder(kids)) {
       const k = kidEl(id);
       k.insertAdjacentHTML('beforeend', `<div class="cr-vest${useBody() ? '' : ' head'}">${LIFE_VEST}</div>`);
       sfx('whoosh');
