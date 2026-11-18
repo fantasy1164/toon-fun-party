@@ -1,5 +1,5 @@
 // 英文複習（棉棉陪，11/17 John 提出）：晚上 20:00–21:30，睡前聽學校的英文。
-// 向澤聽 Rocket Book 1 的 mp3，妍卉看 Max & Mousy Book 2 的 YouTube 影片；家長在家長頁勾選今天要聽的。
+// 向澤聽 Rocket Book 1 的 mp3，妍卉看 Max & Mousy Book 3 的 YouTube 影片；家長在家長頁勾選今天要聽的。
 // 一、三、五、日向澤先聽，二、四、六妍卉先聽；家長按住勾勾（確認聽完了）才換下一個人。
 // 只播原網站的連結，不複製檔案；不算遊玩時間；每人每天第一次聽完給棉棉一顆好朋友星星、累計英文徽章。
 import { EN_HOURS, EN_FIRST } from '../config.js';
@@ -13,7 +13,7 @@ import { avatarSvg } from '../art/characters.js';
 import { mianSvg } from '../art/bedroom.js';
 import { tgIcon, backFor } from '../art/together.js';
 import { ICON } from '../ui/screens.js';
-import { ROCKET, YT_LIST, COURSES, trackKind } from '../data/english.js';
+import { ROCKET, YT_LIST, COURSES, trackKind, syncYtList } from '../data/english.js';
 
 export const englishOpen = (h = hour()) => h >= EN_HOURS.from && h < EN_HOURS.to;
 
@@ -37,6 +37,7 @@ export function englishOrder(members) {
 }
 // 家長勾選的（照課程順序）
 export function englishPicks(id) {
+  if (syncYtList(state)) save();
   const max = COURSES[id]?.count || 0;
   return [...new Set(state.settings.english?.[id] || [])].filter((i) => Number.isInteger(i) && i >= 0 && i < max).sort((a, b) => a - b);
 }

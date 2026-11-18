@@ -2,7 +2,7 @@
 import { state, save } from '../core/store.js';
 import { now } from '../core/clock.js';
 import { EN_FIRST } from '../config.js';
-import { ROCKET, YT_LIST, YT_COUNT } from '../data/english.js';
+import { ROCKET, YT_LIST, YT_COUNT, syncYtList } from '../data/english.js';
 import { loadYT, noReferrer } from '../scenes/english.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
@@ -24,6 +24,8 @@ function groups() {
 }
 
 export function englishSection() {
+  const reset = syncYtList(state);
+  if (reset) save();
   const first = EN_FIRST[now().getDay()];
   const xz = picked('xz');
   const yh = picked('yh');
@@ -43,7 +45,8 @@ export function englishSection() {
       ${g.list.map((t) => `<label class="en-row"><input type="checkbox" data-en="xz" data-i="${t.i}" ${xz.has(t.i) ? 'checked' : ''}> ${t.no}　${t.title} <span class="en-st" data-i="${t.i}"></span></label>`).join('')}
     </details>`).join('')}
 
-    <h3>妍卉：Max &amp; Mousy Book 2（YouTube） <span class="en-n" data-for="yh">已選 ${yh.size} 支</span></h3>
+    <h3>妍卉：Max &amp; Mousy Book 3（YouTube） <span class="en-n" data-for="yh">已選 ${yh.size} 支</span></h3>
+    ${reset ? '<p class="note"><b>播放清單換成 Book 3 了，原本的勾選已清掉，請重新勾選並按「載入影片縮圖」。</b></p>' : ''}
     <button class="quiet small" data-act="en-clear" data-id="yh">全部取消</button>
     <button class="quiet small" data-act="en-thumbs">${ids.length ? '重新載入縮圖' : '載入影片縮圖'}</button> <span class="note en-yt-msg"></span>
     <p class="note">原本的 CD 網站只有 http，iPad 上不能在遊戲裡播放，所以用 YouTube 播放清單。影片標題要在遊戲裡播過一次才會顯示在這裡。</p>

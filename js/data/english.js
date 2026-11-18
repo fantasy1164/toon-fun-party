@@ -1,6 +1,6 @@
 // 英文複習的課程（11/17 John 提供）。只存連結，播放時直接從原網站／YouTube 串流，不複製檔案到專案（專案是公開的）。
 // 向澤：Rocket Book 1（Melody，mymelodysongs.com 公開的 mp3）
-// 妍卉：Max & Mousy Book 2（YouTube 播放清單，凱撒琳親子ABC）。原本的 CD 網站只有 http，iPad 上不能在 https 的遊戲裡播放。
+// 妍卉：Max & Mousy 3e Book 3（YouTube 播放清單，凱撒琳親子ABC；11/18 從 Book 2 換成 Book 3）。原本的 CD 網站只有 http，iPad 上不能在 https 的遊戲裡播放。
 
 const ROCKET_BASE = 'https://mymelodysongs.com/wp-content/uploads/2021/03/';
 // [光碟, 版本, 軌號, 曲名, 檔名]
@@ -88,14 +88,25 @@ const ROCKET_RAW = [
 ];
 export const ROCKET = ROCKET_RAW.map(([disk, ver, no, title, file], i) => ({ i, disk, ver, no, title, url: `${ROCKET_BASE}${file}.mp3` }));
 
-export const YT_LIST = 'PLSwnJFlaFW6wRiuBdwAwB8wK8VUDpC7il';
-export const YT_COUNT = 38;
+export const YT_LIST = 'PLSwnJFlaFW6yPJJN0bGFG0fYRLVT_SU9N';
+export const YT_COUNT = 47;
 
 // 每個小孩的課程
 export const COURSES = {
   xz: { kind: 'audio', name: 'Rocket Book 1', count: ROCKET.length },
-  yh: { kind: 'video', name: 'Max & Mousy Book 2', count: YT_COUNT },
+  yh: { kind: 'video', name: 'Max & Mousy Book 3', count: YT_COUNT },
 };
+
+// 換了播放清單：舊清單的勾選（第幾支）和影片編號都對不上了，清掉重選（影片標題用影片編號記，留著無妨）
+export function syncYtList(state) {
+  const s = state.settings;
+  if (s.enYtList === YT_LIST) return false;
+  const changed = !!s.enYtList || !!(s.enYtIds?.length) || !!(s.english?.yh?.length);
+  s.enYtList = YT_LIST;
+  s.enYtIds = [];
+  s.english = { ...(s.english || {}), yh: [] };
+  return changed;
+}
 
 // 曲目種類 → 小圖示（小孩看不懂字，用圖分辨）
 export function trackKind(title) {
