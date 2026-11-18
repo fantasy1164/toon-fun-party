@@ -337,6 +337,7 @@ export function mountKitchen(stage, { profile, onExit }) {
         if (FOODS[f].g === 'veg' && other === 'kiki' && !needEncourage) {
           needEncourage = true;
           await say('kiki', 'k_kiki_noveg');
+          await say('bobo', 'k_noveg_tap');
           charNode('other').classList.add('glow-char');
         }
         busy = false;
@@ -383,6 +384,7 @@ export function mountKitchen(stage, { profile, onExit }) {
         }
         if (needEncourage && !encouraged) {
           await say('kiki', 'k_kiki_noveg');
+          await say('bobo', 'k_noveg_tap');
           charNode('other').classList.add('glow-char');
           busy = false;
           return;
@@ -509,6 +511,7 @@ export function mountKitchen(stage, { profile, onExit }) {
         if (FOODS[f].g === 'veg' && other === 'kiki' && !needEncourage) {
           needEncourage = true;
           await say('kiki', 'k_kiki_noveg');
+          await say('bobo', 'k_noveg_tap');
           charNode('other').classList.add('glow-char');
         }
         if (isDone(turn)) { sfx('sparkle'); const c = centerOf(me.g); burst(c.x, c.y, { n: 10, kind: 'star', spread: 120 }); }

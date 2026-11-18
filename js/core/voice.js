@@ -155,6 +155,7 @@ export async function speak(charId, lineId, { name = '', who = '', node = null }
   const my = token;
   const text = lineText(lineId, charId, name);
   if (!text) return;
+  window.__said?.push(`${charId}/${lineId}`);   // 測試用：記錄說過的台詞
   speakingToken = my;
   node?.classList.add('talking');
   duck(true);

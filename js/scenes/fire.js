@@ -84,6 +84,7 @@ export function mountFire(stage, { profile, onExit }) {
 
   async function lighter() {
     await say('kiki', 'fi_kiki_lighter');
+    await host('fi_lighter_q');
     await card(FI.giveAdult, [FI.playFire], 'fi_lighter_wrong');
     await host('fi_lighter_ok');
   }

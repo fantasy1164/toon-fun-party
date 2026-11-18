@@ -199,6 +199,7 @@ export function mountBedroom(stage, { profile, onExit }) {
         await say(`m_pj_${o}`);
         mianIn.classList.remove('shiver', `o-${o}`);
         mianIn.classList.add('o-day');
+        await say('m_pj_hard');   // 再問一次：哪一件是睡衣呢？
         await turnCall(CHAR, mianIn);
         busy = false;
       }));

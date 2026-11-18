@@ -164,6 +164,8 @@ function mountClass(stage, { profile, onExit }) {
     k.classList.add('shout');
     await say('kiki', 's_shout');
     guard();
+    await say('gugu', 's_shout_tap');
+    guard();
     k.classList.add('glow-char');
     await tapTurn(k);
     k.classList.remove('glow-char');

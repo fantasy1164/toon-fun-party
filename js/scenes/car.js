@@ -167,6 +167,9 @@ export function mountCar(stage, { profile, onExit, dest = 'park', trip = false }
     $('.belt.kiki', root).classList.remove('on');
     await say('kiki', 'c_naughty');
     guard();
+    // 先說哪裡不對、要怎麼做，再唱名
+    await say('pupu', 'c_stand_tap');
+    guard();
     await turnCall('pupu', driver());
     guard();
     k.classList.add('glow-char');

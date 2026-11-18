@@ -128,6 +128,7 @@ export function mountBus(stage, { profile, onExit, dest = 'theater', trip = fals
   async function ride() {
     await say('pupu', 'bus_hold');
     const st = thing('bt-strap', STRAP, [600, 150]);
+    await say('pupu', 'bus_strap_tap');
     await tap(st);
     guard();
     st.remove();
@@ -139,6 +140,7 @@ export function mountBus(stage, { profile, onExit, dest = 'theater', trip = fals
     gp.classList.add('in');
     await pause(1200);
     await say('kiki', 'bus_gp');
+    await say('pupu', 'bus_gp_q');
     await card('pupu', TR.giveSeat, [TR.keepSeat], 'bus_seat_wrong');
     gp.classList.add('sit');
     sfx('sparkle');
