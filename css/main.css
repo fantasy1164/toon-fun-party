@@ -1807,9 +1807,13 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .tg-english .en-bar { width: 440px; height: 12px; border-radius: 6px; background: rgba(255, 255, 255, .28); overflow: hidden; }
 .tg-english .en-bar i { display: block; height: 100%; width: 0; border-radius: 6px; background: #ffd34d; transition: width .4s linear; }
 /* 右邊：課程清單卡（給家長看，點一行就播那一首） */
-.tg-english .en-list { position: absolute; right: 30px; top: 196px; width: 336px; max-height: 486px; z-index: 5; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px 0; border-radius: 18px; background: #fffaf0; box-shadow: 0 10px 26px rgba(0, 0, 0, .3); }
+.tg-english .en-list { position: absolute; right: 30px; top: 196px; width: 336px; max-height: 486px; z-index: 10; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain; padding: 0 0 10px; border-radius: 18px; background: #fffaf0; box-shadow: 0 10px 26px rgba(0, 0, 0, .3); }
 .tg-english .en-li { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 16px 10px 12px; border: 0; background: none; text-align: left; color: #444441; font: 600 20px/1.3 sans-serif; }
 .tg-english .en-li .tx { flex: 1; }
+.tg-english .en-sep { position: sticky; top: 0; z-index: 1; padding: 10px 16px 6px; background: #fffaf0; color: #888780; font: 700 16px/1.2 sans-serif; border-bottom: 1px solid #ece6d8; }
+.tg-english .en-li.pick { color: #3c3489; }
+.tg-english .en-li { scroll-margin: 40px 0 6px; }
+.tg-english .en-li:not(.pick) { font-weight: 500; }
 .tg-english .en-li.on { background: #fac775; color: #633806; }
 .tg-english .en-li.past { color: #9a988f; }
 .tg-english .en-li.past .ic { opacity: .45; }

@@ -3,13 +3,13 @@ import { state, save } from '../core/store.js';
 import { now } from '../core/clock.js';
 import { EN_FIRST } from '../config.js';
 import { ROCKET, YT_LIST, YT_COUNT, syncYtList } from '../data/english.js';
-import { loadYT, noReferrer } from '../scenes/english.js';
+import { loadYT, noReferrer, ytFetchTitles } from '../scenes/english.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const DAYS = '日一二三四五六';
 const picked = (id) => new Set(state.settings.english?.[id] || []);
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-// 播過的影片會記住標題（english.js 的 learnTitle）
+// 影片標題：打開家長頁自動查（ytFetchTitles），查不到的播過一次也會記住（english.js 的 learnTitle）
 const titleOf = (i) => { const id = state.settings.enYtIds?.[i]; return (id && state.settings.enYtTitles?.[id]) || ''; };
 
 function groups() {
@@ -46,10 +46,10 @@ export function englishSection() {
     </details>`).join('')}
 
     <h3>妍卉：Max &amp; Mousy Book 3（YouTube） <span class="en-n" data-for="yh">已選 ${yh.size} 支</span></h3>
-    ${reset ? '<p class="note"><b>播放清單換成 Book 3 了，原本的勾選已清掉，請重新勾選並按「載入影片縮圖」。</b></p>' : ''}
+    ${reset ? '<p class="note"><b>播放清單換成 Book 3 了，原本的勾選已清掉，請重新勾選。</b></p>' : ''}
     <button class="quiet small" data-act="en-clear" data-id="yh">全部取消</button>
-    <button class="quiet small" data-act="en-thumbs">${ids.length ? '重新載入縮圖' : '載入影片縮圖'}</button> <span class="note en-yt-msg"></span>
-    <p class="note">原本的 CD 網站只有 http，iPad 上不能在遊戲裡播放，所以用 YouTube 播放清單。影片標題要在遊戲裡播過一次才會顯示在這裡。</p>
+    <button class="quiet small" data-act="en-thumbs">重新載入縮圖和標題</button> <span class="note en-yt-msg"></span>
+    <p class="note">原本的 CD 網站只有 http，iPad 上不能在遊戲裡播放，所以用 YouTube 播放清單。打開這頁會自動載入縮圖和標題（需要網路）。<br>睡前英文畫面右邊的清單會列出全部課程：勾選的排最上面、會一支接一支自動播；其他課點了才播，播完就停。星星只看勾選的有沒有聽完。</p>
     <div class="en-yt-grid">
       ${Array.from({ length: YT_COUNT }, (_, i) => `<label class="en-v"><input type="checkbox" data-en="yh" data-i="${i}" ${yh.has(i) ? 'checked' : ''}>${thumb(i)}<b>${i + 1}</b>${titleOf(i) ? `<small>${esc(titleOf(i))}</small>` : ''}</label>`).join('')}
     </div>
@@ -106,9 +106,40 @@ async function loadThumbs(node) {
       v.querySelector('img, .en-ph')?.replaceWith(img);
     });
     msg.textContent = `共 ${ids.length} 支${ids.length !== YT_COUNT ? `（原本是 ${YT_COUNT} 支，播放清單可能有變動）` : ''}`;
+    await fillTitles(node);
   } catch (e) {
     msg.textContent = `載入失敗：${e.message}（確認有網路；如果影片不允許嵌入，遊戲裡也會播不出來）`;
   }
+}
+
+// 查還不知道的影片標題，查到一支就顯示一支
+async function fillTitles(node) {
+  const msg = node.querySelector('.en-yt-msg');
+  const ids = state.settings.enYtIds || [];
+  const missing = () => ids.filter((id) => id && !state.settings.enYtTitles?.[id]).length;
+  if (!ids.length || !missing()) return;
+  const base = msg.textContent;
+  msg.textContent = `${base ? `${base}，` : ''}查影片標題中…`;
+  await ytFetchTitles(ids, (id) => {
+    if (!node.isConnected) return;
+    ids.forEach((v, i) => {
+      if (v !== id) return;
+      const box = node.querySelectorAll('.en-v')[i];
+      if (!box) return;
+      let sm = box.querySelector('small');
+      if (!sm) { sm = document.createElement('small'); box.appendChild(sm); }
+      sm.textContent = state.settings.enYtTitles[id];
+    });
+  });
+  const left = missing();
+  msg.textContent = `${base ? `${base}，` : ''}${left ? `${left} 支標題查不到（播過一次就會記住）` : '標題都載入了'}`;
+}
+
+// 打開家長頁：還沒有影片編號就自動載入，有了就補查標題
+export function englishMounted(node) {
+  if (!node.querySelector('.en-yt-grid')) return;
+  if (!(state.settings.enYtIds || []).length) loadThumbs(node);
+  else fillTitles(node);
 }
 
 // 每一首試著靜音播一下，讀得到長度就是可以播。

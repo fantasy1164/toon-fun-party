@@ -9,7 +9,7 @@ import { listen } from '../core/mic.js';
 import * as fest from '../core/festival.js';
 import { setMusicVolume, playMusic } from '../core/audio.js';
 import { drillDay } from './quake.js';
-import { englishSection, englishChange, englishClick } from './englishParent.js';
+import { englishSection, englishChange, englishClick, englishMounted } from './englishParent.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
@@ -203,6 +203,7 @@ export function openParent(onClose, { onStamp } = {}) {
       <p class="note">天氣資料來源：Open-Meteo.com（CC BY 4.0）</p>
     </div>`);
   document.getElementById('stage').appendChild(node);
+  englishMounted(node);
   const ta = node.querySelector('textarea');
   const off = onSyncStatus((st) => {
     if (!node.isConnected) { off(); return; }

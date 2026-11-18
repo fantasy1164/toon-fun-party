@@ -66,7 +66,7 @@ setupBleed(stage);
 setupStageCamera(stage);
 
 // ---------- 防止 iPad 的縮放、捲動、長按選單 ----------
-const inParent = (e) => e.target.closest?.('.parent, .install');
+const inParent = (e) => e.target.closest?.('.parent, .install, .en-list');   // 這些地方要能用手指滑
 document.addEventListener('touchmove', (e) => { if (!inParent(e)) e.preventDefault(); }, { passive: false });
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 document.addEventListener('contextmenu', (e) => e.preventDefault());

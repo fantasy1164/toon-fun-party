@@ -70,6 +70,30 @@ function loadYT() {
 }
 export { loadYT };
 
+// 影片標題：用 YouTube 公開的 oEmbed 查（不用金鑰、不用先播），查到就記在 iPad 上
+export async function ytFetchTitles(ids, onEach) {
+  const known = state.settings.enYtTitles || {};
+  const todo = [...new Set((ids || []).filter((id) => id && !known[id]))];
+  if (!todo.length || !navigator.onLine) return 0;
+  let got = 0;
+  const one = async (id) => {
+    try {
+      const url = `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}`;
+      const r = await fetch(url, { credentials: 'omit' });
+      if (!r.ok) return;
+      const j = await r.json();
+      if (!j?.title) return;
+      state.settings.enYtTitles = { ...(state.settings.enYtTitles || {}), [id]: String(j.title).trim() };
+      got++;
+      onEach?.(id);
+    } catch { /* 查不到就等播的時候再記 */ }
+  };
+  const q = [...todo];
+  await Promise.all(Array.from({ length: 4 }, async () => { while (q.length) await one(q.shift()); }));
+  if (got) save();
+  return got;
+}
+
 export function mountEnglish(stage, { profile, onExit }) {
   const order = englishOrder(profile.members);
   const root = el(`
@@ -121,41 +145,63 @@ export function mountEnglish(stage, { profile, onExit }) {
   const au = new Audio();
   au.preload = 'auto';
   cleanups.push(() => { au.pause(); au.removeAttribute('src'); au.load(); noReferrer(false); });
-  let bad = 0;
   let yt = null;
   cleanups.push(() => { try { yt?.destroy(); } catch { /* 忽略 */ } yt = null; });
 
   // iOS：播放 mp3 一定要在手指離開螢幕（click）的當下開始，按下去（pointerdown）的時候會被拒絕
   const onClick = (node, fn) => node.addEventListener('click', (e) => { e.preventDefault(); fn(e); });
 
-  let picks = [];     // 這個人今天要聽的
-  let pos = 0;        // 現在第幾個
+  // 清單：家長勾的排前面（照順序自動播），後面是其他課（點了才播，播完就停）
+  let picks = [];     // 這個人今天要聽的（課程編號）
+  let rows = [];      // 清單上的每一行（課程編號）：picks + 其他
+  let nPick = 0;
+  let pos = 0;        // 現在播清單的第幾行
+  let want = 0;       // 影片：該播第幾行（-1 = 停）
+  let doneAll = false;
+  let played = new Set();
+  let badRows = new Set();
+  let shownPos = -1;
   let kind = 'audio';
   let heard = false;  // 有沒有真的開始聽
   let allHeard = null;
 
   // 給家長看的曲目名稱（小孩看書，不看螢幕）
   function label(i) {
-    if (kind === 'audio') { const t = ROCKET[picks[i]]; return `${t.disk} ${t.ver} ${t.no} · ${t.title}`; }
-    const n = picks[i];
+    if (kind === 'audio') { const t = ROCKET[rows[i]]; return `${t.disk} ${t.ver} ${t.no} · ${t.title}`; }
+    const n = rows[i];
     const title = ytTitle(n);
     return title ? `${n + 1}. ${title}` : `第 ${n + 1} 支`;
   }
-  function iconOf(i) { return kind === 'audio' ? trackKind(ROCKET[picks[i]].title) : 'abc'; }
+  function iconOf(i) { return kind === 'audio' ? trackKind(ROCKET[rows[i]].title) : 'abc'; }
   function paintDots() {
-    list.innerHTML = picks.map((p, i) => `<button class="en-li" data-i="${i}"><span class="ic">${tgIcon(iconOf(i), 34)}</span><span class="tx">${label(i)}</span></button>`).join('');
+    const row = (i) => `<button class="en-li${i < nPick ? ' pick' : ''}" data-i="${i}"><span class="ic">${tgIcon(iconOf(i), 34)}</span><span class="tx">${label(i)}</span></button>`;
+    const head = (t) => `<div class="en-sep">${t}</div>`;
+    // 分兩組，各自的標題只黏在自己那一組上面
+    list.innerHTML = `<div class="en-grp">${head(`今天勾選的 ${nPick}`)}${rows.slice(0, nPick).map((_, i) => row(i)).join('')}</div>`
+      + (rows.length > nPick ? `<div class="en-grp">${head('其他課程（點了才播）')}${rows.slice(nPick).map((_, k) => row(nPick + k)).join('')}</div>` : '');
     $$('.en-li', list).forEach((b) => onClick(b, () => { sfx('tap'); jump(+b.dataset.i); }));
+    shownPos = -1;
     markDots();
   }
+  function relabel() {
+    $$('.en-li', list).forEach((b) => { const t = $('.tx', b); const v = label(+b.dataset.i); if (t.textContent !== v) t.textContent = v; });
+    paintNow();
+  }
+  function paintNow() {
+    const cur = Math.max(0, Math.min(rows.length - 1, pos));
+    nowBox.innerHTML = rows.length ? `<span class="ic">${tgIcon(iconOf(cur), 34)}</span><span class="tx">${label(cur)}</span>` : '';
+    nowBox.classList.toggle('done', doneAll && want < 0);
+  }
   function markDots() {
-    $$('.en-li', list).forEach((d, i) => {
-      d.classList.toggle('on', i === pos);
-      d.classList.toggle('past', i < pos);
+    $$('.en-li', list).forEach((d) => {
+      const i = +d.dataset.i;
+      d.classList.toggle('on', i === pos && !(doneAll && want < 0));
+      d.classList.toggle('past', played.has(i) && (i !== pos || (doneAll && want < 0)));
+      d.classList.toggle('bad', badRows.has(i));
     });
-    const cur = picks[pos] != null ? pos : picks.length - 1;
-    nowBox.innerHTML = picks.length ? `<span class="ic">${tgIcon(iconOf(cur), 34)}</span><span class="tx">${label(cur)}</span>` : '';
-    nowBox.classList.toggle('done', pos >= picks.length);
-    $('.en-li.on', list)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    paintNow();
+    // 換曲目時才捲到那一行（家長正在滑清單時不要亂跳）
+    if (pos !== shownPos) { shownPos = pos; $('.en-li.on', list)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
   }
   // YouTube 的影片標題：播過一次就記住（家長頁也看得到）
   function ytTitle(n) {
@@ -172,10 +218,7 @@ export function mountEnglish(stage, { profile, onExit }) {
       if (state.settings.enYtTitles?.[d.video_id] === d.title) return;
       state.settings.enYtTitles = { ...(state.settings.enYtTitles || {}), [d.video_id]: d.title };
       save();
-      const i = picks.indexOf(n);
-      const row = i >= 0 && $(`.en-li[data-i="${i}"] .tx`, list);
-      if (row) row.textContent = label(i);
-      markDots();
+      relabel();
     } catch { /* 忽略 */ }
   }
   // 進度條
@@ -194,34 +237,34 @@ export function mountEnglish(stage, { profile, onExit }) {
 
   // mp3：一首接一首
   function loadTrack(i, autoplay) {
-    pos = Math.max(0, Math.min(picks.length - 1, i));
-    const t = ROCKET[picks[pos]];
+    pos = want = Math.max(0, Math.min(rows.length - 1, i));
+    const t = ROCKET[rows[pos]];
     au.src = t.url;
     markDots();
     if (autoplay) au.play().catch(() => setPlaying(false));
   }
-  au.addEventListener('play', () => { heard = true; setPlaying(true); });
+  au.addEventListener('play', () => { heard = true; played.add(pos); setPlaying(true); markDots(); });
   au.addEventListener('pause', () => setPlaying(false));
   au.addEventListener('ended', () => {
-    if (pos < picks.length - 1) { loadTrack(pos + 1, true); return; }
-    pos = picks.length;
-    markDots();
+    if (pos < nPick - 1) { loadTrack(pos + 1, true); return; }
     setPlaying(false);
-    allHeard?.();
+    if (pos === nPick - 1) { doneAll = true; want = -1; markDots(); allHeard?.(); }
+    else { want = -1; markDots(); }   // 其他課：播完就停
   });
   au.addEventListener('error', () => {
     if (!alive || !au.getAttribute('src')) return;
-    const dot = $(`.en-li[data-i="${pos}"]`, list);
-    if (dot && !dot.classList.contains('bad')) { dot.classList.add('bad'); bad++; }
-    // 全部都放不出來：請爸爸媽媽看看（網路或網站的問題）
-    if (bad >= picks.length) {
+    badRows.add(pos);
+    markDots();
+    // 勾選的全部都放不出來：請爸爸媽媽看看（網路或網站的問題）
+    if (pos < nPick && [...badRows].filter((i) => i < nPick).length >= nPick) {
       setPlaying(false);
       doneBtn.classList.add('pulse');
       if (!ending) speak('mian', 'en_offline', { node: hostIn });
       return;
     }
     // 這一首放不出來：跳下一首
-    if (pos < picks.length - 1) setTimeout(() => { if (alive) loadTrack(pos + 1, heard); }, 800);
+    if (pos < nPick - 1) setTimeout(() => { if (alive) loadTrack(pos + 1, heard); }, 800);
+    else setPlaying(false);
   });
   au.playsInline = true;
   onClick(playBtn, () => {
@@ -232,18 +275,25 @@ export function mountEnglish(stage, { profile, onExit }) {
   function ytState(e) {
     if (!yt) return;
     const S = window.YT.PlayerState;
-    if (e.data === S.PLAYING) { heard = true; hostIn.classList.add('listening'); learnTitle(); }
+    if (e.data === S.PLAYING) { heard = true; if (want >= 0) played.add(want); hostIn.classList.add('listening'); learnTitle(); markDots(); }
     if (e.data === S.PAUSED) { hostIn.classList.remove('listening'); resumeAudio(); }
     if (e.data === S.ENDED) {
-      if (pos < picks.length - 1) { pos++; markDots(); yt.playVideoAt(picks[pos]); }
-      else { pos = picks.length; markDots(); hostIn.classList.remove('listening'); yt.stopVideo(); resumeAudio(); allHeard?.(); }
+      if (want >= 0 && want < nPick - 1) { pos = ++want; markDots(); yt.playVideoAt(rows[pos]); return; }
+      const last = want === nPick - 1;
+      want = -1;
+      hostIn.classList.remove('listening');
+      yt.stopVideo();
+      resumeAudio();
+      if (last) doneAll = true;
+      markDots();
+      if (last) allHeard?.();
       return;
     }
     // 播放清單自己跳到下一支（不是家長選的）：跳回該播的那一支
     if (e.data === S.PLAYING || e.data === S.BUFFERING) {
       const idx = yt.getPlaylistIndex();
-      if (pos >= picks.length) yt.stopVideo();
-      else if (idx >= 0 && idx !== picks[pos]) yt.playVideoAt(picks[pos]);
+      if (want < 0) yt.stopVideo();
+      else if (idx >= 0 && idx !== rows[want]) yt.playVideoAt(rows[want]);
     }
   }
   async function setupVideo() {
@@ -256,7 +306,7 @@ export function mountEnglish(stage, { profile, onExit }) {
         width: 600,
         height: 338,
         host: 'https://www.youtube-nocookie.com',
-        playerVars: { playsinline: 1, rel: 0, modestbranding: 1, listType: 'playlist', list: YT_LIST, index: picks[0] },
+        playerVars: { playsinline: 1, rel: 0, modestbranding: 1, listType: 'playlist', list: YT_LIST, index: rows[0] },
         events: {
           onReady: () => resolve(),
           onStateChange: ytState,
@@ -267,13 +317,21 @@ export function mountEnglish(stage, { profile, onExit }) {
     });
   }
   function jump(n) {
-    n = Math.max(0, Math.min(picks.length - 1, n));
+    n = Math.max(0, Math.min(rows.length - 1, n));
     if (kind === 'audio') loadTrack(n, true);
-    else if (yt) { pos = n; markDots(); yt.playVideoAt(picks[pos]); }
+    else if (yt) { pos = want = n; markDots(); yt.playVideoAt(rows[pos]); }
   }
   function go(d) {
     sfx('tap');
-    jump(Math.min(pos, picks.length - 1) + d);
+    jump(pos + d);
+  }
+  // 影片：從播放器讀出影片編號，再把還不知道的標題查回來
+  async function videoTitles() {
+    try {
+      const l = yt?.getPlaylist?.();
+      if (l?.length && l.join() !== (state.settings.enYtIds || []).join()) { state.settings.enYtIds = l; save(); relabel(); }
+    } catch { /* 忽略 */ }
+    await ytFetchTitles(state.settings.enYtIds, () => { if (alive && kind === 'video') relabel(); });
   }
   onClick($('.en-prev', root), () => go(-1));
   onClick($('.en-next', root), () => go(1));
@@ -320,9 +378,15 @@ export function mountEnglish(stage, { profile, onExit }) {
   async function listen(id) {
     picks = englishPicks(id);
     kind = COURSES[id].kind;
+    const pickSet = new Set(picks);
+    rows = [...picks, ...Array.from({ length: COURSES[id].count }, (_, i) => i).filter((i) => !pickSet.has(i))];
+    nPick = picks.length;
     pos = 0;
+    want = 0;
+    doneAll = false;
+    played = new Set();
+    badRows = new Set();
     heard = false;
-    bad = 0;
     noReferrer(kind === 'audio');
     who.innerHTML = `<div class="en-me">${avatarSvg(id, 150)}</div>${order.filter((k) => k !== id).map((k) => `<div class="en-next-kid">${avatarSvg(k, 70)}</div>`).join('')}`;
     who.style.setProperty('--glow', id === 'yh' ? '#ff8fb8' : '#6fd27a');
@@ -355,6 +419,7 @@ export function mountEnglish(stage, { profile, onExit }) {
       try {
         if (!navigator.onLine) throw new Error('offline');
         await setupVideo();
+        videoTitles();
         await say('en_video');
       } catch (err) {
         guard();
