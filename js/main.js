@@ -112,7 +112,7 @@ async function route() {
   leaveScene();
   const reason = closedReason();
   if (reason) {
-    // 晚上 20:00–21:30：睡覺或休息畫面也可以進去複習英文
+    // 起床後到 21:00：睡覺或休息畫面也可以進去複習英文
     const en = englishOpen();
     showClosed(stage, { reason, onParent: parentGate, onEnglish: en ? startEnglish : null });
     // 休息結束、天亮或英文時間開始／結束，自動重畫

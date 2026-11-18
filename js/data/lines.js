@@ -1539,7 +1539,7 @@ Object.assign(LINES, {
 
 // ---------- 英文複習（棉棉，11/17） ----------
 Object.assign(LINES, {
-  en_hello: { mian: '睡覺前……我們一起來複習英文吧。' },
+  en_hello: { mian: '我們一起來複習英文吧。' },
   en_first_xz: { mian: '今天向澤先聽喔。' },
   en_first_yh: { mian: '今天妍卉先聽喔。' },
   en_play: { mian: '按這個大大的按鈕，開始聽吧。' },
@@ -1550,5 +1550,7 @@ Object.assign(LINES, {
   en_none: { mian: '爸爸媽媽還沒選要聽哪些喔……請爸爸媽媽幫忙。' },
   en_offline: { mian: '好像沒有網路……今天先不能聽喔。' },
   en_bye: { mian: '英文複習完了……晚安，好好睡喔。' },
-  en_late: { mian: '九點半了……該睡覺囉。晚安。' },
+  en_bye_day: { mian: '英文複習完了……你們好棒喔。' },
+  en_soon: { mian: '九點了……再五分鐘就要睡覺囉。' },
+  en_late: { mian: '九點五分了……該睡覺囉。晚安。' },
 });

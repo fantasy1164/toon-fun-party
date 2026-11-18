@@ -46,7 +46,7 @@ const MODES = {
   fun: { host: 'gaogao', reward: 'amuse', series: 'gaogao', track: 'amuse', icon: 'ferris' },
   firecheck: { host: 'yongyong', reward: 'fire', series: 'yongyong', track: 'fire', icon: 'alarm' },
   read: { host: 'gugu', reward: 'library', series: 'gugu', track: 'study', icon: 'book' },
-  // 英文複習：晚上 20:00–21:30 才出現在臥室（scenes/english.js）
+  // 英文複習：起床後到 21:00 出現在臥室（scenes/english.js）
   english: { host: 'mian', track: 'bedroom', icon: 'abc' },
 };
 export const MEAL_MIN = 25;   // 吃飯盤子時鐘幾分鐘走完

@@ -213,7 +213,7 @@ function restArt(ph) {
     <rect x="460" y="560" width="120" height="80" rx="8" fill="#5fc3e8" transform="rotate(-8 520 600)"/>` };
 }
 
-// 晚上 20:00–21:30：睡覺／休息畫面右下角有英文複習的入口（棉棉＋ABC）
+// 起床後到 21:00：睡覺／休息畫面右下角有英文複習的入口（棉棉＋ABC）
 function englishEntry(node, onEnglish) {
   if (!onEnglish) return;
   const b = el(`<button class="round-btn en-entry">${tgIcon('abc', 150)}<div class="mini"><svg viewBox="-40 -20 320 360">${characterSvg('mian')}</svg></div></button>`);

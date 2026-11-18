@@ -12,8 +12,8 @@ export const DEFAULT_SETTINGS = {
   english: { xz: [], yh: [] }, // 英文複習：家長勾選今天要聽的（向澤：Rocket Book 曲目編號；妍卉：YouTube 播放清單第幾支，從 0 算）
 };
 
-// 英文複習：晚上 20:00–21:30 可以聽（睡覺時間後也可以，21:30 一到就關）
-export const EN_HOURS = { from: 20, to: 21.5 };
+// 英文複習（11/19 John）：起床後到 21:00 都可以進去聽；21:00 棉棉暫停、提醒再五分鐘要睡覺，21:05 結束道晚安
+export const EN_END = { warn: 21, stop: 21 + 5 / 60 };
 // 星期幾誰先聽（0＝星期日）：一、三、五、日向澤先；二、四、六妍卉先
 export const EN_FIRST = { 0: 'xz', 1: 'xz', 2: 'yh', 3: 'xz', 4: 'yh', 5: 'xz', 6: 'yh' };
 

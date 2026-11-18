@@ -1,8 +1,8 @@
-// 英文複習（棉棉陪，11/17 John 提出）：晚上 20:00–21:30，睡前聽學校的英文。
+// 英文複習（棉棉陪，11/17 John 提出）：複習學校的英文；起床後到 21:00 都能進來，21:00 暫停提醒、21:05 道晚安（11/19 John）。
 // 向澤聽 Rocket Book 1 的 mp3，妍卉看 Max & Mousy Book 3 的 YouTube 影片；家長在家長頁勾選今天要聽的。
 // 一、三、五、日向澤先聽，二、四、六妍卉先聽；家長按住勾勾（確認聽完了）才換下一個人。
 // 只播原網站的連結，不複製檔案；不算遊玩時間；每人每天第一次聽完給棉棉一顆好朋友星星、累計英文徽章。
-import { EN_HOURS, EN_FIRST } from '../config.js';
+import { EN_END, EN_FIRST, DEFAULT_SETTINGS } from '../config.js';
 import { el, $, $$, wait, burst, centerOf, onTap } from '../core/dom.js';
 import { sfx, stopMusic, resumeAudio } from '../core/audio.js';
 import { speak, hush } from '../core/voice.js';
@@ -15,7 +15,8 @@ import { tgIcon, backFor } from '../art/together.js';
 import { ICON } from '../ui/screens.js';
 import { ROCKET, YT_LIST, COURSES, trackKind, syncYtList } from '../data/english.js';
 
-export const englishOpen = (h = hour()) => h >= EN_HOURS.from && h < EN_HOURS.to;
+// 可以進去聽：起床後到 21:00（睡覺時間設得比較早也可以從睡覺畫面進來）
+export const englishOpen = (h = hour()) => h >= (state.settings?.wake ?? DEFAULT_SETTINGS.wake) && h < EN_END.warn;
 
 // 課程網站會擋「從別的網站來的」播放（防盜連），不附上來源就可以播。
 // YouTube 嵌入反而需要來源，所以只在播 mp3 時切成不附來源，播影片前切回來。
@@ -463,13 +464,26 @@ export function mountEnglish(stage, { profile, onExit }) {
       const h = await listen(id);
       await praise(id, h);
     }
-    await say('en_bye');
+    await say(hour() >= 18 ? 'en_bye' : 'en_bye_day');
     finish('bed');
   }
 
-  // 21:30：時間到就關
+  // 21:00 暫停、提醒再五分鐘（家長可以再按播放把這一首聽完）；21:05 結束道晚安
+  let warned = hour() >= EN_END.warn;
   const clock = setInterval(async () => {
-    if (!alive || ending || englishOpen()) return;
+    if (!alive || ending) return;
+    const h = hour();
+    if (h < EN_END.warn) return;
+    if (h < EN_END.stop) {
+      if (warned) return;
+      warned = true;
+      au.pause();
+      try { yt?.pauseVideo(); } catch { /* 忽略 */ }
+      hush();
+      try { await speak('mian', 'en_soon', { node: hostIn }); } catch { /* 忽略 */ }
+      resumeAudio();
+      return;
+    }
     ending = true;
     au.pause();
     try { yt?.pauseVideo(); } catch { /* 忽略 */ }
