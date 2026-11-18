@@ -350,6 +350,8 @@ export function mountBedroom(stage, { profile, onExit }) {
     guard();
     await lightsOut();
     guard();
+    await say('dn_bedroom');
+    guard();
     await celebrate();
     mode = 'done';
     if (timeUp) await goodbye();

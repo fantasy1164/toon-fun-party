@@ -102,6 +102,7 @@ export function mountHike(stage, { profile, onExit }) {
       await pause(900);
       await host('hk_top');
       await say('kiki', 'hk_kiki_top');
+      await host('dn_hike');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'hike', series: HOST, say: host });
       await host('hk_mission');
       ctl.mode = 'done';

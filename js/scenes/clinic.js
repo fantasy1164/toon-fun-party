@@ -160,6 +160,7 @@ export function mountClinic(stage, { profile, onExit }) {
       await waiting();
       await exam();
       await medicine();
+      await host('dn_clinic');   // 說出做到了什麼
       await host('cl_bye');
       await giveReward({ root, kids, reward: 'clinic', series: HOST, say: host });
       await host('cl_mission');

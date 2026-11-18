@@ -333,6 +333,7 @@ export function mountAmuse(stage, { profile, onExit }) {
       if (kids.some((id) => state.profiles[id].amLost !== dateKey())) await lost();
       await trash();
       await fireworks();
+      await host('dn_amuse');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'amuse', series: HOST, say: host });
       await host('am_mission');
       ctl.mode = 'done';

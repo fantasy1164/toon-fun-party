@@ -16,6 +16,7 @@ import { sceneWeather } from './door.js';
 import { callTurn, passTurn, turnsOn, turnsScene, freeTurns } from '../core/turns.js';
 import { LIST_POOL } from '../art/market.js';
 import { englishOpen } from './english.js';
+import { LINES } from '../data/lines.js';
 
 // 廁所固定由嘟嘟負責（11/14 起每個場景一位負責的角色）
 export function nextCharacter() {
@@ -163,6 +164,8 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
 
   // 稱讚：一起玩時等兩個人都好了，一起稱讚（不比誰快）
   const praise = () => say(two ? 'tg_both' : pick(['praise1', 'praise2', 'praise3']));
+  // 每一步做完：說出做到了什麼（ok_<這一步的台詞>，lines.js）；沒有才退回一般稱讚
+  const stepPraise = (s) => { const id = `ok_${Array.isArray(s.line) ? s.line[0] : s.line}`; return LINES[id] ? say(id) : praise(); };
   const checkLine = () => say('tg_check');
 
   // iPad 放旁邊時不要自動關螢幕
@@ -304,7 +307,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     if (!s.auto) await waitOk();
     guard();
     done(i, s);
-    if (!s.auto) await praise();
+    if (!s.auto) await stepPraise(s);
   }
   function done(i, s) {
     markDot(i, 'done');
@@ -319,7 +322,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     for (let i = 0; i < list.length; i++) {
       await step(i, list[i]);
       // 計時步驟提早按勾勾時，要稱讚一下
-      if (list[i].ms && !list[i].auto && !list[i].lock) await praise();
+      if (list[i].ms && !list[i].auto && !list[i].lock) await stepPraise(list[i]);
     }
   }
 
@@ -347,7 +350,8 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     hostBox.classList.add('happy');
     sfx('fanfare');
     confetti(hostBox, 16);
-    await praise();
+    // 說出做到了什麼（不只說好棒）
+    await say(LINES[`dn_tg_${kind}`] ? `dn_tg_${kind}` : (two ? 'tg_both' : 'praise2'));
     recordHabit(profile.members, kind, host);
     const slot = currentSlot(REWARD_SLOTS[M.reward], hour());
     const winners = slot ? profile.members.filter((id) => !hasClaimed(id, `${M.reward}_${slot}`)) : [];
@@ -506,7 +510,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
         markDot(2, 'on');
         await mealClock();
         markDot(2, 'done');
-        await praise();
+        await say('ok_tm_eat');
       }
     }
     await celebrate();
@@ -640,7 +644,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
         (async () => {
           await speak(host, 'tr_found', { node: hostIn });
           if (!alive || !left.size) return;
-          await speak(host, pick(['praise1', 'praise2', 'praise3']), { node: hostIn });
+          await speak(host, 'tr_sharp', { node: hostIn });
         })();
       };
       const off = () => grid.removeEventListener('pointerdown', h);
@@ -817,7 +821,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     await waitOk();
     guard();
     done(4, list[4]);
-    await praise();
+    await say('ok_tdc_brave');
     await step(5, list[5]);
     showIcon('sticker', 'pop');
     await celebrate();
@@ -857,7 +861,7 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     }
     await pause(600);
     grid.classList.add('hidden');
-    await praise();
+    await say('ok_tsh_list');
     setDots(['ecobag', 'list', 'cashier', 'thanks']);
     await step(0, { icon: 'ecobag', line: 'tsh_bag' });
     // 到超市：螢幕變暗，找到清單上的東西就點一下（兩個人可以一起找）

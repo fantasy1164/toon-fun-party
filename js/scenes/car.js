@@ -394,6 +394,8 @@ export function mountCar(stage, { profile, onExit, dest = 'park', trip = false }
     }
     await arrive();
     guard();
+    await say('pupu', 'dn_car');   // 說出做到了什麼
+    guard();
     await celebrate();
     if (!alive) return;
     mode = 'done';

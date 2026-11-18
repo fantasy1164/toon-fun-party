@@ -120,6 +120,7 @@ export function mountBath(stage, { profile, onExit }) {
       await host('bt_slip');
       await card(BTC.walk, [BTC.run], 'bt_slip_wrong');
       await host('bt_slip_ok');
+      await host('dn_bath');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'bath', series: HOST, say: host });
       await host('bt_mission');
       ctl.mode = 'done';

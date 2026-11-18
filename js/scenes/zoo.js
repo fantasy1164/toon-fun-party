@@ -640,6 +640,7 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
         await explore(area);
         for (const kind of STATIONS[area]) await station(kind, area);
       }
+      await host('dn_zoo');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'zoo', series: HOST, say: host });
       await host('zo_mission');
       ctl.mode = 'done';

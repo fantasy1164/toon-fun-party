@@ -192,6 +192,7 @@ export function mountLibrary(stage, { profile, onExit }) {
       await borrow();
       await shelve();
       await giveBack();
+      await host('dn_library');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'library', series: HOST, say: host });
       await host('lb_mission');
       ctl.mode = 'done';

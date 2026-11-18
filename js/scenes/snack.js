@@ -263,6 +263,7 @@ export function mountSnack(stage, { profile, onExit }) {
       await eat();
       await litter();
       await sort();
+      await host('dn_snack');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'snack', series: HOST, say: host });
       await host('sn_mission');
       ctl.mode = 'done';

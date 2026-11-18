@@ -98,6 +98,7 @@ export async function runQuake(hub, profile, isDone) {
     cnt.classList.add('hidden');
     sfx('fanfare');
     burst(window.innerWidth / 2, window.innerHeight / 2, { n: 24, kind: 'star', spread: 300 });
+    await say('dn_quake');
     await say('qk_done');
     for (const id of profile.members) state.profiles[id].quakeMonth = month;
     recordHabit(profile.members, 'quake');

@@ -144,6 +144,7 @@ export function mountGift(stage, { profile, onExit }) {
     guard();
     sfx('ding');
     reg.remove();
+    await host('dn_gift');   // 說出做到了什麼
     // 今天的娃娃（這個時段還沒帶過的人才放進陳列櫃）
     const slot = currentSlot(REWARD_SLOTS.gift, hour());
     const winners = slot ? kids.filter((id) => !hasClaimed(id, `gift_${slot}`)) : [];

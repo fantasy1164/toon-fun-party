@@ -181,7 +181,7 @@ function mountPrep(stage, { profile, onExit }) {
     await say('dudu', 'ny_window');
     guard();
     await rubWindow();
-    await say('dudu', 'praise2');
+    await say('dudu', 'ny_window_ok');
     guard();
     await say('kiki', 'ny_toys');
     guard();
@@ -229,6 +229,7 @@ function mountPrep(stage, { profile, onExit }) {
     burst(...Object.values(centerOf(fu)), { n: 16, kind: 'star', spread: 160 });
     await say('kiki', 'ny_fu_dao');
     guard();
+    await say('dudu', 'dn_ny_prep');
     await nyGift(ctl, profile, 'dudu', say);
     guard();
     await say('dudu', 'ny_m_clean');
@@ -363,6 +364,7 @@ function mountEve(stage, { profile, onExit }) {
     await dinner();
     await say('gugu', 'ny_together');
     guard();
+    await say('gugu', 'dn_ny_eve');
     await nyGift(ctl, profile, 'gugu', say, 'ny_nian');
     guard();
     await say('gugu', 'ny_m_eve');
@@ -486,6 +488,7 @@ function mountDays(stage, { profile, onExit }, ny) {
         sfx('pop');
       }
       guard();
+      await say('gugu', 'dn_ny_days');
       await nyGift(ctl, profile, 'gugu', say);
       guard();
     }
@@ -665,6 +668,7 @@ function mountLantern(stage, { profile, onExit }) {
     await say('bobo', 'ny_yum');
     guard();
     bowl.classList.add('hidden');
+    await say('gugu', 'dn_ny_lantern');
     await nyGift(ctl, profile, 'gugu', say);
     guard();
     await say('gugu', 'ny_m_lantern');

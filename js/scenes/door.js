@@ -1,4 +1,5 @@
 // 客廳大門區：出門前幫奇奇穿對衣服。第一回合用今天的真實天氣（早上有獎品），之後可以轉天氣轉盤練習。
+import { LINES } from '../data/lines.js';
 import { REWARD_SLOTS } from '../config.js';
 import { el, $, $$, wait, pick, burst, centerOf, onTap } from '../core/dom.js';
 import { sfx, playMusic, rainOn, rainOff } from '../core/audio.js';
@@ -241,6 +242,7 @@ export function mountDoor(stage, { profile, onExit }) {
     const c = centerOf(kiki);
     burst(c.x, c.y, { n: 16, kind: 'star', spread: 200 });
     await say('d_ok');
+    if (LINES[`dn_door_${wk}`]) await say(`dn_door_${wk}`);   // 說出為什麼這樣穿
     kiki.classList.remove('happy');
     kiki.classList.add('gone');
     await pause(900);

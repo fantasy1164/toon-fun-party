@@ -117,6 +117,7 @@ export function mountDental(stage, { profile, onExit }) {
         await host('dt_loose_ok');
       }
       await say('kiki', 'dt_kiki_ok');
+      await host('dn_dental');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'dental', series: HOST, say: host });
       await host('dt_mission');
       ctl.mode = 'done';

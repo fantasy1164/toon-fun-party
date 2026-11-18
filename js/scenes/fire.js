@@ -172,6 +172,7 @@ export function mountFire(stage, { profile, onExit }) {
       await lighter();
       await dial();
       await hose();
+      await host('dn_fire');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'fire', series: HOST, say: host });
       await host('fi_mission');
       ctl.mode = 'done';

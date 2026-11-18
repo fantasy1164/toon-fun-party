@@ -290,7 +290,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
     charBox.classList.remove('gargle');
     cupWater.style.opacity = 0;
 
-    await celebrate('brush', 'b_mission');
+    await celebrate('brush', 'b_mission', 'dn_brush_b');
   }
 
   // ---------- 陪刷：小孩刷自己的牙，全程不用碰螢幕 ----------
@@ -378,7 +378,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
     sfx('sparkle');
     await say('b_done');
     await showView('main');
-    await celebrate('brush', 't_mission');
+    await celebrate('brush', 't_mission', 'dn_brush_t');
   }
 
   // ---------- 洗手 ----------
@@ -472,7 +472,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
     await say('w_done');
     await showView('main');
 
-    await celebrate('wash', 'w_mission');
+    await celebrate('wash', 'w_mission', 'dn_wash');
   }
 
   // ---------- 完成：稱讚、給獎、現實任務 ----------
@@ -494,13 +494,14 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
     flash($('.hud .cab', root), 'used');
   }
 
-  async function celebrate(activity, missionLine) {
+  async function celebrate(activity, missionLine, doneLine) {
     guard();
     charBox.classList.add('happy');
     sfx('fanfare');
     const c = centerOf(charBox);
     burst(c.x - 300, c.y, { n: 14, kind: 'star', spread: 200 });
-    await say(pick(['praise1', 'praise2', 'praise3']));
+    // 說出做到了什麼（不只說好棒）
+    await say(doneLine);
     guard();
 
     const slot = currentSlot(REWARD_SLOTS[activity], hour());

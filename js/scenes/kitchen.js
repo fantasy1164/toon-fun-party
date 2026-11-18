@@ -145,7 +145,7 @@ export function mountKitchen(stage, { profile, onExit }) {
     tableSet = true;
     sfx('fanfare');
     await say('bobo', 'k_set_done');
-    await celebrate();
+    await celebrate('set');
   }
 
   // 3 歲：點一疊餐具，自動放到下一個位子，一起數一、二、三
@@ -534,7 +534,7 @@ export function mountKitchen(stage, { profile, onExit }) {
     });
     guard();
     counter.innerHTML = '';
-    await say('bobo', 'tg_both');
+    await say('bobo', 'k_both_ok');
   }
 
   // 最後一片水果：給誰？還是切一半分享？
@@ -604,11 +604,11 @@ export function mountKitchen(stage, { profile, onExit }) {
     node.remove();
   }
 
-  async function celebrate() {
+  async function celebrate(what) {
     guard();
     $$('.seat-char', root).forEach((c) => c.classList.add('happy'));
     sfx('fanfare');
-    await say('bobo', pick(['praise1', 'praise2', 'praise3']));
+    await say('bobo', what === 'set' ? 'dn_k_set' : 'dn_k_meal');   // 說出做到了什麼
     $$('.seat-char', root).forEach((c) => c.classList.remove('happy'));
     const slot = currentSlot(REWARD_SLOTS.kitchen, hour());
     const winners = slot ? profile.members.filter((id) => !hasClaimed(id, `kitchen_${slot}`)) : [];

@@ -66,7 +66,6 @@ export function mountPark(stage, { profile, onExit }) {
     return pause(ms + 30);
   }
   const confetti = (node, n = 10) => { const c = centerOf(node); burst(c.x, c.y, { n, kind: 'star', spread: 140 }); };
-  const praise = () => host(two ? 'tg_both' : pick(['praise1', 'praise2', 'praise3']));
   // 一起玩：輪到某一個小孩（唱名）
   async function callKid(id) {
     if (!turnsOn()) return;
@@ -410,7 +409,7 @@ export function mountPark(stage, { profile, onExit }) {
     sfx('munch');
     await pause(500);
     bottle.remove();
-    await praise();
+    await host('pk_water_ok');
     guard();
   }
   async function hotBreak() {
@@ -443,7 +442,7 @@ export function mountPark(stage, { profile, onExit }) {
     guard();
     tree.remove();
     await Promise.all([moveTo(who(HOST), [120, 640]), ...kids.map((id, i) => moveTo(kidEl(id), [230 + i * 110, 650]))]);
-    await praise();
+    await host('pk_shade_ok');
     guard();
     await Promise.all(kids.map((id, i) => moveTo(kidEl(id), kidHome(i), 600)));
   }
@@ -565,6 +564,7 @@ export function mountPark(stage, { profile, onExit }) {
       if (ctl.timeUp) break;
     }
     if (!ctl.timeUp) await goHome();
+    await host('dn_park');   // 說出做到了什麼
     await celebrate();
     afterwards();
   }
@@ -622,6 +622,7 @@ export function mountPark(stage, { profile, onExit }) {
     await host('pk_rain_done');
     guard();
     if (needSafety()) await safety();
+    await host('dn_park_rain');
     await celebrate();
     afterwards();
   }

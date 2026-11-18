@@ -205,7 +205,7 @@ function mountClass(stage, { profile, onExit }) {
     }
     root.classList.remove('kid-hand');
     $$('.raised', root).forEach((r) => r.classList.remove('up'));
-    if (two) await say('gugu', 'tg_both');
+    if (two) await say('gugu', 's_hand_both');
   }
 
   // ---------- 二、垃圾分類 ----------
@@ -267,7 +267,7 @@ function mountClass(stage, { profile, onExit }) {
       await pause(450);
       sfx('pop');
       if (hard) await say('gugu', t.en);
-      else await say('gugu', pick(['praise1', 'praise2', 'praise3']));
+      else await say('gugu', 's_sort_ok');
       guard();
       trash.className = 'trash hidden';
     }
@@ -366,6 +366,7 @@ function mountClass(stage, { profile, onExit }) {
     await sorting();
     await pause(600);
     await sorry();
+    await say('gugu', 'dn_school');   // 說出做到了什麼
     await celebrate();
     mode = 'done';
     if (timeUp) await goodbye();

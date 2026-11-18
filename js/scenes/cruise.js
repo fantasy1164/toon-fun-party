@@ -172,6 +172,7 @@ export function mountCruise(stage, { profile, onExit }) {
       await dolphins();
       await gull();
       await arrive();
+      await host('dn_cruise');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'ship', series: 'pupu', say: cap });
       ctl.mode = 'done';
       await pause(300);

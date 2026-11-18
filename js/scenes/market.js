@@ -244,6 +244,7 @@ export function mountMarket(stage, { profile, onExit }) {
       await bag();
       await shopping();
       await checkout();
+      await host('dn_market');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'market', series: HOST, say: host });
       await host('mk_mission');
       ctl.mode = 'done';

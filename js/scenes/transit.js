@@ -210,6 +210,7 @@ export function mountBus(stage, { profile, onExit, dest = 'theater', trip = fals
       await ride();
       await bell();
       await getOff();
+      await say('pupu', 'dn_bus');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'bus', series: 'pupu', say: (l) => say('pupu', l) });
       ctl.mode = 'done';
       if (trip) { await pause(300); ctl.leave('arrive'); return; }
@@ -345,6 +346,7 @@ export function mountTrain(stage, { profile, onExit, to = 'suburb' }) {
       await platform();
       await seat();
       await ride();
+      await say('pupu', 'dn_train');   // 說出做到了什麼
       await giveReward({ root, kids, reward: 'train', series: 'pupu', say: (l) => say('pupu', l) });
       ctl.mode = 'done';
       await pause(300);

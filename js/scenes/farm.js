@@ -176,7 +176,7 @@ function mountDay(stage, { profile, onExit }) {
       sfx(d.sound);
       const c = centerOf(node);
       burst(c.x, c.y - 60, { n: 8, kind: 'star', spread: 90 });
-      await say(hard ? d.en : pick(['praise1', 'praise2', 'praise3']));
+      await say(hard ? d.en : 'f_ate');
       guard();
     }
     sfx('fanfare');
@@ -389,7 +389,7 @@ function mountDay(stage, { profile, onExit }) {
     can.classList.add('hidden');
     $$('.plot', root).forEach((p) => { p.classList.add('happy'); setTimeout(() => p.classList.remove('happy'), 1200); });
     sfx('sparkle');
-    await say(pick(['praise1', 'praise2', 'praise3']));
+    await say('f_watered');
     guard();
   }
 
@@ -430,6 +430,7 @@ function mountDay(stage, { profile, onExit }) {
     await barn();
     await pause(400);
     await garden();
+    await say('dn_farm');   // 說出做到了什麼
     await celebrate();
     mode = 'done';
     if (timeUp) await goodbye();
