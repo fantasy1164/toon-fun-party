@@ -215,7 +215,22 @@ html, body {
 .closed .art { position: absolute; inset: 0; width: 1200px; height: 900px; }
 
 /* ---------- 家長頁面（給大人看，所以有文字） ---------- */
-.parent { position: absolute; inset: 0; z-index: 80; background: #fffaf0; padding: 40px 60px; overflow: auto; color: #3a2a22; font-size: 26px; touch-action: pan-y; -webkit-user-select: text; user-select: text; }
+.parent { position: absolute; inset: 0; z-index: 80; background: #fffaf0; color: #3a2a22; font-size: 26px; touch-action: pan-y; -webkit-user-select: text; user-select: text; display: grid; grid-template-columns: 260px 1fr; }
+/* 左側分頁（11/19） */
+.parent .pnav { background: #f6ead2; padding: 30px 16px; overflow: auto; display: flex; flex-direction: column; gap: 10px; border-right: 3px solid #eadcc4; }
+.parent .pnav h1 { margin: 0 6px 18px; font-size: 32px; }
+.parent .ptab { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; margin: 0; padding: 18px 18px; font-size: 28px; text-align: left; background: transparent; color: #5a4636; border-radius: 16px; }
+.parent .ptab.on { background: #fff; color: #3a2a22; font-weight: bold; box-shadow: 0 4px 0 #eadcc4; }
+.parent .ptab .bd { min-width: 34px; padding: 2px 10px; border-radius: 17px; background: #e8553f; color: #fff; font-size: 20px; text-align: center; }
+.parent .ptab .bd.soft { background: #7aa7d8; }
+.parent .ptab .dot { width: 16px; height: 16px; border-radius: 50%; background: transparent; }
+.parent .ptab .dot.ok { background: #2ea05a; } .parent .ptab .dot.bad { background: #e8553f; } .parent .ptab .dot.wait { background: #ffb300; }
+.parent .pbody { position: relative; overflow: auto; padding: 24px 50px 60px; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+.parent .pdone { position: sticky; top: 0; float: right; z-index: 2; margin: 0 0 0 20px; box-shadow: 0 4px 0 #d9b43a; }
+.parent .pp { display: none; } .parent .pp.on { display: block; }
+.parent .pp > h2:first-child { margin-top: 6px; }
+.parent .danger { margin-top: 40px; padding: 10px 24px 20px; border: 3px solid #f2b5aa; border-radius: 18px; background: #fff3f0; }
+.parent .danger h3 { color: #c9462c; }
 .parent h1 { margin: 0 0 20px; font-size: 40px; }
 .parent h2 { margin: 28px 0 10px; font-size: 30px; }
 .parent table { border-collapse: collapse; }

@@ -66,10 +66,9 @@ function testSection() {
   // 沒設定的欄位留空＝用真實的日期或時間
   const d = t.date || '';
   const h = t.hour ?? '';
-  const days = snapshotDays();
   return `
     <p class="note">${testing ? `<b style="color:#c9462c">測試模式中</b>：遊戲時間是 ${dateKey()} ${p(n.getHours())}:${p(n.getMinutes())}${t.weather ? `，天氣假裝成「${WX_TEST.find((w) => w[0] === t.weather)?.[1]}」` : ''}。` : '目前使用真實的日期、時間與天氣。'}
-      測試時的蓋章、領獎、聖誕進度都會真的寫進存檔，測完可用下面的「清除資料」回復。</p>
+      測試時的蓋章、領獎、聖誕進度都會真的寫進存檔，測完可用「資料」分頁的「清除資料」回復。</p>
     <label>日期 <input type="date" data-t="date" value="${d}"></label>
     <label>時間 <input type="number" data-t="hour" min="0" max="23.5" step="0.5" value="${h}" placeholder="真實"> 點（可用 .5 表示半點）</label>
     <p class="note">日期或時間留空，就用真實的日期或時間。</p>
@@ -85,14 +84,21 @@ function testSection() {
     <button class="quiet small" data-act="t-preset" data-d="12-01" data-h="9">12/1 早上</button>
     <button class="quiet small" data-act="t-preset" data-d="12-24" data-h="19.5">平安夜晚上</button>
     <button class="quiet small" data-act="t-preset" data-d="12-24" data-h="22">平安夜睡覺</button>
-    <button class="quiet small" data-act="t-preset" data-d="12-25" data-h="8">聖誕節早上</button>
+    <button class="quiet small" data-act="t-preset" data-d="12-25" data-h="8">聖誕節早上</button>`;
+}
 
+// 清除資料（放在「資料」分頁最下面，跟其他按鈕分開）
+function clearSection() {
+  const days = snapshotDays();
+  return `
+    <div class="danger">
     <h3>清除資料</h3>
     <p class="note">每天第一次使用時會自動記下當時的進度（保留 35 天，目前有 ${days.length} 天：${days[0] || '—'} 起）。回到今天一開始、回到 30 天前：家長頁面的設定（時間、天氣地點、聖誕開關）會保留；全部清除：連設定一起清掉，回到第一次打開的狀態。</p>
     <button class="quiet" data-act="c-day">回到今天一開始</button>
     <button class="quiet" data-act="c-month">回到 30 天前</button>
     <button class="quiet" data-act="c-all" style="background:#f7c5bd">全部清除</button>
-    <span class="note c-msg"></span>`;
+    <span class="note c-msg"></span>
+    </div>`;
 }
 
 function syncText(st = syncStatus()) {
@@ -136,15 +142,49 @@ export function openParent(onClose, { onStamp } = {}) {
   }).join('');
   const s = state.settings;
   const resting = state.session.restUntil > Date.now();
+  // 分頁（11/19 John 選左側分頁）：照使用頻率排，下次打開停在上次的分頁
+  const owed = ['yh', 'xz'].filter((id) => !stampedToday(id)).length;
+  const enN = (s.english?.xz?.length || 0) + (s.english?.yh?.length || 0);
+  const TABS = [
+    ['stamp', '蓋章', owed ? `<b class="bd">${owed}</b>` : ''],
+    ['english', '英文複習', enN ? `<b class="bd soft">${enN}</b>` : ''],
+    ['time', '作息', ''],
+    ['fest', '節日', ''],
+    ['look', '畫面聲音', ''],
+    ['data', '資料', '<i class="dot"></i>'],
+    ['test', '測試', testing ? '<b class="bd">測試中</b>' : ''],
+  ];
+  let tab = 'stamp';
+  try { tab = localStorage.getItem('tfp-parent-tab') || 'stamp'; } catch { /* 忽略 */ }
+  if (!TABS.some((t) => t[0] === tab)) tab = 'stamp';
+  const pane = (id, html) => `<section class="pp${id === tab ? ' on' : ''}" data-pane="${id}">${html}</section>`;
   const node = el(`
     <div class="parent">
-      <h1>家長頁面</h1>
+      <nav class="pnav">
+        <h1>家長頁面</h1>
+        ${TABS.map(([id, t, b]) => `<button class="ptab${id === tab ? ' on' : ''}" data-tab="${id}"><span>${t}</span>${b}</button>`).join('')}
+      </nav>
+      <div class="pbody">
+      <button class="pdone" data-act="close">完成</button>
+      ${pane('stamp', `
       <h2>好寶寶蓋章</h2>
       ${stampSection('yh')}
       ${stampSection('xz')}
       <h2>今天</h2>
-      <table><tr><th></th><th>遊玩時間</th><th>已領獎的活動</th><th>收藏品總數</th></tr>${rows}</table>
+      <table><tr><th></th><th>遊玩時間</th><th>已領獎的活動</th><th>收藏品總數</th></tr>${rows}</table>`)}
 
+      ${pane('english', englishSection())}
+
+      ${pane('time', `
+      <h2>時間設定</h2>
+      <label>每次可玩 <input type="number" data-k="sessionMin" min="1" max="60" value="${s.sessionMin}"> 分鐘</label>
+      <label>下班後休息 <input type="number" data-k="restMin" min="0" max="600" value="${s.restMin}"> 分鐘</label><br>
+      <label>幾點睡覺 <input type="number" data-k="bedtime" min="17" max="24" value="${s.bedtime}"> 點</label>
+      <label>幾點起床 <input type="number" data-k="wake" min="4" max="10" value="${s.wake}"> 點</label>
+      <p class="note">${resting ? `角色正在休息，到 ${new Date(state.session.restUntil).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })} 為止。` : '角色目前沒有在休息。'}</p>
+      <button data-act="wake" class="quiet">立刻結束休息</button>`)}
+
+      ${pane('fest', `
       <h2>生日</h2>
       <label>妍卉 <input type="date" data-bd="yh" value="${fest.birthday('yh')}"></label>
       <label>向澤 <input type="date" data-bd="xz" value="${fest.birthday('xz')}"></label>
@@ -156,13 +196,9 @@ export function openParent(onClose, { onStamp } = {}) {
       <h2>聖誕節</h2>
       <label><input type="checkbox" data-xmas="real" ${fest.xmas().realGift ? 'checked' : ''}> 今年床邊有準備真禮物（12/25 早上聖誕老公公會說「快去看看你的床邊」）</label>
       <p class="note">12 月：選房間畫面會出現聖誕樹與降臨月曆；12/24 晚上可以擺餅乾牛奶；12/25 打開就會拆禮物。</p>
-      <button class="quiet small" data-act="xreset">重設今年的聖誕進度</button>
+      <button class="quiet small" data-act="xreset">重設今年的聖誕進度</button>`)}
 
-      <h2>天氣</h2>
-      <div class="wx">${weatherSection()}</div>
-
-      ${englishSection()}
-
+      ${pane('look', `
       <h2>聲音</h2>
       <span>音樂大小</span>
       ${[['low', '小'], ['mid', '中'], ['high', '大']].map(([v, t]) => `<label><input type="radio" name="mv" data-mv="${v}" ${(s.musicVol || 'mid') === v ? 'checked' : ''}> ${t}</label>`).join('')}
@@ -177,14 +213,11 @@ export function openParent(onClose, { onStamp } = {}) {
       <label><input type="checkbox" data-tilt ${s.tilt !== false ? 'checked' : ''}> 傾斜 iPad 時畫面跟著動</label>
       <p class="note">下次進場景時生效。傾斜開著的話，每次打開 app 第一次點螢幕時，iPad 會問能不能使用「動作與方向」，按允許即可。孩子容易分心或頭暈就關掉。</p>
 
-      <h2>時間設定</h2>
-      <label>每次可玩 <input type="number" data-k="sessionMin" min="1" max="60" value="${s.sessionMin}"> 分鐘</label>
-      <label>下班後休息 <input type="number" data-k="restMin" min="0" max="600" value="${s.restMin}"> 分鐘</label><br>
-      <label>幾點睡覺 <input type="number" data-k="bedtime" min="17" max="24" value="${s.bedtime}"> 點</label>
-      <label>幾點起床 <input type="number" data-k="wake" min="4" max="10" value="${s.wake}"> 點</label>
-      <p class="note">${resting ? `角色正在休息，到 ${new Date(state.session.restUntil).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })} 為止。` : '角色目前沒有在休息。'}</p>
-      <button data-act="wake" class="quiet">立刻結束休息</button>
+      <h2>天氣</h2>
+      <div class="wx">${weatherSection()}</div>
+      <p class="note">天氣資料來源：Open-Meteo.com（CC BY 4.0）</p>`)}
 
+      ${pane('data', `
       <h2>雲端同步</h2>
       <div class="sync">${syncSection()}</div>
 
@@ -194,19 +227,30 @@ export function openParent(onClose, { onStamp } = {}) {
       <button data-act="export" class="quiet">產生備份</button>
       <button data-act="import" class="quiet">還原</button>
       <span class="note msg"></span>
+      ${clearSection()}`)}
 
+      ${pane('test', `
       <h2>開發測試</h2>
-      <div class="test">${testSection()}</div>
-
-      <h2>&nbsp;</h2>
-      <button data-act="close">完成</button>
-      <p class="note">天氣資料來源：Open-Meteo.com（CC BY 4.0）</p>
+      <div class="test">${testSection()}</div>`)}
+      </div>
     </div>`);
   document.getElementById('stage').appendChild(node);
   englishMounted(node);
   const ta = node.querySelector('textarea');
+  const body = node.querySelector('.pbody');
+  const dot = node.querySelector('.ptab[data-tab="data"] .dot');
+  const paintDot = (st = syncStatus()) => { dot.className = `dot ${!configured() ? '' : st.kind === 'error' ? 'bad' : st.kind === 'ok' ? 'ok' : 'wait'}`; };
+  paintDot();
+  node.querySelectorAll('.ptab').forEach((b) => b.addEventListener('click', () => {
+    const id = b.dataset.tab;
+    node.querySelectorAll('.ptab').forEach((x) => x.classList.toggle('on', x === b));
+    node.querySelectorAll('.pp').forEach((x) => x.classList.toggle('on', x.dataset.pane === id));
+    body.scrollTop = 0;
+    try { localStorage.setItem('tfp-parent-tab', id); } catch { /* 忽略 */ }
+  }));
   const off = onSyncStatus((st) => {
     if (!node.isConnected) { off(); return; }
+    paintDot(st);
     node.querySelector('.sync-st').innerHTML = syncText(st);
   });
   const msg = node.querySelector('.msg');
