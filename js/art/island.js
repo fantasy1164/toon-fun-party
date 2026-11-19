@@ -1,5 +1,5 @@
-// 歡樂島（第四張地圖）：整座島是動物王國。郊區的碼頭坐郵輪過來。
-// 地圖上有 8 個展示區、遊園車站（中間）、美食街、紀念品店、碼頭。舞台 1200x900。
+// 歡樂島（第四張地圖）：島上高處是動物王國。郊區的碼頭坐郵輪到海岸區（海生館），再坐纜車上來（11/19）。
+// 地圖上有 8 個展示區、遊園車站（中間）、美食街、紀念品店、纜車站（下面中間，往下到海生館）。舞台 1200x900。
 import { weatherLayer, skyColors } from './bathroom.js';
 import { ANIMALS, BABIES } from './animals.js';
 
@@ -20,7 +20,7 @@ export const AREA_IDS = Object.keys(AREAS);
 
 // 地圖上的位置：box [x, y, w, h]、門口（小孩走到這裡）
 export const ISLAND = {
-  pier: { box: [490, 772, 220, 128], door: [600, 772] },
+  cable: { box: [505, 744, 190, 156], door: [600, 752] },
   tram: { box: [510, 330, 180, 130], door: [600, 470] },
   kids: { box: [118, 92, 196, 139], door: [216, 244] },
   taiwan: { box: [320, 40, 240, 180], door: [440, 244] },
@@ -33,14 +33,14 @@ export const ISLAND = {
   gift: { box: [710, 548, 200, 150], door: [810, 702] },
   panda: { box: [940, 536, 220, 160], door: [1050, 702] },
 };
-export const ISLAND_START = [600, 770];
+export const ISLAND_START = [600, 752];
 const ROAD_TOP = 280;
 const ROAD_BOTTOM = 730;
-// 從碼頭走到某個地方：先上大路（下面那條），要去上面的就走中間的路上去
+// 從纜車站走到某個地方：先上大路（下面那條），要去上面的就走中間的路上去
 export function islandPath(dest) {
   const d = ISLAND[dest].door;
   const s = ISLAND_START;
-  if (dest === 'pier') return [s];
+  if (dest === 'cable') return [s];
   if (d[1] >= 600) return [s, [600, ROAD_BOTTOM], [d[0], ROAD_BOTTOM], d];
   if (dest === 'tram') return [s, [600, ROAD_BOTTOM], d];
   return [s, [600, ROAD_BOTTOM], [600, ROAD_TOP], [d[0], ROAD_TOP], d];
@@ -67,7 +67,9 @@ export function islandBack(ph, wx) {
     <rect x="290" y="268" width="620" height="472" rx="90" fill="none" stroke="${n ? '#8a8070' : '#f4ead0'}" stroke-width="10" stroke-dasharray="3 9"/>
     <!-- 步道 -->
     <path d="M600 790V${ROAD_BOTTOM}M60 ${ROAD_BOTTOM}H1140M600 ${ROAD_BOTTOM}V${ROAD_TOP}M60 ${ROAD_TOP}H1140" stroke="${road}" stroke-width="30" fill="none" stroke-linecap="round"/>
-    ${Object.entries(ISLAND).filter(([k]) => k !== 'pier').map(([, sp]) => `<path d="M${sp.door[0]} ${sp.door[1]}V${sp.door[1] >= 600 ? ROAD_BOTTOM : sp.door[1] <= ROAD_TOP ? ROAD_TOP : sp.door[1]}" stroke="${road}" stroke-width="22" stroke-linecap="round"/>`).join('')}
+    <!-- 纜車線：從纜車站往下拉到海邊（海生館在下面） -->
+    <path d="M604 860V900M624 860V900" stroke="${n ? '#8a96a6' : '#4a5666'}" stroke-width="3"/>
+    ${Object.entries(ISLAND).filter(([k]) => k !== 'cable').map(([, sp]) => `<path d="M${sp.door[0]} ${sp.door[1]}V${sp.door[1] >= 600 ? ROAD_BOTTOM : sp.door[1] <= ROAD_TOP ? ROAD_TOP : sp.door[1]}" stroke="${road}" stroke-width="22" stroke-linecap="round"/>`).join('')}
     ${tree(300, 500, 1.1, n)}${tree(860, 500, 1, n)}${tree(400, 470, 0.9, n, '#5aa86a')}${tree(800, 470, 1.1, n)}${palm(1150, 520, 0.9)}${palm(40, 520, 0.8)}
     ${[[330, 620], [880, 620]].map(([x, y]) => `<g transform="translate(${x} ${y})"><rect x="-26" y="-10" width="52" height="8" rx="3" fill="#b8895a"/><rect x="-22" y="-2" width="4" height="12" fill="#8a5a2b"/><rect x="18" y="-2" width="4" height="12" fill="#8a5a2b"/></g>`).join('')}
     ${n ? '' : '<g fill="#fff" opacity=".9"><ellipse cx="200" cy="40" rx="50" ry="14"/><ellipse cx="1000" cy="30" rx="40" ry="12"/></g>'}

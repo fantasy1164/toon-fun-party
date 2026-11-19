@@ -1,9 +1,9 @@
 // 首頁：明星總動員歡樂派對。布幕、標題、派對布置、十位明星排排站。
 import { characterSvg } from './characters.js';
 
-export const OP_CAST = ['dudu', 'kiki', 'bobo', 'mian', 'gugu', 'doudou', 'pupu', 'tiaotiao', 'yuanyuan', 'lili', 'gaogao', 'yongyong', 'sensen'];
+export const OP_CAST = ['dudu', 'kiki', 'bobo', 'mian', 'gugu', 'doudou', 'pupu', 'tiaotiao', 'yuanyuan', 'lili', 'gaogao', 'yongyong', 'sensen', 'lulu'];
 // 每位明星進場的聲音
-export const OP_SND = { dudu: 'squeak', kiki: 'boing', bobo: 'drum', mian: 'baa', gugu: 'ding', doudou: 'boing', pupu: 'horn', tiaotiao: 'whoosh', yuanyuan: 'trumpet', lili: 'coin', gaogao: 'ding', yongyong: 'horn' };
+export const OP_SND = { dudu: 'squeak', kiki: 'boing', bobo: 'drum', mian: 'baa', gugu: 'ding', doudou: 'boing', pupu: 'horn', tiaotiao: 'whoosh', yuanyuan: 'trumpet', lili: 'coin', gaogao: 'ding', yongyong: 'horn', sensen: 'sparkle', lulu: 'bubble' };
 
 export function opBack() {
   return `<svg viewBox="0 0 1200 900">
@@ -107,7 +107,7 @@ export const POPPER = (flip) => `<svg viewBox="0 0 120 120" width="120" height="
 
 // 角色（站在舞台上）
 export function opCast() {
-  return OP_CAST.map((id, i) => `<div class="op-char${i < 7 ? ' from-l' : ' from-r'}" data-id="${id}" style="left:${58 + i * 83}px;--d:${(i % 4) * 0.15}s"><div class="op-dance"><svg viewBox="0 0 240 320" width="94" height="126">${characterSvg(id)}</svg></div></div>`).join('');
+  return OP_CAST.map((id, i) => `<div class="op-char${i < 7 ? ' from-l' : ' from-r'}" data-id="${id}" style="left:${40 + i * 80}px;--d:${(i % 4) * 0.15}s"><div class="op-dance"><svg viewBox="0 0 240 320" width="94" height="126">${characterSvg(id)}</svg></div></div>`).join('');
 }
 
 // 飄落的彩紙

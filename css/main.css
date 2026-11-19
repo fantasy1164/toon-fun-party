@@ -1873,3 +1873,168 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .bathroom .prop.rinsing { animation: wiggle .3s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
 .bathroom .prop.upside { transform: rotate(180deg); transform-box: fill-box; transform-origin: 50% 50%; transition: transform .4s; }
 .bathroom .dry .char { animation: wiggle .25s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+
+/* ===================== 歡樂島海岸區地圖（11/19） ===================== */
+.map.zone-coast .room.out > svg { overflow: visible; }
+.map.zone-coast .room.closed > svg { filter: grayscale(.6) brightness(.9); }
+.map.zone-coast .room.map-whale.closed > svg { filter: none; }
+.map .room .jet { animation: jetUp 1.4s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes jetUp { from { transform: scaleY(.55); opacity: .7; } to { transform: scaleY(1); opacity: 1; } }
+
+/* ===================== 海生館館內（11/19） ===================== */
+.sea .sea-cr { position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: opacity .35s; }
+.sea .sea-fx { position: absolute; inset: 0; z-index: 2; pointer-events: none; transition: opacity .35s; }
+.sea .sea-fx > div { position: absolute; inset: 0; }
+.sea .sea-fx svg { width: 100%; height: 100%; display: block; }
+.sea .sea-glass { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.sea .sea-glass svg { width: 100%; height: 100%; }
+.sea.swap .p-layer, .sea.swap .sea-cr, .sea.swap .sea-fx { opacity: 0; }
+.sea .p-layer { transition: opacity .35s, filter 1.2s; }
+.sea.outdoor .sea-glass { display: none; }
+/* 海洋生物：慢慢游來游去、上下漂 */
+.sea .sea-an { position: absolute; padding: 0; border: 0; background: none; pointer-events: auto; transition: left .6s ease-in-out, top .6s ease-in-out, opacity .6s, filter .3s;
+  animation: seaDrift var(--t, 6s) ease-in-out var(--d, 0s) infinite alternate; }
+.sea .sea-an > svg { width: 100%; height: 100%; overflow: visible; }
+.sea .sea-an.flip > svg { transform: scaleX(-1); }
+.sea .sea-an.an-fiddler, .sea .sea-an.an-crab, .sea .sea-an.an-seastar, .sea .sea-an.an-seacuke, .sea .sea-an.an-urchin, .sea .sea-an.an-urchin2, .sea .sea-an.an-seahare,
+.sea .sea-an.an-mudskipper, .sea .sea-an.an-isopod, .sea .sea-an.an-spidercrab, .sea .sea-an.an-gardeneel, .sea .sea-an.an-trilobite,
+.sea .sea-an.an-king, .sea .sea-an.an-adelie, .sea .sea-an.an-chinstrap, .sea .sea-an.an-macaroni, .sea .sea-an.an-puffin { animation: none; }
+.sea .sea-an.an-jelly { animation: jellyBob 3s ease-in-out infinite alternate; }
+@keyframes seaDrift { from { translate: -26px 6px; } to { translate: 26px -6px; } }
+@keyframes jellyBob { from { translate: 0 18px; } to { translate: 0 -18px; } }
+.sea .sea-an.react > svg { animation: anReact .7s ease-out; }
+.sea .sea-an.flip.react > svg { animation: anReactFlip .7s ease-out; }
+@keyframes anReactFlip { 0% { transform: scaleX(-1); } 35% { transform: scaleX(-1) translateY(-26px); } 100% { transform: scaleX(-1); } }
+.sea .sea-an.happy > svg { animation: anHappy .9s ease-in-out; }
+.sea .sea-an.scared > svg { animation: anScared .9s ease-in-out; }
+.sea .sea-an.nope > svg { animation: shakehead .4s; }
+.sea .sea-an.sing > svg { animation: seaSing .5s ease-out; }
+@keyframes seaSing { 50% { transform: scale(1.08) rotate(-3deg); } }
+.sea .sea-an.glow-an { filter: drop-shadow(0 0 10px var(--glow, #ffd000)) drop-shadow(0 0 4px var(--glow, #ffd000)); }
+.sea .sea-an.met { filter: none; }
+.sea .sea-an.away { opacity: 0; pointer-events: none; }
+.sea .sea-an.swimin { animation: seaSwimIn 1.2s ease-out, seaDrift var(--t, 6s) ease-in-out 1.2s infinite alternate; }
+@keyframes seaSwimIn { from { translate: -300px 40px; opacity: 0; } to { translate: 0 0; opacity: 1; } }
+.sea .sea-an.rush { animation: seaRush .7s ease-in-out 2 alternate; }
+@keyframes seaRush { to { translate: 0 -120px; scale: 1.05; } }
+.sea .sea-an.hidden-rock { opacity: .55; filter: brightness(.5) saturate(.5); }
+.sea .sea-an.indark { filter: brightness(.12); }
+.sea .sea-an.found { filter: drop-shadow(0 0 12px #ffd34d); opacity: 1; }
+.sea .sea-an.glowfish { filter: drop-shadow(0 0 18px #fff6a8); z-index: 8; }
+.sea .sea-an.glowfish.glow-an { filter: drop-shadow(0 0 22px #fff6a8) drop-shadow(0 0 8px #ffd000); }
+.sea .sea-an.behind { opacity: .0; }
+.sea .sea-an.popout { animation: seaPop .5s ease-out; }
+@keyframes seaPop { from { translate: 0 60px; scale: .3; opacity: 0; } to { translate: 0 0; scale: 1; opacity: 1; } }
+.sea .sea-an.crab-up { animation: meerUp .45s ease-out; }
+.sea .sea-an.nobig .bigclaw { display: none; }
+.sea .sea-an.counted { filter: none; }
+.sea .sea-an.dive > svg { animation: pgDive 1.2s ease-in; }
+@keyframes pgDive { 30% { transform: translateY(-40px) rotate(-20deg); } 100% { transform: translateY(180px) rotate(160deg); opacity: 0; } }
+.sea .sea-an.an-gardeneel { transition: transform .5s ease-in, opacity .5s; transform-origin: 50% 100%; }
+.sea .sea-an.eel-down { transform: translateY(70%) scaleY(.2); opacity: .2; }
+.sea .sea-an .zo-num { position: absolute; left: 50%; top: -24px; transform: translateX(-50%); font: 900 50px/1 system-ui, sans-serif; color: #ff7a1a; text-shadow: 0 3px 0 #fff, 0 0 8px #fff; pointer-events: none; animation: popin .3s; }
+.sea .sea-an.touching > svg { transform: scaleY(.96); }
+.sea .sea-an.stroke-hint::after { content: ''; position: absolute; left: 30%; top: 40%; width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 255, 255, .7); box-shadow: 0 0 0 6px rgba(255, 211, 77, .8); animation: strokeHint 1.6s ease-in-out infinite; pointer-events: none; }
+/* 水族箱裡的光、泡泡、水草 */
+.sea .ray { animation: seaRay 4s ease-in-out infinite alternate; }
+@keyframes seaRay { from { opacity: .03; } to { opacity: .12; } }
+.sea .bub { animation: seaBub 5s linear infinite; }
+@keyframes seaBub { from { transform: translateY(0); opacity: 0; } 10% { opacity: .6; } to { transform: translateY(-560px); opacity: 0; } }
+.sea .weed { animation: seaWeed 3s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes seaWeed { from { transform: skewX(-4deg); } to { transform: skewX(4deg); } }
+.sea .snow { animation: seaSnow 6s linear infinite; }
+@keyframes seaSnow { from { transform: translateY(0); } to { transform: translateY(380px); } }
+.sea .tent { animation: seaWeed 2s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+/* 樓層牌 */
+.sea .sea-floors { position: absolute; right: 22px; top: 130px; z-index: 10; display: flex; flex-direction: column; gap: 10px; padding: 12px 10px; border-radius: 26px; background: rgba(12, 26, 46, .55); pointer-events: none; }
+.sea .sea-floors .sf { width: 74px; height: 56px; border-radius: 18px; background: rgba(255, 255, 255, .25); display: flex; align-items: center; justify-content: center; font: 900 30px/1 system-ui, sans-serif; color: rgba(255, 255, 255, .7); transition: all .4s; }
+.sea .sea-floors .sf.on { background: #ffd34d; color: #3a2a10; transform: scale(1.12); box-shadow: 0 0 16px #ffd34d; }
+/* 換樓層：走樓梯 */
+.sea .sea-stairs { position: absolute; inset: 0; z-index: 8; background: rgba(12, 26, 46, .82); pointer-events: none; }
+.sea .sea-stairs .ss-steps { position: absolute; left: 300px; top: 240px; }
+.sea .sea-stairs .ss-kids { position: absolute; left: 330px; top: 180px; display: flex; gap: 10px; }
+.sea .sea-stairs .ss-kid { width: 70px; height: 70px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 5px #fff; }
+.sea .sea-stairs.go .ss-kids { animation: ssDown 1.8s ease-in-out forwards; }
+.sea .sea-stairs.go.up .ss-kids { animation: ssUp 1.8s ease-in-out forwards; }
+@keyframes ssDown { from { transform: translate(0, 0); } to { transform: translate(400px, 290px); } }
+@keyframes ssUp { from { transform: translate(400px, 290px); } to { transform: translate(0, 0); } }
+/* 放大鏡、手電筒 */
+.sea .sea-lens { position: absolute; inset: 0; z-index: 7; background: rgba(14, 22, 34, .8); --x: 600px; --y: 400px; touch-action: none;
+  -webkit-mask-image: radial-gradient(circle 120px at var(--x) var(--y), transparent 96%, #000 100%);
+  mask-image: radial-gradient(circle 120px at var(--x) var(--y), transparent 96%, #000 100%); }
+.sea .sea-lens.lk-torch { background: rgba(2, 4, 10, .94); -webkit-mask-image: radial-gradient(circle 130px at var(--x) var(--y), transparent 70%, #000 100%); mask-image: radial-gradient(circle 130px at var(--x) var(--y), transparent 70%, #000 100%); }
+.sea .sea-lens.lk-glass::after { content: ''; position: absolute; left: calc(var(--x) - 128px); top: calc(var(--y) - 128px); width: 244px; height: 244px; border-radius: 50%; border: 8px solid #c98a4a; pointer-events: none; }
+.sea .sea-lens.lk-glass::before { content: ''; position: absolute; left: calc(var(--x) + 80px); top: calc(var(--y) + 80px); width: 30px; height: 120px; border-radius: 14px; background: #8a5a2b; transform: rotate(-45deg); transform-origin: 50% 0; pointer-events: none; }
+.sea .sea-lens .zo-hint { position: absolute; width: 80px; height: 80px; border-radius: 50%; border: 5px dashed #ffd34d; animation: pulse .6s ease-in-out infinite alternate; pointer-events: none; }
+.sea .zo-flash { position: absolute; inset: 0; z-index: 8; background: #fff; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.sea .zo-flash.on { opacity: .9; transition: none; }
+/* 奇奇做錯事（跑、滑倒） */
+.kit .p-char.running svg { animation: kikiRun .22s ease-in-out infinite alternate; }
+@keyframes kikiRun { from { transform: translateY(0) rotate(-4deg); } to { transform: translateY(-14px) rotate(4deg); } }
+.kit .p-char.slip svg { animation: kikiSlip .7s ease-in-out; }
+@keyframes kikiSlip { 30% { transform: rotate(-24deg) translateX(-20px); } 60% { transform: rotate(10deg); } 100% { transform: none; } }
+/* 道具 */
+.sea .zo-sink.water::after { content: ''; position: absolute; left: 124px; top: 40px; width: 10px; height: 70px; background: linear-gradient(#bfe6fb, #7cc8ea); border-radius: 5px; }
+.sea .sea-trash { animation: seaFloat 2.4s ease-in-out infinite alternate; transition: left .6s ease-in, top .6s ease-in; }
+@keyframes seaFloat { from { translate: 0 -6px; rotate: -6deg; } to { translate: 0 8px; rotate: 6deg; } }
+.sea .sea-murk { transition: opacity .6s; }
+.sea .sea-anemone.done { filter: none; animation: none; }
+.sea .sea-anemone.nope { animation: shakehead .4s; }
+.sea .sea-strip { overflow: hidden; left: 0 !important; top: 30px !important; width: 1200px; height: 420px; inset: auto !important; }
+.sea .sea-strip-in { display: flex; width: 4800px; height: 400px; animation: seaStrip 40s linear infinite; }
+.sea .sea-strip-in svg { width: 2400px; height: 400px; flex: none; }
+.sea.walking .sea-strip-in { animation-duration: 12s; }
+@keyframes seaStrip { from { transform: translateX(0); } to { transform: translateX(-2400px); } }
+.sea.walking .kt-kid, .sea.walking .p-char { animation: bob .22s ease-in-out infinite alternate; }
+.sea.room-tunnel .p-layer, .sea.deeper .p-layer { transition: filter 1.4s; }
+.sea.deeper .p-layer, .sea.deeper .sea-fx { filter: brightness(.45) saturate(.8); }
+.sea .sea-steps.glow { animation: pulse .6s ease-in-out infinite alternate; }
+.sea .sea-note { transition: transform .15s; }
+.sea .sea-note.lit { transform: scale(1.22); filter: drop-shadow(0 0 16px #fff) drop-shadow(0 0 8px #9fdcf6); }
+.sea .sea-slab .dust circle { transition: opacity .3s; }
+.sea .sea-slab { touch-action: none; }
+.sea .sea-kelp { transition: transform .6s ease-out; transform-origin: 50% 100%; pointer-events: auto; }
+.sea .sea-kelp.apart { transform: skewX(-26deg) translateX(-90px); opacity: .7; pointer-events: none; }
+.sea .sea-bones { left: 50px !important; top: 60px !important; inset: auto !important; }
+.sea .sea-bones svg { width: 1100px; height: 260px; overflow: visible; }
+.sea .sea-bus.ghost { opacity: .5; }
+.sea .sea-bus.placed { animation: dropIn .35s ease-out; }
+.sea .sea-jet { animation: jetIn .35s ease-out; transform-origin: 50% 100%; }
+@keyframes jetIn { from { transform: scaleY(.1); opacity: 0; } to { transform: none; opacity: 1; } }
+.sea .kt-kid.shiny { filter: drop-shadow(0 0 10px #fff6a8); }
+.sea .sea-hat { position: absolute; left: 30px; top: -4px; width: 74px; pointer-events: none; animation: dropIn .35s ease-out; }
+.sea .kt-kid:not(.body) .sea-hat { left: 18px; top: -26px; }
+.sea .sea-hat svg { width: 100%; height: auto; }
+.sea .sea-diver.swimin { animation: seaSwimIn 1.4s ease-out; }
+.sea .zo-food { transition: left .6s ease-in-out, top .6s ease-in-out; }
+
+/* ===================== 纜車（11/19） ===================== */
+.cable .cb-in { position: absolute; inset: 0; z-index: 1; display: none; pointer-events: none; }
+.cable.inside .cb-in { display: block; }
+.cable.inside .p-layer { visibility: hidden; }
+.cable .cb-view { position: absolute; left: 90px; top: 90px; width: 1020px; height: 480px; overflow: hidden; border-radius: 40px; pointer-events: auto; }
+.cable .cb-strip { position: absolute; left: -90px; top: 0; width: 1200px; height: 2400px; will-change: transform; }
+.cable .cb-strip > svg { display: block; }
+.cable .cb-spots { position: absolute; inset: 0; }
+.cable .cb-spot { position: absolute; padding: 0; border: 0; border-radius: 50%; background: none; pointer-events: auto; }
+.cable .cb-spot.glow { box-shadow: 0 0 0 8px rgba(255, 211, 77, .85), 0 0 30px 10px rgba(255, 211, 77, .6); animation: pulse .6s ease-in-out infinite alternate; }
+.cable .cb-spot.seen { box-shadow: none; animation: none; }
+.cable .cb-others { position: absolute; inset: 0; pointer-events: none; }
+.cable .cb-other { position: absolute; left: 740px; padding: 0; border: 0; background: none; pointer-events: auto; }
+.cable .cb-other.waved svg { filter: drop-shadow(0 0 10px #ff7fa8); }
+.cable .cb-frame { position: absolute; inset: 0; pointer-events: none; }
+.cable .cb-frame svg { width: 100%; height: 100%; display: block; }
+.cable.inside .p-char { z-index: 3; }
+.cable.sway .cb-in { animation: cbSway .5s ease-in-out infinite alternate; transform-origin: 50% 0; }
+@keyframes cbSway { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }
+.cable .cb-gondola { position: absolute; left: -460px; top: 120px; width: 420px; height: 460px; z-index: 3; display: none; pointer-events: auto; }
+.cable .cb-gondola.show { display: block; }
+.cable .cb-gondola svg { overflow: visible; }
+.cable .cb-gondola .cbd { transition: transform .7s ease-in-out; }
+.cable .cb-gondola.open .cbd-l { transform: translateX(-92px); }
+.cable .cb-gondola.open .cbd-r { transform: translateX(92px); }
+.cable .cb-gondola.glow svg { filter: drop-shadow(0 0 14px var(--glow, #ffd000)) drop-shadow(0 0 6px var(--glow, #ffd000)); }
+.cable.swap .p-layer, .cable.swap .cb-in { opacity: 0; }
+.cable .p-layer, .cable .cb-in { transition: opacity .35s; }
+.screen.sea { background: #0c1a2e; }
+.screen.sea.outdoor { background: #f2e2c0; }

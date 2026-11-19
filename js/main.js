@@ -33,6 +33,8 @@ import { mountZoo } from './scenes/zoo.js';
 import { mountSnack } from './scenes/snack.js';
 import { mountGift } from './scenes/gift.js';
 import { mountCruise } from './scenes/cruise.js';
+import { mountCable } from './scenes/cable.js';
+import { mountSea } from './scenes/sea.js';
 import { chooseMode, mountTogether } from './scenes/together.js';
 import { mountEnglish, englishOpen } from './scenes/english.js';
 import { setupTurns, turnsScene } from './core/turns.js';
@@ -132,11 +134,13 @@ async function route() {
   profile = chosen;
   setupTurns(profile);
   zone = 'city';
+  arrive = null;
   goMap();
 }
 
 // 地圖 → 家（房子）或其他地方 → 場景；從場景按回家，回到剛才的地方（房子或地圖）
 let zone = 'city';   // 現在在哪一張地圖
+let arrive = null;   // 海岸區：坐船（pier）還是坐纜車（cable）來的，決定小孩站在哪裡
 async function goMap() {
   if (!profile) { route(); return; }
   if (closedReason()) { route(); return; }
@@ -144,18 +148,20 @@ async function goMap() {
   if (fest.isChristmas() && profile.members.some((id) => !fest.xmas().gift[id])) {
     await christmasMorning(stage, profile);
   }
-  const r = await showMap(stage, profile, zone);
+  const r = await showMap(stage, profile, zone, { arrive });
   if (r.room === 'back') { profile = null; route(); return; }
   if (closedReason()) { route(); return; }
   if (r.room === 'home') { goHouse(); return; }
   if (r.room === 'zone') {
     if (r.trip) { startTrain(r.zone); return; }
     zone = r.zone;
+    arrive = r.arrive || null;
     goMap();
     return;
   }
   if (r.room === 'trip') { startTrip(r.dest, r.by); return; }
   if (r.room === 'ship') { startShip(); return; }
+  if (r.room === 'cable') { startCable(r.dir); return; }
   enterRoom(r.room, 'map');
 }
 
@@ -173,7 +179,9 @@ const goBack = (from) => (from === 'house' ? goHouse() : goMap());
 // 歡樂島：8 個展示區、遊園車、美食街、紀念品店
 const zooArea = (area) => (stage2, opts) => mountZoo(stage2, { ...opts, area });
 const ZOO_MOUNT = Object.fromEntries(['kids', 'taiwan', 'rain', 'africa', 'desert', 'aus', 'penguin', 'panda'].map((a) => [a, zooArea(a)]));
-const MOUNT = { ...ZOO_MOUNT, tram: (stage2, opts) => mountZoo(stage2, { ...opts, tour: true }), snack: mountSnack, gift: mountGift, door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear, theater: mountHall, clinic: mountClinic, market: mountMarket, amuse: mountAmuse, fire: mountFire, dental: mountDental, library: mountLibrary, trail: mountHike };
+// 歡樂島海生館（11/19）：三個館＋迎賓廣場
+const SEA_MOUNT = Object.fromEntries(['tw', 'coral', 'world', 'plaza'].map((h) => [h, (stage2, opts) => mountSea(stage2, { ...opts, hall: h })]));
+const MOUNT = { ...ZOO_MOUNT, ...SEA_MOUNT, tram: (stage2, opts) => mountZoo(stage2, { ...opts, tour: true }), snack: mountSnack, gift: mountGift, door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear, theater: mountHall, clinic: mountClinic, market: mountMarket, amuse: mountAmuse, fire: mountFire, dental: mountDental, library: mountLibrary, trail: mountHike };
 
 function startScene(make) {
   if (state.session.usedMs === 0) warned = false;
@@ -236,7 +244,22 @@ function startShip() {
     onExit: (why) => {
       scene = null;
       stage.querySelector('.playclock')?.remove();
-      if (why === 'arrive') zone = 'island';
+      if (why === 'arrive') { zone = 'coast'; arrive = 'pier'; }
+      if (why === 'arrive' || why === 'home') { if (closedReason()) route(); else goMap(); return; }
+      exitHome(why);
+    },
+  }));
+}
+
+// 坐纜車：動物園往下到海生館（down）、海生館往上到動物園（up）
+function startCable(dir) {
+  const exitHome = sceneExit('map');
+  startScene(() => mountCable(stage, {
+    profile, dir,
+    onExit: (why) => {
+      scene = null;
+      stage.querySelector('.playclock')?.remove();
+      if (why === 'arrive') { zone = dir === 'down' ? 'coast' : 'island'; arrive = dir === 'down' ? 'cable' : null; }
       if (why === 'arrive' || why === 'home') { if (closedReason()) route(); else goMap(); return; }
       exitHome(why);
     },
@@ -251,7 +274,7 @@ function startTrain(to) {
     onExit: (why) => {
       scene = null;
       stage.querySelector('.playclock')?.remove();
-      if (why === 'arrive') zone = to;
+      if (why === 'arrive') { zone = to; arrive = null; }
       if (why === 'arrive' || why === 'home') { if (closedReason()) route(); else goMap(); return; }
       exitHome(why);
     },

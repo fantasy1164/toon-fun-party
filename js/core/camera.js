@@ -39,10 +39,15 @@ const PRESETS = {
   map: { depth: 0.88, overscan: 1.07, fore: null, light: 0.8 },
   house: { depth: 0.9, overscan: 1.07, fore: outdoorFore, light: 0.8 },
   stage: { depth: 0.85, overscan: 1.08, fore: null, light: 0.35 },
+  // 海生館館內（11/19）：暗暗的展示缸，光線很淡
+  aqua: { depth: 0.78, overscan: 1.08, fore: null, light: 0.3 },
 };
 const REGISTRY = [
   ['.tg, .asleep, .resting, .picker, .stamping', null],
   ['.zoo', 'outdoor'],
+  ['.sea.outdoor', 'outdoor'],
+  ['.sea', 'aqua'],
+  ['.cable', 'sky'],
   ['.hub.map', 'map'],
   ['.hub.town', 'map'],
   ['.hub', 'house'],

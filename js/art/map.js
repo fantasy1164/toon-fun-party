@@ -3,6 +3,7 @@
 import { weatherLayer, skyColors } from './bathroom.js';
 import { characterSvg } from './characters.js';
 import { ISLAND, ISLAND_START, islandPath } from './island.js';
+import { COAST, COAST_START, coastPath } from './coast.js';
 
 export const ROAD_Y = 720;
 const WALK_Y = ROAD_Y - 40;   // 人行道
@@ -37,14 +38,18 @@ export const ZONES = {
   },
   // 歡樂島（11/17）：整座島是動物園
   island: ISLAND,
+  // 歡樂島海岸區（11/19）：海生館
+  coast: COAST,
 };
 // 小孩出發的地方：生活區是家門口，郊區、山區是車站旁邊的月台
-export const ZONE_START = { city: [600, 566], suburb: [800, 790], mountain: [800, 790], island: ISLAND_START };
+export const ZONE_START = { city: [600, 566], suburb: [800, 790], mountain: [800, 790], island: ISLAND_START, coast: COAST_START.pier };
+export { COAST_START };
 
 // 走路的路線（生活區從家門口出發；其他區從車站出發）
-export function walkPath(zone, dest) {
+export function walkPath(zone, dest, from = null) {
   const Z = ZONES[zone];
   const d = Z[dest].door;
+  if (zone === 'coast') return coastPath(dest, from || 'pier');
   if (zone === 'mountain') return [ZONE_START.mountain, [800, 560], [330, 560], d];
   if (zone === 'island') return islandPath(dest);
   if (zone === 'suburb') return [ZONE_START.suburb, [d[0], 790], d];

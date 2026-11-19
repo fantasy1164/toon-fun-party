@@ -1,5 +1,6 @@
 // 虛擬收藏品：每位角色一個系列，每件畫在 100x100 的框內。
 import { ANIMALS } from './animals.js';
+import { FIGURES, FIGURE_ITEMS } from './sea.js';
 
 // 動物娃娃（歡樂島紀念品店，一次只能選一隻）：動物縮小，加上娃娃的標籤和縫線
 const plush = (id, dy = 0) => `<circle cx="50" cy="54" r="44" fill="#fff6fb"/><g transform="translate(2 ${2 + dy}) scale(.48)">${ANIMALS[id].svg()}</g>
@@ -7,6 +8,15 @@ const plush = (id, dy = 0) => `<circle cx="50" cy="54" r="44" fill="#fff6fb"/><g
 export const PLUSH_IDS = ['panda', 'koala', 'penguin', 'giraffe', 'lion', 'elephant', 'bear', 'leopardcat', 'kangaroo', 'zebra', 'meerkat', 'llama'];
 
 export const ITEMS = {
+
+  // 露露館長的海生館系列（迎賓廣場、往下坐纜車）
+  lulu_ticket: `<g transform="rotate(-10 50 50)"><path d="M8 28H92V42A8 8 0 0 0 92 58V72H8V58A8 8 0 0 0 8 42Z" fill="#5fc3ea"/><path d="M68 28V72" stroke="#fff" stroke-width="3" stroke-dasharray="5 4"/><path d="M18 56Q22 38 40 38Q56 38 62 52Q50 62 34 62Q22 62 18 56Z" fill="#fff"/><path d="M60 50l6 -6v12z" fill="#fff"/><circle cx="28" cy="48" r="2.5" fill="#1d2433"/><path d="M76 42l3 6h6l-5 4l2 6l-6 -4l-6 4l2 -6l-5 -4h6z" fill="#ffd34d"/></g>`,
+  lulu_shell: `<path d="M50 88L14 50Q20 16 50 12Q80 16 86 50Z" fill="#ffd0c0" stroke="#f0a090" stroke-width="4" stroke-linejoin="round"/>${[24, 37, 50, 63, 76].map((x) => `<path d="M50 86L${x} ${x === 50 ? 14 : 22 + Math.abs(50 - x) * 0.3}" stroke="#f0a090" stroke-width="3"/>`).join('')}<path d="M40 88h20l-4 8h-12z" fill="#f0a090"/>`,
+  lulu_goggles: `<path d="M10 44Q8 30 22 30H78Q92 30 90 44" stroke="#3a7bd5" stroke-width="7" fill="none"/><rect x="14" y="38" width="32" height="28" rx="12" fill="#bfe6fb" stroke="#ff8a3c" stroke-width="6"/><rect x="54" y="38" width="32" height="28" rx="12" fill="#bfe6fb" stroke="#ff8a3c" stroke-width="6"/><path d="M46 52H54" stroke="#ff8a3c" stroke-width="6"/><path d="M20 46l8 -4M60 46l8 -4" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M80 66Q88 80 74 88" stroke="#5fc3ea" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="72" cy="88" r="5" fill="#ffd34d"/>`,
+  lulu_hat: `<ellipse cx="50" cy="66" rx="40" ry="11" fill="#fff" stroke="#c6d6e2" stroke-width="3"/><path d="M16 64Q18 26 50 24Q82 26 84 64Z" fill="#2f5f9e"/><path d="M16 58Q50 48 84 58" stroke="#fff" stroke-width="5" fill="none"/><path d="M38 40q6 -7 12 0t12 0" stroke="#9fdcf6" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="50" cy="20" r="6" fill="#e5484d"/>`,
+  lulu_bubble: `${[[50, 54, 30], [26, 26, 14], [78, 24, 11], [80, 78, 9]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#dff4ff" stroke="#7cc8ea" stroke-width="5"/><path d="M${x - r * 0.5} ${y - r * 0.4}a${r * 0.6} ${r * 0.6} 0 0 1 ${r * 0.5} ${-r * 0.3}" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>`).join('')}`,
+  lulu_badge: `<circle cx="50" cy="50" r="40" fill="#2f5f9e"/><circle cx="50" cy="50" r="32" fill="#5fc3ea"/><path d="M50 22L57 40L76 40L61 51L67 70L50 59L33 70L39 51L24 40L43 40Z" fill="#ffb35c" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><circle cx="50" cy="48" r="4" fill="#fff"/>`,
+  ...FIGURE_ITEMS,
   ...Object.fromEntries(PLUSH_IDS.map((id) => [`zp_${id}`, plush(id)])),
   // 森森園長的動物園系列
   sen_binoc: `<g transform="rotate(-8 50 50)"><rect x="16" y="30" width="28" height="42" rx="10" fill="#333a48"/><rect x="56" y="30" width="28" height="42" rx="10" fill="#333a48"/><rect x="40" y="40" width="20" height="14" fill="#555c6a"/><circle cx="30" cy="70" r="11" fill="#9fd0ff" stroke="#222" stroke-width="3"/><circle cx="70" cy="70" r="11" fill="#9fd0ff" stroke="#222" stroke-width="3"/><path d="M20 30Q50 4 80 30" stroke="#8a5a2b" stroke-width="4" fill="none"/></g>`,
@@ -142,6 +152,8 @@ export const SERIES = {
   gaogao: ['gao_ticket', 'gao_balloon', 'gao_horse', 'gao_ferris', 'gao_popcorn', 'gao_cap'],
   sensen: ['sen_binoc', 'sen_hat', 'sen_tram', 'sen_paw', 'sen_leaf', 'sen_book'],
   plush: PLUSH_IDS.map((id) => `zp_${id}`),
+  lulu: ['lulu_ticket', 'lulu_shell', 'lulu_goggles', 'lulu_hat', 'lulu_bubble', 'lulu_badge'],
+  ...Object.fromEntries(Object.entries(FIGURES).map(([h, ids]) => [`fig_${h}`, ids.map((id) => `fig_${id}`)])),
   kiki: ['kiki_leaf', 'kiki_ball', 'kiki_kite', 'kiki_car', 'kiki_star', 'kiki_mush'],
 };
 

@@ -426,12 +426,55 @@ function sensen(extra = '') {
   </g>`;
 }
 
+// 小白鯨 露露館長：海生館館長，喜歡唱歌（白鯨是「海洋的金絲雀」）、溫柔開朗的大姊姊。
+// 圓圓的大額頭、尾鰭當腳站著、胸鰭當手；藍色水手帽（浪花徽章）、水藍色領巾、胸前別著海星館長章
+function lulu(extra = '') {
+  return `
+  <g class="char lulu">
+    <ellipse cx="120" cy="312" rx="92" ry="11" fill="#000" opacity=".12"/>
+    <!-- 尾鰭（當腳） -->
+    <path d="M120 262Q104 290 66 300Q60 312 78 314Q108 312 120 292Q132 312 162 314Q180 312 174 300Q136 290 120 262Z" fill="#d6e8f2" stroke="#a9c3d4" stroke-width="4" stroke-linejoin="round"/>
+    <!-- 身體 -->
+    <path d="M52 186Q44 116 120 108Q196 116 188 186Q184 262 120 276Q56 262 52 186Z" fill="#e4f1f8" stroke="#a9c3d4" stroke-width="4"/>
+    <ellipse cx="120" cy="214" rx="48" ry="52" fill="#f7fbfd"/>
+    <path d="M86 236Q120 252 154 236" stroke="#e3edf4" stroke-width="4" fill="none"/>
+    <!-- 胸鰭（手） -->
+    <g class="arm arm-l"><path d="M60 180Q30 196 26 232Q40 240 56 222Q66 206 68 190Z" fill="#d6e8f2" stroke="#a9c3d4" stroke-width="4" stroke-linejoin="round"/></g>
+    <g class="arm arm-r"><path d="M180 180Q210 196 214 232Q200 240 184 222Q174 206 172 190Z" fill="#d6e8f2" stroke="#a9c3d4" stroke-width="4" stroke-linejoin="round"/></g>
+    <!-- 領巾＋海星館長章 -->
+    <path d="M78 150Q120 172 162 150L156 168Q120 186 84 168Z" fill="#5fc3ea"/>
+    <path d="M112 170L104 204L120 192L136 204L128 170Z" fill="#3aa6d6"/>
+    <g transform="translate(150 196)"><path d="M0 -14L4 -4L14 -4L6 3L9 13L0 7L-9 13L-6 3L-14 -4L-4 -4Z" fill="#ffb35c" stroke="#e8893a" stroke-width="2" stroke-linejoin="round"/><circle r="2.5" fill="#fff"/></g>
+    <!-- 頭（大額頭） -->
+    <path d="M58 118Q54 34 120 30Q186 34 182 118Q178 158 120 160Q62 158 58 118Z" fill="#ecf5fa" stroke="#a9c3d4" stroke-width="4"/>
+    <ellipse cx="120" cy="64" rx="44" ry="22" fill="#fff" opacity=".9"/>
+    <path d="M92 50Q108 40 124 44" stroke="#fff" stroke-width="8" fill="none" stroke-linecap="round" opacity=".9"/>
+    <circle cx="78" cy="122" r="11" fill="#ffb0c4" opacity=".55"/><circle cx="162" cy="122" r="11" fill="#ffb0c4" opacity=".55"/>
+    ${eyes(94, 146, 104, '#ecf5fa')}
+    <!-- 嘴：白鯨的微笑 -->
+    <path d="M84 132Q120 150 156 132" fill="none" stroke="#9ab0c0" stroke-width="4" stroke-linecap="round"/>
+    <ellipse class="mouth" cx="120" cy="140" rx="10" ry="6" fill="#d9707e"/>
+    <!-- 噴氣孔的小水花 -->
+    <g class="lulu-spout" fill="#9fdcf6"><circle cx="120" cy="22" r="4"/><circle cx="110" cy="14" r="3"/><circle cx="130" cy="14" r="3"/></g>
+    <!-- 水手帽 -->
+    <g transform="rotate(-8 150 40)">
+      <ellipse cx="150" cy="48" rx="40" ry="10" fill="#fff" stroke="#c6d6e2" stroke-width="3"/>
+      <path d="M118 46Q120 18 150 16Q180 18 182 46Z" fill="#2f5f9e"/>
+      <path d="M118 42Q150 34 182 42" stroke="#fff" stroke-width="5" fill="none"/>
+      <path d="M140 30q5 -6 10 0t10 0" stroke="#9fdcf6" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="150" cy="12" r="5" fill="#e5484d"/>
+    </g>
+    ${extra}
+    ${zzz}
+  </g>`;
+}
+
 export const NIGHTCAP = {
   dudu: `<g class="cap"><path d="M64 60Q96 -14 176 44L180 60Q120 40 62 74Z" fill="#7a8cff"/><path d="M62 66Q120 44 182 62" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"/><circle cx="182" cy="40" r="13" fill="#fff"/></g>`,
   kiki: `<g class="cap"><path d="M70 56Q100 -4 168 34L170 50Q120 36 70 66Z" fill="#7a8cff"/><path d="M70 60Q120 40 172 52" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="174" cy="32" r="12" fill="#fff"/></g>`,
 };
 
-const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao, yuanyuan, lili, gaogao, yongyong, sensen };
+const BUILDERS = { dudu, kiki, santa, bobo, mian, gugu, pupu, doudou, tiaotiao, yuanyuan, lili, gaogao, yongyong, sensen, lulu };
 
 // 回傳可放進 <svg> 的角色群組，x、y 為左上角，s 為縮放。
 export function characterSvg(id, { x = 0, y = 0, s = 1, extra = '' } = {}) {

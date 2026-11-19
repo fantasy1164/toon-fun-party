@@ -157,6 +157,17 @@ const SFX = {
   meow: (t) => tone(700, t, 0.45, { type: 'triangle', to: 950, gain: 0.14, attack: 0.05 }),
   monkey: (t) => [0, 0.16, 0.32, 0.5, 0.62].forEach((d, i) => tone(i < 3 ? 500 + i * 120 : 1100, t + d, 0.12, { type: 'triangle', to: i < 3 ? 700 + i * 120 : 1400, gain: 0.14 })),
   penguin: (t) => [0, 0.18, 0.36].forEach((d, i) => { tone(330 + i * 40, t + d, 0.16, { type: 'square', to: 280, gain: 0.08 }); noise(t + d, 0.14, { freq: 700, q: 3, gain: 0.1 }); }),
+  // ---- 歡樂島海生館（11/19） ----
+  clack: (t) => [0, 0.09, 0.18].forEach((d) => { noise(t + d, 0.04, { freq: 3200, q: 4, gain: 0.3 }); tone(1400, t + d, 0.03, { type: 'square', gain: 0.05 }); }),
+  bark: (t) => [0, 0.32].forEach((d) => { tone(420, t + d, 0.18, { type: 'sawtooth', to: 260, gain: 0.09 }); noise(t + d, 0.16, { freq: 900, q: 2, gain: 0.14 }); }),
+  // 白鯨的叫聲：高高的哨音、上下滑（海洋的金絲雀）
+  whale: (t) => { tone(1100, t, 0.35, { type: 'sine', to: 1700, gain: 0.12, attack: 0.04 }); tone(1600, t + 0.36, 0.3, { type: 'sine', to: 1000, gain: 0.1, attack: 0.04 }); tone(1300, t + 0.7, 0.25, { type: 'triangle', to: 1900, gain: 0.07 }); },
+  // 白鯨唱歌遊戲的三個音（低、中、高）
+  note1: (t) => { tone(784, t, 0.5, { type: 'sine', to: 830, gain: 0.2, attack: 0.03 }); tone(1568, t, 0.4, { type: 'sine', gain: 0.04 }); },
+  note2: (t) => { tone(1047, t, 0.5, { type: 'sine', to: 1100, gain: 0.2, attack: 0.03 }); tone(2093, t, 0.4, { type: 'sine', gain: 0.04 }); },
+  note3: (t) => { tone(1319, t, 0.5, { type: 'sine', to: 1400, gain: 0.18, attack: 0.03 }); tone(2637, t, 0.4, { type: 'sine', gain: 0.03 }); },
+  brush: (t) => noise(t, 0.25, { freq: 2600, q: 0.6, gain: 0.12 }),
+  gondola: (t) => { tone(220, t, 0.5, { type: 'triangle', gain: 0.08 }); noise(t, 0.6, { freq: 500, q: 1.5, gain: 0.1 }); tone(1760, t + 0.4, 0.4, { type: 'sine', gain: 0.08 }); },
 };
 
 export function sfx(name) {
@@ -375,6 +386,18 @@ const TRACKS = {
     melody: seq('E5 . . G5 . . A5 . G5 . E5 .  D5 . . E5 . . C5 . . . . .  E5 . . G5 . . C6 . A5 . G5 .  A5 . . G5 . . E5 . . . . .'),
     bass: seq('C3 . G3 . C3 . A2 . E3 . A2 .  F2 . C3 . F2 . G2 . D3 . G2 .  C3 . G3 . C3 . A2 . E3 . A2 .  F2 . C3 . G2 . C3 . . . . .'),
   },
+  // ---- 歡樂島海生館：水底的感覺（慢、像泡泡一樣的鐵琴、迴音、偶爾冒泡泡）11/19 ----
+  aqua: {
+    style: 'water', bpm: 76, lead: 'sine', leadGain: 0.18, echo: true, bubbles: true,
+    melody: seq('E5 . G5 . B5 . . .  A5 . G5 . E5 . . .  D5 . E5 . G5 . A5 .  B5 . . . . . . .  C6 . B5 . G5 . . .  A5 . G5 . E5 . D5 .  E5 . . . G5 . E5 .  D5 . . . . . . .'),
+    bass: seq('E2 . . . B2 . . .  C3 . . . G2 . . .  D3 . . . A2 . . .  E2 . . . B2 . . .  A2 . . . E3 . . .  C3 . . . G2 . . .  E2 . . . B2 . . .  B2 . . . . . . .'),
+  },
+  // ---- 纜車：輕輕搖、慢慢往上的感覺（風、高高的鈴聲）11/19 ----
+  cable: {
+    style: 'breeze', bpm: 92, lead: 'triangle', leadGain: 0.18,
+    melody: seq('C5 . D5 . E5 . G5 . . . E5 . G5 . A5 .  C6 . . . A5 . G5 . E5 . . . D5 . . .  F5 . G5 . A5 . C6 . . . A5 . G5 . E5 .  D5 . E5 . C5 . . . . . . . . . . .'),
+    bass: seq('C3 . . . G2 . . . A2 . . . E2 . . .  F2 . . . C3 . . . G2 . . . G2 . . .  F2 . . . C3 . . . A2 . . . E2 . . .  G2 . . . C3 . . . C3 . . . . . . .'),
+  },
   bath: {
     style: 'song', bpm: 112, lead: 'triangle', leadGain: 0.2,
     melody: seq('G4 . B4 D5 G5 . D5 . E5 . C5 . B4 . . .  A4 . C5 E5 A5 . E5 . D5 . B4 . G4 . . .'),
@@ -391,6 +414,10 @@ const STYLE = {
   song: { pad: 0.07, bass: 0.26, lead: 1.15, octave: 0.32, kick: 0.85, clap: 0.32, hat: 0.07 },
   bg: { pad: 0.06, bass: 0.24, lead: 1.05, octave: 0.25, kick: 0.55, clap: 0.14, hat: 0.045 },
   quiet: { pad: 0.07, bass: 0.2, lead: 1.0, octave: 0.18, kick: 0, clap: 0, hat: 0 },
+  // 水底：不打鼓、鋪底厚一點、低音軟
+  water: { pad: 0.09, bass: 0.17, lead: 1.0, octave: 0.3, kick: 0, clap: 0, hat: 0 },
+  // 微風：沒有大鼓，只有很輕的沙鈴
+  breeze: { pad: 0.07, bass: 0.2, lead: 1.0, octave: 0.32, kick: 0, clap: 0, hat: 0.03 },
 };
 
 function osc(c, dest, freq, t, dur, { type = 'sine', gain = 0.2, attack = 0.01, release = null, lp = 0 } = {}) {
@@ -458,6 +485,12 @@ function scheduleStep(c, nb, dest, tr, i, t, stepDur) {
     const lp = tr.lead === 'square' ? 2600 : 0;
     osc(c, dest, f, t, stepDur * 1.8, { type: tr.lead, gain: tr.leadGain * st.lead, lp });
     osc(c, dest, f * 2, t, stepDur * 1.2, { type: 'sine', gain: tr.leadGain * st.octave });
+    // 迴音：三格後再小聲響一次（水底的空間感）
+    if (tr.echo) osc(c, dest, f * 2, t + stepDur * 3, stepDur * 1.6, { type: 'sine', gain: tr.leadGain * 0.22, attack: 0.02 });
+  }
+  // 偶爾冒幾個泡泡（往上滑的小音）
+  if (tr.bubbles && i % 8 === 6 && (i * 7919) % 5 < 2) {
+    [0, 0.11, 0.2].forEach((d, k) => osc(c, dest, 500 + ((i + k * 3) % 5) * 90, t + d, 0.12, { type: 'sine', gain: 0.05 }));
   }
   // 低音：三角波＋高八度，iPad 小喇叭也聽得到
   if (b !== '.') {
