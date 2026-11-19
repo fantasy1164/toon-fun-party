@@ -11,6 +11,7 @@
 //   node tools/gen-voice.mjs --dry        # 只列出要做什麼，不呼叫 API
 //   node tools/gen-voice.mjs --convert    # 把現有的 wav 轉成 mp3（需要 ffmpeg，不呼叫 API）
 //   node tools/gen-voice.mjs --resplit    # 用 tools/voice-debug 裡存下來的原始語音重新切一次（不呼叫 API）
+//   node tools/gen-voice.mjs --sample mian --voices Achernar,Aoede   # 試聽不同聲音（存到 tools/voice-samples，不會 push）
 //
 // 金鑰只放在環境變數，不要寫進任何檔案。
 // 角色的聲音與說話風格在 tools/voice-config.json。
@@ -336,6 +337,34 @@ function writeManifest() {
   files.sort();
   writeFileSync(join(VOICE_DIR, 'manifest.json'), JSON.stringify({ files }, null, 2) + '\n');
   return files.length;
+}
+
+// ---------- 試聽：同一段話用不同的聲音各念一次，存到 tools/voice-samples（不會 push） ----------
+// node tools/gen-voice.mjs --sample mian --voices Achernar,Aoede,Despina [--style "說話風格"]
+// 不加 --style 用 voice-config.json 的 sampleStyle（有的話）或原本的 style
+if (flag('sample')) {
+  if (!KEY) { console.error('請先設定環境變數 GEMINI_API_KEY'); process.exit(1); }
+  const charId = opt('sample');
+  const base = cfg.characters[charId];
+  if (!base) { console.error(`找不到角色 ${charId}`); process.exit(1); }
+  const voices = (opt('voices') || base.voice).split(',').map((v) => v.trim()).filter(Boolean);
+  const style = opt('style') || base.sampleStyle || base.style;
+  const ids = Object.keys(LINES).filter((id) => typeof LINES[id] !== 'string' && LINES[id][charId]).slice(0, 40);
+  const pickIds = (opt('lines') || '').split(',').filter((id) => LINES[id]?.[charId]);
+  const use = (pickIds.length ? pickIds : ids.slice(0, 3)).map((id) => LINES[id][charId].replaceAll('{name}', WHO.yh));
+  const text = use.join('<long pause>');
+  const dir = join(ROOT, 'tools', 'voice-samples');
+  mkdirSync(dir, { recursive: true });
+  for (const v of voices) {
+    cfg.characters[charId] = { ...base, voice: v, style };
+    console.log(`試聽 ${charId}／${v} …`);
+    const audio = await synth({ charId, text });
+    const out = join(dir, `${charId}-${v}.wav`);
+    writeFileSync(out, toWav(Buffer.from(audio.data, 'base64')));
+    console.log(`  → ${out}`);
+  }
+  console.log('聽完告訴 Claude 要用哪一個聲音。');
+  process.exit(0);
 }
 
 if (flag('convert')) {
