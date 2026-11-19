@@ -147,6 +147,7 @@ function midLayer() {
       <path d="M476 500V440Q476 404 512 404H536V426H514Q498 426 498 442V500Z" fill="#b9c6d2"/>
       <rect x="524" y="400" width="18" height="32" rx="6" fill="#9aa9b8"/>
       <circle cx="466" cy="470" r="12" fill="#5fc3e8"/>
+      <rect class="fwater" x="480" y="500" width="14" height="70" rx="7" fill="#8fd8f5"/>
       ${hit(440, 380, 110, 125)}
     </g>
 

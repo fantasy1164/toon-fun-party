@@ -417,6 +417,12 @@ html, body {
 .together .tgo { left: 680px; top: 360px; width: 220px; height: 220px; background: #2ea05a; animation: pulse .7s ease-in-out infinite alternate; }
 .together .tgo svg path { fill: #fff; stroke: #fff; }
 .together .tpause { right: 130px; top: 22px; width: 92px; height: 92px; }
+/* 刷完牙後的四步（漱口、洗牙刷、洗杯子、洗臉） */
+.together .tsteps { position: absolute; left: 520px; top: 330px; display: flex; gap: 26px; }
+.together .tsteps i { width: 132px; height: 132px; border-radius: 50%; background: rgba(255, 255, 255, .85); display: grid; place-items: center; box-shadow: 0 6px 0 rgba(0, 0, 0, .08); opacity: .55; transition: transform .3s, opacity .3s; }
+.together .tsteps i.on { opacity: 1; transform: scale(1.25); box-shadow: 0 0 0 8px var(--glow, #ffd34d); animation: pulse .8s ease-in-out infinite alternate; }
+.together .tsteps i.done { opacity: 1; background: #c9f2d6; }
+.together.after .together-art > g:not(.buddy) { opacity: .12; transition: opacity .5s; }
 .together .tpause .pl { display: none; }
 .together.paused .tpause .pl { display: block; }
 .together.paused .tpause .pa { display: none; }
@@ -1845,3 +1851,10 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .parent .en-yt-probe { position: absolute; left: -9999px; top: 0; }
 .parent .en-v small { display: block; font-size: 13px; line-height: 1.3; color: #555; margin-top: 2px; }
 .tg-english .en-done.ready { background: #2e9e4f; }
+
+/* 刷牙遊戲：沖牙刷、沖杯子、水龍頭出水、洗臉擦乾 */
+.bathroom .prop .fwater { opacity: 0; }
+.bathroom .prop.on .fwater { opacity: .9; animation: drip .3s linear infinite; }
+.bathroom .prop.rinsing { animation: wiggle .3s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+.bathroom .prop.upside { transform: rotate(180deg); transform-box: fill-box; transform-origin: 50% 50%; transition: transform .4s; }
+.bathroom .dry .char { animation: wiggle .25s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }

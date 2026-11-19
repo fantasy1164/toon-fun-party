@@ -460,19 +460,21 @@ export function mountTogether(stage, { profile, onExit, kind, host: hostHint }) 
     const eat = $('.eat', plate);
     card.classList.add('hidden');
     await say('tm_rest');
+    await say('tm_focus');   // 吃飯要專心（11/19 John）
     plate.classList.remove('hidden');
     root.classList.add('dim');
     playMusic('meal');
     musicLevel(0.6, 2);
     const total = MEAL_MIN * 60000;
-    const pool = ['tm_r1', 'tm_r2', 'tm_r3', 'tm_r4', 'tm_r5', 'tm_r6'];
+    const pool = ['tm_r1', 'tm_r2', 'tm_r3', 'tm_r4', 'tm_r5', 'tm_r6', 'tm_r8'];
+    let nth = 0;   // 每隔一次提醒專心吃飯（tm_r7），其他次照舊隨機
     let next = 3.5 * 60000;
     let last = '';
     const t = timer(total, (e) => {
       eat.setAttribute('stroke-dasharray', `${(PLATE_C * e / total).toFixed(1)} ${PLATE_C.toFixed(1)}`);
       if (e >= next && e < total - 60000) {
         next += 4 * 60000;
-        last = pick(pool.filter((x) => x !== last));
+        last = nth++ % 2 === 0 ? 'tm_r7' : pick(pool.filter((x) => x !== last));
         sfx('sparkle');
         sayBg(last);
       }

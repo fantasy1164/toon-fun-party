@@ -13,9 +13,20 @@ import { ICON, openCabinet } from '../ui/screens.js';
 import { nextCharacter } from './together.js';
 import { turnsOn, turnCall, passTurn, turnsScene } from '../core/turns.js';
 import { mountBath } from './bath.js';
+import { waterOn as tapOn, waterOff as tapOff } from '../core/audio.js';
+import { tgIcon } from '../art/together.js';
 
 const BRUSH_PROPS = ['brush', 'paste', 'cup'];
 const WASH_PROPS = ['soap', 'faucet', 'towel'];
+
+// 刷完牙接著做的四步（11/19 John）：漱口、洗牙刷、洗杯子、洗臉
+const CUP = (flip) => `<svg viewBox="0 0 100 100" width="96" height="96"><g ${flip ? 'transform="rotate(180 50 50)"' : ''}><path d="M26 18H74L66 86H34Z" fill="#ffd34d"/><path d="M26 18H74L72 32H28Z" fill="#ffe58a"/>${flip ? '' : '<path d="M30 40H70L65 82H35Z" fill="#8fd8f5"/>'}</g>${flip ? '<circle cx="50" cy="94" r="4" fill="#5fc3e8"/>' : '<circle cx="40" cy="10" r="5" fill="#bfe9f8"/><circle cx="58" cy="6" r="4" fill="#bfe9f8"/>'}</svg>`;
+const AFTER = [
+  { id: 'rinse', line: 't_rinse', ok: 't_rinse_ok', ms: 15000, sound: 'gargle', icon: () => CUP(false) },
+  { id: 'wbrush', line: 't_wbrush', ok: 't_wbrush_ok', ms: 15000, water: true, icon: () => tgIcon('toothbrush', 96) },
+  { id: 'wcup', line: 't_wcup', ok: 't_wcup_ok', ms: 10000, water: true, icon: () => CUP(true) },
+  { id: 'face', line: 't_face', ok: 't_face_ok', ms: 20000, water: true, icon: () => tgIcon('towel', 96) },
+];
 
 export function mountBathroom(stage, { profile, onExit, charId: chosen, together = false }) {
   const charId = chosen || nextCharacter();
@@ -32,6 +43,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
       <div class="view together off">${togetherView(charId)}
         <div class="tbar"><i></i></div>
         <button class="round-btn tgo hidden">${ICON.play || ''}</button>
+        <div class="tsteps hidden">${AFTER.map((s) => `<i data-s="${s.id}">${s.icon()}</i>`).join('')}</div>
         <button class="round-btn tpause hidden"><svg viewBox="0 0 100 100" width="50" height="50"><rect class="pa" x="24" y="20" width="18" height="60" rx="6" fill="#2f7fe0"/><rect class="pa" x="58" y="20" width="18" height="60" rx="6" fill="#2f7fe0"/><path class="pl" d="M30 18L80 50L30 82Z" fill="#2ea05a"/></svg></button>
       </div>
       <div class="hud">
@@ -289,8 +301,56 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
     await pause(1600);
     charBox.classList.remove('gargle');
     cupWater.style.opacity = 0;
+    await say('t_rinse_ok');
 
-    await celebrate('brush', 'b_mission', 'dn_brush_b');
+    // 洗牙刷
+    const faucet = propsIn('main', 'faucet')[0];
+    const rinseAt = async (node, ms = 1800) => {
+      node.classList.add('rinsing');
+      faucet.classList.add('on');
+      tapOn();
+      const c = centerOf(node);
+      burst(c.x, c.y, { n: 8, kind: 'bubble', spread: 70 });
+      await pause(ms);
+      tapOff();
+      faucet.classList.remove('on');
+      node.classList.remove('rinsing');
+    };
+    say('b_wbrush');
+    await choose('brush');
+    await rinseAt(brush);
+    await say('t_wbrush_ok');
+
+    // 洗杯子
+    say('b_wcup');
+    await choose('cup');
+    const cup = propsIn('main', 'cup')[0];
+    await rinseAt(cup, 1500);
+    cup.classList.add('upside');
+    await say('t_wcup_ok');
+    cup.classList.remove('upside');
+
+    // 洗臉：水龍頭洗、毛巾擦乾
+    say('b_face');
+    await choose('faucet');
+    faucet.classList.add('on');
+    tapOn();
+    sfx('splash');
+    const r = charBox.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height * 0.3, { n: 10, kind: 'bubble', spread: 90 });
+    await pause(1500);
+    tapOff();
+    faucet.classList.remove('on');
+    say('b_face_dry');
+    await choose('towel');
+    sfx('scrub');
+    charBox.classList.add('dry');
+    await pause(1200);
+    charBox.classList.remove('dry');
+    sfx('sparkle');
+    await say('t_face_ok');
+
+    await celebrate('brush', 'b_mission', 'dn_brush_b2');
   }
 
   // ---------- 陪刷：小孩刷自己的牙，全程不用碰螢幕 ----------
@@ -331,12 +391,13 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
 
     let elapsed = 0;
     let paused = false;
+    let resumeTrack = 'brush_song';
     let seg = -1;
     const togglePause = () => {
       paused = !paused;
       v.classList.toggle('paused', paused);
       sfx('tap');
-      if (paused) { hush(); playMusic(track); } else playMusic('brush_song');
+      if (paused) { hush(); playMusic(track); } else playMusic(resumeTrack);
     };
     pauseBtn.addEventListener('pointerdown', togglePause);
     cleanups.push(() => pauseBtn.removeEventListener('pointerdown', togglePause));
@@ -367,18 +428,57 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
       cleanups.push(() => clearInterval(timer));
     });
     guard();
-    try { lock?.release(); } catch { /* 忽略 */ }
-    pauseBtn.classList.add('hidden');
     v.classList.remove('brushing');
     $$('.zone', v).forEach((z) => z.classList.replace('on', 'done'));
     playMusic(track);
-    await say('t_spit');
-    sfx('gargle');
-    await pause(2500);
     sfx('sparkle');
     await say('b_done');
+    guard();
+
+    // 刷完接著漱口、洗牙刷、洗杯子、洗臉：手是濕的，自動往下走（可以暫停）
+    resumeTrack = track;
+    const steps = $('.tsteps', v);
+    v.classList.add('after');
+    steps.classList.remove('hidden');
+    pauseBtn.classList.remove('hidden');
+    const runFor = (ms) => new Promise((res) => {
+      let done = 0;
+      let last = performance.now();
+      bar.style.width = '0%';
+      const tm = setInterval(() => {
+        const t = performance.now();
+        const dt = t - last;
+        last = t;
+        if (!alive) { clearInterval(tm); res(); return; }
+        if (paused) return;
+        done += dt;
+        bar.style.width = `${Math.min(100, (done / ms) * 100)}%`;
+        if (done >= ms) { clearInterval(tm); res(); }
+      }, 100);
+      cleanups.push(() => clearInterval(tm));
+    });
+    cleanups.push(() => tapOff());
+    for (const s of AFTER) {
+      const dot = $(`[data-s="${s.id}"]`, steps);
+      dot.classList.add('on');
+      await say(s.line);
+      guard();
+      if (s.water) tapOn();
+      if (s.sound) sfx(s.sound);
+      await runFor(s.ms);
+      guard();
+      tapOff();
+      dot.classList.replace('on', 'done');
+      sfx('sparkle');
+      await say(s.ok);
+      guard();
+    }
+    try { lock?.release(); } catch { /* 忽略 */ }
+    pauseBtn.classList.add('hidden');
+    steps.classList.add('hidden');
+    v.classList.remove('after');
     await showView('main');
-    await celebrate('brush', 't_mission', 'dn_brush_t');
+    await celebrate('brush', 't_mission', 'dn_brush_t2');
   }
 
   // ---------- 洗手 ----------
