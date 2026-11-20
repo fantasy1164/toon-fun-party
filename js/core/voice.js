@@ -158,7 +158,7 @@ export async function speak(charId, lineId, { name = '', who = '', node = null }
   window.__said?.push(`${charId}/${lineId}`);   // 測試用：記錄說過的台詞
   speakingToken = my;
   node?.classList.add('talking');
-  duck(true);
+  try { duck(true); } catch { /* 音樂壓低失敗也要照樣說話 */ }
   try {
     const key = lineHasName(lineId, charId) ? `${charId}/${lineId}.${who}` : `${charId}/${lineId}`;
     let played = false;
@@ -168,7 +168,7 @@ export async function speak(charId, lineId, { name = '', who = '', node = null }
     if (!played && my === token) await playTts(text, charId, my);
   } finally {
     node?.classList.remove('talking');
-    if (my === token) { duck(false); speakingToken = -1; }
+    if (my === token) { try { duck(false); } catch { /* 忽略 */ } speakingToken = -1; }
     lastSpokeAt = Date.now();
   }
 }
@@ -194,5 +194,5 @@ export function primeTts() {
 
 export function hush() {
   stopCurrent();
-  duck(false);
+  try { duck(false); } catch { /* 忽略 */ }
 }

@@ -56,8 +56,9 @@ export function setMusicVolume(v) {
 }
 
 // 說話時把音樂壓低一點（活動歌壓得最少，讓小孩還能跟著節奏）
-const DUCK = { song: 0.6, bg: 0.45, quiet: 0.55 };
-function duckFactor() { return DUCK[(music && TRACKS[music.name]?.style) || 'bg']; }
+// 11/21：沒列在這裡的曲風（水底 water、纜車 breeze）一律當背景音樂，不能算出 NaN（會讓 setTargetAtTime 丟錯、角色說不出話）
+const DUCK = { song: 0.6, bg: 0.45, quiet: 0.55, water: 0.5, breeze: 0.45 };
+function duckFactor() { return DUCK[music && TRACKS[music.name]?.style] ?? DUCK.bg; }
 export function duck(on) {
   ducked = on;
   if (!ctx) return;
