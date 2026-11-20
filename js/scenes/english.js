@@ -178,7 +178,7 @@ export function mountEnglish(stage, { profile, onExit }) {
     const row = (i) => `<button class="en-li${i < nPick ? ' pick' : ''}" data-i="${i}"><span class="ic">${tgIcon(iconOf(i), 34)}</span><span class="tx">${label(i)}</span></button>`;
     const head = (t) => `<div class="en-sep">${t}</div>`;
     // 分兩組，各自的標題只黏在自己那一組上面
-    list.innerHTML = `<div class="en-grp">${head(`今天勾選的 ${nPick}`)}${rows.slice(0, nPick).map((_, i) => row(i)).join('')}</div>`
+    list.innerHTML = (nPick ? `<div class="en-grp">${head(`今天勾選的 ${nPick}`)}${rows.slice(0, nPick).map((_, i) => row(i)).join('')}</div>` : '')
       + (rows.length > nPick ? `<div class="en-grp">${head('其他課程（點了才播）')}${rows.slice(nPick).map((_, k) => row(nPick + k)).join('')}</div>` : '');
     $$('.en-li', list).forEach((b) => onClick(b, () => { sfx('tap'); jump(+b.dataset.i); }));
     shownPos = -1;
@@ -401,11 +401,10 @@ export function mountEnglish(stage, { profile, onExit }) {
     const finished = new Promise((r) => { doneWait = r; });
     doneBtn.classList.remove('pulse');
     allHeard = () => { doneBtn.classList.add('pulse'); if (alive && !ending) speak('mian', 'en_all_heard', { node: hostIn }); };
+    // 這台裝置沒有勾選（例如新的平板、車機還沒同步）：照樣列出全部課程，家長點了就播
     if (!picks.length) {
       doneBtn.classList.add('pulse');
       await say('en_none');
-      await finished;
-      return false;
     }
     paintDots();
     main.classList.remove('hidden');
@@ -414,14 +413,14 @@ export function mountEnglish(stage, { profile, onExit }) {
       loadTrack(0, false);
       setPlaying(false);
       if (!navigator.onLine) { await say('en_offline'); doneBtn.classList.add('pulse'); }
-      else await say('en_play');
+      else if (nPick) await say('en_play');
     } else {
       videoBox.classList.remove('hidden');
       try {
         if (!navigator.onLine) throw new Error('offline');
         await setupVideo();
         videoTitles();
-        await say('en_video');
+        if (nPick) await say('en_video');
       } catch (err) {
         guard();
         videoBox.classList.add('hidden');
