@@ -16,6 +16,7 @@ import { sceneWeather } from './door.js';
 import { callTurn, passTurn, turnsOn, turnsScene, freeTurns } from '../core/turns.js';
 import { LIST_POOL } from '../art/market.js';
 import { englishOpen } from './english.js';
+import { timesOpen } from './times.js';
 import { LINES } from '../data/lines.js';
 
 // 廁所固定由嘟嘟負責（11/14 起每個場景一位負責的角色）
@@ -49,6 +50,8 @@ const MODES = {
   read: { host: 'gugu', reward: 'library', series: 'gugu', track: 'study', icon: 'book' },
   // 英文複習：起床後到 21:00 出現在臥室（scenes/english.js）
   english: { host: 'mian', track: 'bedroom', icon: 'abc' },
+  // 九九乘法（11/21）：學堂，妍卉在才出現（scenes/times.js）
+  times: { host: 'gugu', track: 'study', icon: 'times' },
 };
 export const MEAL_MIN = 25;   // 吃飯盤子時鐘幾分鐘走完
 export const LULLABY_MIN = 10;
@@ -71,6 +74,7 @@ function hostSvg(id) {
 export function chooseMode(stage, room, profile) {
   const kinds = (TOGETHER[room] || []).filter((k) => k !== 'homework' || profile.level === 'hard');
   if (room === 'bedroom' && englishOpen()) kinds.push('english');
+  if (room === 'school' && timesOpen(profile)) kinds.push('times');
   if (!kinds.length) return Promise.resolve({ mode: 'game' });
   const host = room === 'bathroom' ? nextCharacter() : ROOM_HOST[room];
   const ph = phase();
@@ -81,7 +85,7 @@ export function chooseMode(stage, room, profile) {
       <div class="tg-host"><div class="tg-host-in o-day">${hostSvg(host)}</div></div>
       <div class="tg-choices n${kinds.length + 1}">
         <button class="round-btn tg-choice game" data-mode="game">${tgIcon('game', 170)}</button>
-        ${kinds.map((k) => `<button class="round-btn tg-choice tog" data-kind="${k}">${tgIcon(MODES[k].icon, 150)}<span class="badge">${tgIcon('hands2', 74)}</span></button>`).join('')}
+        ${kinds.map((k) => `<button class="round-btn tg-choice tog" data-kind="${k}">${tgIcon(MODES[k].icon, 150)}${k === 'times' ? '' : `<span class="badge">${tgIcon('hands2', 74)}</span>`}</button>`).join('')}
       </div>
       <div class="hud"><button class="round-btn home">${ICON.home}</button></div>
     </div>`);

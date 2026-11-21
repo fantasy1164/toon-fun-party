@@ -10,6 +10,7 @@ import * as fest from '../core/festival.js';
 import { setMusicVolume, playMusic } from '../core/audio.js';
 import { drillDay } from './quake.js';
 import { englishSection, englishChange, englishClick, englishMounted } from './englishParent.js';
+import { timesSection, timesClick, timesBadge } from './timesParent.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
@@ -148,6 +149,7 @@ export function openParent(onClose, { onStamp } = {}) {
   const TABS = [
     ['stamp', '蓋章', owed ? `<b class="bd">${owed}</b>` : ''],
     ['english', '英文複習', enN ? `<b class="bd soft">${enN}</b>` : ''],
+    ['times', '乘法', timesBadge()],
     ['time', '作息', ''],
     ['fest', '節日', ''],
     ['look', '畫面聲音', ''],
@@ -174,6 +176,8 @@ export function openParent(onClose, { onStamp } = {}) {
       <table><tr><th></th><th>遊玩時間</th><th>已領獎的活動</th><th>收藏品總數</th></tr>${rows}</table>`)}
 
       ${pane('english', englishSection())}
+
+      ${pane('times', timesSection())}
 
       ${pane('time', `
       <h2>時間設定</h2>
@@ -297,6 +301,7 @@ export function openParent(onClose, { onStamp } = {}) {
     }
     const act = e.target.dataset?.act;
     const id = e.target.dataset?.id;
+    if (act && timesClick(act, e, node)) return;
     if (act === 'stamp') {
       const row = e.target.closest('.stamp-row');
       const reasons = [...row.querySelectorAll('.chip.on')].map((c) => c.dataset.r);

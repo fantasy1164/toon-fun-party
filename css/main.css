@@ -2068,3 +2068,42 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .stairs-hint .sh-back, .stairs-hint .sh-back svg { position: absolute; inset: 0; width: 1200px; height: 900px; }
 .stairs-hint .sh-kid { position: absolute; width: 110px; height: 110px; transition: left .25s linear, top .25s linear; }
 .hub .stairs-room.glow { filter: drop-shadow(0 0 10px var(--glow, #ffd000)); animation: pulse 1.2s ease-in-out infinite; }
+
+/* ---------- 九九乘法（11/21） ---------- */
+.times .tm-board { position: absolute; left: 278px; top: 78px; width: 524px; height: 260px; z-index: 3; pointer-events: none; transition: transform .6s ease-in-out; }
+.times .tm-board svg { display: block; }
+.times .tm-board.spin { transform: rotate(90deg) scale(.7); }
+.times .tm-board.hide-dots .tm-dot { opacity: 0; }
+.times .tm-board .tm-dot { transition: opacity .3s, transform .3s; transform-box: fill-box; transform-origin: center; }
+.times .tm-board .tm-dot.lit { transform: scale(1.35); fill: #ffd34d; }
+.times .tm-board .tm-part { transition: opacity .3s; }
+.times .tm-board .tm-part.lit { opacity: .6; }
+.times .tm-board .tm-part.gone { opacity: .15; }
+.times .tm-board .tm-frog { transition: transform .4s; }
+.times .tm-poster { position: absolute; left: 870px; top: 176px; width: 300px; height: 300px; z-index: 3; pointer-events: none; transition: transform .4s; }
+.times .tm-poster.shine { transform: scale(1.06); filter: drop-shadow(0 0 16px #ffd000); }
+.times .tm-poster .tp-cell.hot rect { stroke: #e5484d; stroke-width: 3; }
+.times .tm-berry { width: 34px; height: 38px; pointer-events: none; z-index: 6; }
+.times .tm-plate { width: 160px; height: 70px; }
+.times .tm-basket { width: 140px; height: 110px; }
+.times .tm-ctx { width: 78px; height: 78px; border-radius: 16px; background: rgba(255, 255, 255, .7); transition: opacity .3s, transform .3s; }
+.times .tm-ctx.dim { opacity: .45; }
+.times .tm-ctx:not(.dim) { transform: translateY(-6px); }
+.times .tm-rotate { width: 96px; height: 96px; border-radius: 50%; }
+.times .tm-board-tap, .times .tm-zone { border-radius: 16px; background: rgba(255, 255, 255, .01); }
+.times .tm-board-tap.glow, .times .tm-zone.glow { box-shadow: 0 0 0 5px var(--glow, #ffd000), 0 0 22px var(--glow, #ffd000); animation: none; filter: none; }
+.times .tm-zone.hidden { display: none; }
+.times .chalk { display: none; }   /* 黑板乾淨，只放數線、點點、題目 */
+.times .kt-cards { top: 420px; gap: 28px; }   /* 卡片放在黑板下面，答題時還看得到數線、點點 */
+.times .kt-cards .kt-card { width: 170px !important; height: 170px !important; }
+.times .kt-cards .kt-card svg { width: 146px; height: 146px; }
+/* 家長頁：乘法進度（11/21） */
+.parent .tgrid { margin: 8px 0 6px; }
+.parent .tgrid th, .parent .tgrid td { width: 44px; height: 40px; padding: 0; text-align: center; font-size: 18px; border: 2px solid #fff; }
+.parent .tgrid th { color: #8a5a2b; background: none; }
+.parent .tgrid td { background: #f1ece2; color: #3a5a2a; border-radius: 6px; }
+.parent .tgrid td.lt, .parent .tg-k.lt { background: #bfe6a8; }
+.parent .tgrid td.st, .parent .tg-k.st { background: #ffd34d; }
+.parent .tgrid td.wk, .parent .tg-k.wk { background: #ffc2c2; }
+.parent .tg-k { display: inline-block; width: 18px; height: 18px; border-radius: 4px; vertical-align: -2px; margin: 0 4px 0 8px; }
+.parent .tweak { font-size: 20px; line-height: 1.7; }

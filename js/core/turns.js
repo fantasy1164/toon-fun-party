@@ -128,6 +128,8 @@ export async function passTurn(charId = null, node = null) {
 // 指定輪到誰（例如：一人一題、一起做時問「妍卉做好了嗎」）
 export function setTurn(id) {
   if (!turnsOn() || !ids.includes(id)) return;
+  // 剛換人之後又指定回剛剛做完的那個人：不是換人，唱名只叫名字（不說「換向澤囉」）
+  if (id !== cur) thank = false;
   cur = id;
   free = false;
   paint();
