@@ -20,7 +20,7 @@ const SND = { dudu: 'squeak', kiki: 'boing', bobo: 'drum', mian: 'baa', gugu: 'd
 // 小明星徽章：一起做的種類 → 圖示
 export const HABITS = [
   ['sleep', 'moon'], ['out', 'shoes'], ['meal', 'bowl'], ['brush', 'toothbrush'], ['wash', 'hands'], ['bag', 'bag'], ['homework', 'homework'],
-  ['gym', 'bunny'], ['ride', 'redcar'], ['outing', 'park'], ['doctor', 'steth'], ['shop', 'cart'], ['bath', 'bathtub'], ['fun', 'ferris'], ['firecheck', 'alarm'], ['read', 'book'], ['english', 'abc'], ['quake', 'quake'],
+  ['gym', 'bunny'], ['ride', 'redcar'], ['outing', 'park'], ['doctor', 'steth'], ['shop', 'cart'], ['bath', 'bathtub'], ['fun', 'ferris'], ['firecheck', 'alarm'], ['read', 'book'], ['english', 'abc'], ['quake', 'quake'], ['stairs', 'stairs'],
 ];
 const tierOf = (n) => BADGE_TIERS.filter((t) => n >= t).length;
 

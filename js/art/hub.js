@@ -17,10 +17,11 @@ export const SPOTS = {
   farm: [930, 268, 250, 240],
   park: [22, 496, 300, 200],
   town: [890, 790, 290, 110],
+  stairs: [190, 352, 134, 430],   // 樓梯間（11/21）：房子左邊加一間，二樓地板對齊
 };
 // 前院放節慶帳篷、聖誕樹的位置
 // 公園的草地上放節慶帳篷、聖誕樹（11/14 起前院改成公園）
-export const YARD = [[20, 676, 130, 134], [158, 686, 120, 124]];
+export const YARD = [[20, 676, 130, 134], [34, 540, 120, 124]];   // 11/21：右邊那格讓給樓梯間
 
 export function hubBack(ph, wx, { december = false, newyear = false } = {}) {
   const { grey, colors: [a, b] } = skyColors(ph, wx);
@@ -54,10 +55,13 @@ export function hubBack(ph, wx, { december = false, newyear = false } = {}) {
     <rect x="770" y="128" width="50" height="110" fill="#c9562f"/><rect x="760" y="118" width="70" height="20" rx="6" fill="#a8422a"/>
     <path d="M292 276L600 92L908 276Z" fill="#e5734f"/><path d="M292 276L600 92L908 276" fill="none" stroke="#c9562f" stroke-width="14" stroke-linejoin="round"/>
     ${[0, 1, 2, 3].map((i) => `<path d="M${380 + i * 20} ${232 - i * 12}L${820 - i * 20} ${232 - i * 12}" stroke="#d9663f" stroke-width="5" opacity="${0.6 - i * 0.1}"/>`).join('')}
+    <!-- 樓梯間（11/21）：房子左邊加一間，斜屋頂 -->
+    <rect x="178" y="340" width="156" height="450" fill="#fff4e0"/>
+    <path d="M160 352L334 286V312L172 366Z" fill="#e5734f"/><path d="M160 352L334 286" stroke="#c9562f" stroke-width="10" stroke-linecap="round"/>
     <rect x="330" y="262" width="540" height="528" fill="#fff4e0"/>
     <rect x="330" y="520" width="540" height="14" fill="#c8915a"/>
     <rect x="598" y="262" width="14" height="528" fill="#e8d6b8"/>
-    <rect x="322" y="786" width="556" height="14" rx="4" fill="#b9824f"/>
+    <rect x="170" y="786" width="708" height="14" rx="4" fill="#b9824f"/>
     <!-- 車庫 -->
     <path d="M864 562L1126 562L1100 520L890 520Z" fill="#9aa0aa"/><rect x="870" y="562" width="250" height="228" fill="#e8e0d0"/>
     <rect x="884" y="590" width="226" height="200" fill="#5a5f6a"/>

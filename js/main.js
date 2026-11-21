@@ -18,7 +18,7 @@ import { mountFarm } from './scenes/farm.js';
 import { mountPark } from './scenes/park.js';
 import { mountParty } from './scenes/party.js';
 import { mountNewYear } from './scenes/newyear.js';
-import { showHub } from './ui/hub.js';
+import { showHub, stairsHint, ROOM_FLOOR } from './ui/hub.js';
 import { showMap } from './ui/map.js';
 import { mountHall } from './scenes/hall.js';
 import { mountClinic } from './scenes/clinic.js';
@@ -35,6 +35,7 @@ import { mountGift } from './scenes/gift.js';
 import { mountCruise } from './scenes/cruise.js';
 import { mountCable } from './scenes/cable.js';
 import { mountSea } from './scenes/sea.js';
+import { mountStairs } from './scenes/stairs.js';
 import { chooseMode, mountTogether } from './scenes/together.js';
 import { mountEnglish, englishOpen } from './scenes/english.js';
 import { setupTurns, turnsScene } from './core/turns.js';
@@ -151,7 +152,7 @@ async function goMap() {
   const r = await showMap(stage, profile, zone, { arrive });
   if (r.room === 'back') { profile = null; route(); return; }
   if (closedReason()) { route(); return; }
-  if (r.room === 'home') { goHouse(); return; }
+  if (r.room === 'home') { houseFloor = 1; goHouse(); return; }
   if (r.room === 'zone') {
     if (r.trip) { startTrain(r.zone); return; }
     zone = r.zone;
@@ -165,10 +166,19 @@ async function goMap() {
   enterRoom(r.room, 'map');
 }
 
+// 在房子裡現在在幾樓（從地圖進來是一樓）；換樓層時勇勇提醒走樓梯（每天第一次上樓、第一次下樓）
+let houseFloor = 1;
 async function goHouse() {
   if (!profile) { route(); return; }
   if (closedReason()) { route(); return; }
   const room = await showHub(stage, profile);
+  // 從二樓出門也要下樓
+  const to = room === 'back' ? 1 : ROOM_FLOOR[room];
+  if (to && to !== houseFloor) {
+    await stairsHint(stage, profile, to > houseFloor ? 'up' : 'down');
+    houseFloor = to;
+  }
+  if (room === 'stairs') houseFloor = 1;   // 樓梯間玩完回到一樓
   if (room === 'back') { goMap(); return; }
   if (room === 'tree') { await treeScreen(stage, profile); goHouse(); return; }
   if (closedReason()) { route(); return; }
@@ -181,7 +191,7 @@ const zooArea = (area) => (stage2, opts) => mountZoo(stage2, { ...opts, area });
 const ZOO_MOUNT = Object.fromEntries(['kids', 'taiwan', 'rain', 'africa', 'desert', 'aus', 'penguin', 'panda'].map((a) => [a, zooArea(a)]));
 // 歡樂島海生館（11/19）：三個館＋迎賓廣場
 const SEA_MOUNT = Object.fromEntries(['tw', 'coral', 'world', 'plaza'].map((h) => [h, (stage2, opts) => mountSea(stage2, { ...opts, hall: h })]));
-const MOUNT = { ...ZOO_MOUNT, ...SEA_MOUNT, tram: (stage2, opts) => mountZoo(stage2, { ...opts, tour: true }), snack: mountSnack, gift: mountGift, door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear, theater: mountHall, clinic: mountClinic, market: mountMarket, amuse: mountAmuse, fire: mountFire, dental: mountDental, library: mountLibrary, trail: mountHike };
+const MOUNT = { ...ZOO_MOUNT, ...SEA_MOUNT, tram: (stage2, opts) => mountZoo(stage2, { ...opts, tour: true }), snack: mountSnack, gift: mountGift, door: mountDoor, kitchen: mountKitchen, bedroom: mountBedroom, car: mountCar, school: mountSchool, farm: mountFarm, park: mountPark, party: mountParty, newyear: mountNewYear, theater: mountHall, clinic: mountClinic, market: mountMarket, amuse: mountAmuse, fire: mountFire, dental: mountDental, library: mountLibrary, trail: mountHike, stairs: mountStairs };
 
 function startScene(make) {
   if (state.session.usedMs === 0) warned = false;
