@@ -202,13 +202,14 @@ export function mountAmuse(stage, { profile, onExit }) {
         ctl.cleanups.push(() => resolve());
       });
       guard();
+      // 坐上去的是剛剛被唱名、點對的那個人（11/21 John：原本固定妍卉先，跟唱名相反）
+      const rider = whoseTurn() || kids[0];
       passTurn();
       target.classList.remove('glow');
       target.classList.add('found');
       sfx('sparkle');
       const c = centerOf(target);
       burst(c.x, c.y, { n: 12, kind: 'star', spread: 120 });
-      const rider = kids[order.indexOf(a) % kids.length];
       target.insertAdjacentHTML('beforeend', `<div class="am-on">${avatarSvg(rider, 54)}</div>`);
       await host('am_found');
     }

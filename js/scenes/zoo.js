@@ -17,7 +17,7 @@ import { cameraFor, NO_CAM } from '../core/camera.js';
 import { areaBack, WALKWAY, foreArt, TRAM_BIG, FOOD, RULE, NUM, ANIMAL_CARD, FOOT_PANEL, ELE_PRINT, KID_PRINT, KID_SHADOW, SINK, SOAP, TOWEL, SPEAKER, JUMP_BTN, BUCKET } from '../art/zoo.js';
 import { makeScene, charDiv } from './party.js';
 import { pickCard, tapOne, tapEach, hardNow, giveReward, moveTo, kidNode, shuffle } from './kit.js';
-import { turnsOn, passTurn, freeTurns } from '../core/turns.js';
+import { turnsOn, passTurn, freeTurns, whoseTurn } from '../core/turns.js';
 import { avatarSvg } from '../art/characters.js';
 
 const HOST = 'sensen';
@@ -500,18 +500,20 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
     await host('zs_tall');
     const base = [420, 668];
     const stack = [];
-    const colorOf = (i) => (kids.length > 1 ? (i % 2 ? '#5fc98a' : '#ff7fa8') : (kids[0] === 'xz' ? '#5fc98a' : '#ff7fa8'));
-    const btn = thing('zo-stack', KID_SHADOW(colorOf(0)), [base[0] - 48, base[1] - 112]);
+    // 影子顏色跟著目前輪到的人（妍卉粉紅、向澤綠；11/21：原本固定粉紅先）
+    const colorNow = () => ((whoseTurn() || kids[0]) === 'xz' ? '#5fc98a' : '#ff7fa8');
+    const btn = thing('zo-stack', KID_SHADOW(colorNow()), [base[0] - 48, base[1] - 112]);
     btn.style.opacity = '.55';
     for (let i = 0; i < 4; i += 1) {
+      const c = colorNow();
       await tap(btn);
       guard();
       sfx('pop');
-      const s = thing('zo-shadow', KID_SHADOW(colorOf(i)), [base[0] - 48, base[1] - 112 - i * 112]);
+      const s = thing('zo-shadow', KID_SHADOW(c), [base[0] - 48, base[1] - 112 - i * 112]);
       s.style.pointerEvents = 'none';
       s.classList.add('drop');
       stack.push(s);
-      btn.innerHTML = KID_SHADOW(colorOf(i + 1));
+      btn.innerHTML = KID_SHADOW(colorNow());
       btn.style.top = `${base[1] - 112 - (i + 1) * 112}px`;
       if (i === 3) btn.remove();
     }

@@ -55,20 +55,30 @@ export async function tapEach(nodes, onEach, { free = false, call, cleanups, ali
   nodes.forEach((n) => n.classList.add('glow'));
   if (free) freeTurns(true);
   else if (turnsOn() && call) { calling = true; await call(); calling = false; }
+  // 做完就把這一步的點擊拿掉（11/21：牙科先數牙齒、再點蛀牙，同一批牙齒上留著數牙齒的點擊，
+  // 搶先把蛀牙標成 done，蛀牙那一步永遠點不完）
+  const handlers = [];
+  const off = () => handlers.splice(0).forEach(([n, h]) => n.removeEventListener('pointerdown', h));
   await new Promise((resolve) => {
     if (!left) { resolve(); return; }
-    nodes.forEach((n) => onTap(n, async () => {
-      if (n.classList.contains('done') || calling || !alive()) return;
-      n.classList.add('done');
-      n.classList.remove('glow');
-      if (!free) { passTurn(); calling = turnsOn(); }
-      await onEach(n);
-      left -= 1;
-      if (left === 0) { calling = false; resolve(); return; }
-      if (calling && call) { await call().catch(() => {}); calling = false; }
-    }));
+    nodes.forEach((n) => {
+      const h = async (e) => {
+        e.preventDefault();
+        if (n.classList.contains('done') || calling || !alive()) return;
+        n.classList.add('done');
+        n.classList.remove('glow');
+        if (!free) { passTurn(); calling = turnsOn(); }
+        await onEach(n);
+        left -= 1;
+        if (left === 0) { calling = false; resolve(); return; }
+        if (calling && call) { await call().catch(() => {}); calling = false; }
+      };
+      n.addEventListener('pointerdown', h);
+      handlers.push([n, h]);
+    });
     cleanups?.push(() => resolve());
   });
+  off();
   if (free) freeTurns(false);
 }
 

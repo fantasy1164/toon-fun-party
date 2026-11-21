@@ -9,6 +9,7 @@ import { avatarSvg } from '../art/characters.js';
 import { clinicBack, CL, TOOL } from '../art/clinic.js';
 import { makeScene, charDiv } from './party.js';
 import { pickCard, tapOne, hardNow, giveReward, moveTo, kidNode } from './kit.js';
+import { whoseTurn, inTurnOrder } from '../core/turns.js';
 
 const HOST = 'yuanyuan';
 const CHAIRS = [[298, 560], [408, 560], [518, 560]];
@@ -79,13 +80,15 @@ export function mountClinic(stage, { profile, onExit }) {
   }
 
   async function exam() {
-    const k0 = kidEl(kids[0]);
+    // 一起玩：誰被唱名、點了工具，就檢查誰（11/21：原本固定檢查妍卉）
+    const tapBy = async (node) => { const id = whoseTurn() || kids[0]; await tap(node); return kidEl(id); };
+    let k0 = kidEl(kids[0]);
     // 量體溫
     const th = thing('cl-tool', TOOL.thermo, [880, 330]);
     const li = thing('cl-tool', TOOL.light, [1000, 330]);
     const st = thing('cl-tool', TOOL.steth, [1080, 300]);
     await host('cl_thermo');
-    await tap(th);
+    k0 = await tapBy(th);
     guard();
     await moveTo(th, [parseFloat(k0.style.left) + 120, parseFloat(k0.style.top) + 70], 600);
     for (let i = 0; i < 3; i++) { sfx('beep'); await pause(350); }
@@ -94,9 +97,9 @@ export function mountClinic(stage, { profile, onExit }) {
     th.remove();
     // 看喉嚨
     await host('cl_mouth');
-    await tap(li);
+    k0 = await tapBy(li);
     guard();
-    await moveTo(li, [parseFloat(k0.style.left) + 140, parseFloat(k0.style.top) + 90], 600);
+    await moveTo(li, [parseFloat(k0.style.left) + 104, parseFloat(k0.style.top) + 180], 600);   // 照著被檢查的人的嘴巴
     li.classList.add('on');
     kids.forEach((id) => kidEl(id).classList.add('ah'));
     await host('cl_ah');
@@ -105,7 +108,7 @@ export function mountClinic(stage, { profile, onExit }) {
     li.remove();
     // 聽心跳
     await host('cl_heart');
-    await tap(st);
+    k0 = await tapBy(st);
     guard();
     await moveTo(st, [parseFloat(k0.style.left) + 70, parseFloat(k0.style.top) + 140], 600);
     const heart = thing('cl-heart', TOOL.heart, [520, 220]);
@@ -127,10 +130,14 @@ export function mountClinic(stage, { profile, onExit }) {
       await host('cl_out');
     }
     bal.remove();
+    // 每個人都打一針（後面每個人都貼 OK 繃），照唱名順序
     const shot = thing('cl-tool', TOOL.shot, [880, 330]);
-    await moveTo(shot, [parseFloat(k0.style.left) + 140, parseFloat(k0.style.top) + 110], 600);
-    sfx('pop');
-    await pause(400);
+    for (const id of inTurnOrder(kids)) {
+      const kn = kidEl(id);
+      await moveTo(shot, [parseFloat(kn.style.left) + 140, parseFloat(kn.style.top) + 110], 600);
+      sfx('pop');
+      await pause(400);
+    }
     shot.remove();
     kids.forEach((id) => kidEl(id).insertAdjacentHTML('beforeend', `<div class="kt-band">${TOOL.bandage}</div>`));
     await host('cl_shot_ok');

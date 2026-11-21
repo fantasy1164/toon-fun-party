@@ -8,6 +8,7 @@ import { PROFILES } from '../config.js';
 import { dentalBack, LAMP, CUP, CHAIR_BTN, MOUTH, TEETH, TOOTH, DT } from '../art/dental.js';
 import { makeScene, charDiv } from './party.js';
 import { pickCard, tapOne, tapEach, hardNow, giveReward, moveTo, kidNode, shuffle } from './kit.js';
+import { whoseTurn } from '../core/turns.js';
 
 const HOST = 'yuanyuan';
 
@@ -41,11 +42,12 @@ export function mountDental(stage, { profile, onExit }) {
   async function sit() {
     await host('dt_sit');
     const ch = thing('dt-chair', CHAIR_BTN, [560, 440]);
+    const sitter = whoseTurn() || kids[0];   // 被唱名、點椅子的人坐上去（11/21：原本固定妍卉）
     await tap(ch);
     guard();
     ch.remove();
     sfx('pop');
-    await moveTo(kidEl(kids[0]), [600, 640], 600);
+    await moveTo(kidEl(sitter), [600, 640], 600);
     const lamp = thing('dt-lamp', LAMP, [640, 190]);
     await host('dt_lamp');
     await tap(lamp);
