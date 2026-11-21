@@ -18,7 +18,44 @@ const tree = (x, y, s = 1, c = '#4caf50', c2 = '#43a047') => `<g transform="tran
 const bush = (x, y, s = 1, c = '#4f9a4f') => `<g transform="translate(${x} ${y}) scale(${s})"><circle cx="-40" r="40" fill="${c}"/><circle cx="10" cy="-18" r="48" fill="${c}"/><circle cx="56" r="38" fill="${c}"/><rect x="-80" y="0" width="174" height="34" fill="${c}"/></g>`;
 const rock = (x, y, s = 1, c = '#9aa0aa') => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-60 0Q-56 -50 -10 -56Q40 -60 56 -20Q64 0 60 0Z" fill="${c}"/><path d="M-30 -40Q0 -50 30 -36" stroke="#fff" stroke-width="5" fill="none" opacity=".35"/></g>`;
 
+// 遊園車站（11/21 John：上車要在車站，不是第一個景點）：月台、遮雨棚、路線圖、長椅
+function tramStop(ph, wx) {
+  const n = night(ph);
+  const roof = n ? '#2f6a48' : '#3fae6a';
+  const post = n ? '#8a7a5a' : '#ffd34d';
+  const heads = ['rabbit', 'bear', 'elephant', 'lion', 'camel', 'koala', 'penguin', 'panda'];
+  // 路線圖：一圈 8 站，每站一個動物頭
+  const route = heads.map((h, i) => {
+    const t = (i / heads.length) * Math.PI * 2 - Math.PI / 2;
+    const x = 130 + Math.cos(t) * 92;
+    const y = 104 + Math.sin(t) * 62;
+    return `<circle cx="${x}" cy="${y}" r="21" fill="#fff" stroke="#3fae6a" stroke-width="4"/><g transform="translate(${x - 19} ${y - 21}) scale(.19)">${ANIMALS[h].svg()}</g>`;
+  }).join('');
+  return `<svg viewBox="0 0 1200 900">${sky(ph, wx, 'zstram')}
+    <path d="M0 400Q200 300 420 360Q640 290 860 350Q1040 300 1200 360V700H0Z" fill="${n ? '#2f5a3a' : '#7cbf6a'}"/>
+    ${tree(80, 420, 1.1)}${tree(1130, 400, 1.2)}${tree(700, 360, 0.7, '#43a047', '#4caf50')}
+    <path d="M0 520H1200V700H0Z" fill="${n ? '#4a5a52' : '#cfd8d2'}"/>
+    <rect y="508" width="1200" height="14" fill="${n ? '#5a6a62' : '#e6ece8'}"/>
+    <g transform="translate(150 150)">
+      ${[0, 300, 600, 900].map((x) => `<rect x="${x}" y="40" width="22" height="330" rx="6" fill="${post}"/>`).join('')}
+      <path d="M-70 60L-30 0H950L990 60Z" fill="${roof}"/>
+      <path d="M-70 60H990" stroke="#fff" stroke-width="10"/>
+      ${Array.from({ length: 11 }, (_, i) => `<path d="M${-30 + i * 98} 0L${-60 + i * 104} 60" stroke="${n ? '#285a3c' : '#36985c'}" stroke-width="6"/>`).join('')}
+      <g transform="translate(380 -86)"><rect x="-6" y="70" width="10" height="20" fill="#8a5a2b"/><rect x="0" y="0" width="200" height="80" rx="18" fill="#fff" stroke="${roof}" stroke-width="8"/>${tramSvg(14, 10, 0.78, n)}</g>
+      <g transform="translate(60 140)"><rect width="260" height="210" rx="18" fill="#fff6d6" stroke="#8a5a2b" stroke-width="8"/><ellipse cx="130" cy="104" rx="92" ry="62" fill="none" stroke="#3fae6a" stroke-width="12" stroke-dasharray="18 10"/>${route}</g>
+      <g transform="translate(640 300)"><rect width="200" height="18" rx="8" fill="#c98a4a"/><rect x="14" y="18" width="14" height="50" fill="#8a5a2b"/><rect x="172" y="18" width="14" height="50" fill="#8a5a2b"/><rect y="-46" width="200" height="16" rx="8" fill="#c98a4a"/></g>
+    </g>
+    ${bush(1040, 520, 0.7, n ? '#2f5a3a' : '#4f9a4f')}
+    <rect y="700" width="1200" height="140" fill="${n ? '#55504a' : '#a8a29a'}"/>
+    ${Array.from({ length: 13 }, (_, i) => `<rect x="${i * 100}" y="764" width="60" height="10" rx="5" fill="#fff" opacity=".6"/>`).join('')}
+    <rect y="840" width="1200" height="60" fill="${n ? '#6a5f52' : '#e8d4a8'}"/>
+    <rect y="836" width="1200" height="12" fill="#ffd34d"/>
+    ${Array.from({ length: 24 }, (_, i) => `<rect x="${i * 50 + 8}" y="836" width="24" height="12" fill="#333" opacity=".25"/>`).join('')}
+    ${weatherLayer(wx, ph, 0, 0, 1200, 900)}</svg>`;
+}
+
 export function areaBack(area, ph, wx) {
+  if (area === 'tramstop') return tramStop(ph, wx);
   const n = night(ph);
   const id = `zs${area}`;
   const A = AREAS[area];

@@ -76,7 +76,9 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
     <div class="zo-binoc hidden"></div>
     <div class="zo-flash"></div>
     <div class="kt-cards hidden"></div>`;
-  const ctl = makeScene(stage, profile, onExit, inner, HOST, { cls: `kit zoo area-${stops[0]}`, back: areaBack(stops[0], ph, wx) });
+  // 遊園車從車站出發（11/21 John：原本在第一站上車不合理）
+  const first = tour ? 'tramstop' : stops[0];
+  const ctl = makeScene(stage, profile, onExit, inner, HOST, { cls: `kit zoo area-${first}`, back: areaBack(first, ph, wx) });
   const { root, guard, pause } = ctl;
   const who = (id) => $(`.p-char[data-who="${id}"]`, root);
   const kidEl = (id) => $(`.kt-kid[data-id="${id}"]`, root);
@@ -103,12 +105,12 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
     frontArt: WALKWAY(night),
     foreArt: foreArt(night),
   }) || NO_CAM;
-  let here = stops[0];
+  let here = first;
   let exploring = false;
 
   // ---------- 動物 ----------
   function placeAnimals(a) {
-    animalsLayer.innerHTML = LAYOUT[a].map(([id, x, y, size], i) => {
+    animalsLayer.innerHTML = (LAYOUT[a] || []).map(([id, x, y, size], i) => {
       const w = size || ANIMALS[id].size;
       const svg = id === 'koala' && a === 'aus' ? animalSvg(id, w) : animalSvg(id, w);
       return `<button class="zo-an an-${id}" data-id="${id}" data-i="${i}" style="left:${x - w / 2}px;top:${y - w * 0.96}px;width:${w}px;height:${w}px;--d:${(i * 0.7).toFixed(1)}s">${svg}</button>`;
@@ -618,7 +620,7 @@ export function mountZoo(stage, { profile, onExit, area = 'kids', tour = false }
 
   (async () => {
     playMusic('zoo');
-    placeAnimals(stops[0]);
+    placeAnimals(first);
     await wait(400);
     try {
       ctl.mode = 'act';
