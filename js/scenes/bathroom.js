@@ -20,12 +20,13 @@ const BRUSH_PROPS = ['brush', 'paste', 'cup'];
 const WASH_PROPS = ['soap', 'faucet', 'towel'];
 
 // 刷完牙接著做的四步（11/19 John）：漱口、洗牙刷、洗杯子、洗臉
+// 11/21 John：小孩跟不上，每一步時間加倍（15／15／10／20 秒 → 30／30／20／40 秒）
 const CUP = (flip) => `<svg viewBox="0 0 100 100" width="96" height="96"><g ${flip ? 'transform="rotate(180 50 50)"' : ''}><path d="M26 18H74L66 86H34Z" fill="#ffd34d"/><path d="M26 18H74L72 32H28Z" fill="#ffe58a"/>${flip ? '' : '<path d="M30 40H70L65 82H35Z" fill="#8fd8f5"/>'}</g>${flip ? '<circle cx="50" cy="94" r="4" fill="#5fc3e8"/>' : '<circle cx="40" cy="10" r="5" fill="#bfe9f8"/><circle cx="58" cy="6" r="4" fill="#bfe9f8"/>'}</svg>`;
 const AFTER = [
-  { id: 'rinse', line: 't_rinse', ok: 't_rinse_ok', ms: 15000, sound: 'gargle', icon: () => CUP(false) },
-  { id: 'wbrush', line: 't_wbrush', ok: 't_wbrush_ok', ms: 15000, water: true, icon: () => tgIcon('toothbrush', 96) },
-  { id: 'wcup', line: 't_wcup', ok: 't_wcup_ok', ms: 10000, water: true, icon: () => CUP(true) },
-  { id: 'face', line: 't_face', ok: 't_face_ok', ms: 20000, water: true, icon: () => tgIcon('towel', 96) },
+  { id: 'rinse', line: 't_rinse', ok: 't_rinse_ok', ms: 30000, sound: 'gargle', icon: () => CUP(false) },
+  { id: 'wbrush', line: 't_wbrush', ok: 't_wbrush_ok', ms: 30000, water: true, icon: () => tgIcon('toothbrush', 96) },
+  { id: 'wcup', line: 't_wcup', ok: 't_wcup_ok', ms: 20000, water: true, icon: () => CUP(true) },
+  { id: 'face', line: 't_face', ok: 't_face_ok', ms: 40000, water: true, icon: () => tgIcon('towel', 96) },
 ];
 
 export function mountBathroom(stage, { profile, onExit, charId: chosen, together = false }) {
@@ -359,7 +360,7 @@ export function mountBathroom(stage, { profile, onExit, charId: chosen, together
     const bar = $('.tbar i', v);
     const go = $('.tgo', v);
     const pauseBtn = $('.tpause', v);
-    const segMs = hard ? 15000 : 7500;   // 6 歲 2 分鐘、3 歲 1 分鐘
+    const segMs = hard ? 30000 : 15000;   // 11/21 John 要求加倍：6 歲 4 分鐘、3 歲 2 分鐘（原本 2 分鐘、1 分鐘）
     const total = segMs * ZONES.length;
     bar.style.width = '0%';
     $$('.zone', v).forEach((z) => z.classList.remove('on', 'done'));
