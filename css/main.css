@@ -241,6 +241,24 @@ html, body {
 .parent button { font-size: 26px; padding: 12px 26px; border: 0; border-radius: 14px; background: #ffd34d; margin: 8px 12px 8px 0; }
 .parent button.quiet { background: #eadcc4; }
 .parent .note { font-size: 20px; color: #8a7a66; }
+/* 測試分頁（11/22）：大按鈕加減、常用時段、情境快捷 */
+.parent .test .trow { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 14px 0 0; }
+.parent .test .trow.sub { margin: 4px 0 10px 96px; }
+.parent .test .tlab { width: 86px; flex: none; font-weight: bold; }
+.parent .test .tbig { min-width: 220px; padding: 8px 14px; border-radius: 14px; background: #fff; border: 3px solid #ffd34d; text-align: center; font-size: 32px; font-weight: bold; }
+.parent .test .tbig.real { border-color: #eadcc4; color: #8a7a66; font-size: 26px; font-weight: normal; }
+.parent .test button.tstep { margin: 0; padding: 12px 18px; }
+.parent .test button.tstep.small { font-size: 20px; padding: 8px 12px; }
+.parent .tchip { display: inline-flex; flex-direction: column; align-items: center; margin: 0; padding: 8px 16px; font-size: 22px; border-radius: 12px; background: #f3e8d4; color: #5a4636; border: 2px solid transparent; }
+.parent .tchip.on { background: #fff4c7; border-color: #e0a800; color: #3a2a22; font-weight: bold; }
+.parent .tchip small { font-size: 16px; color: #8a7a66; font-weight: normal; }
+.parent .tpick { position: relative; overflow: hidden; }
+.parent .tpick input { position: absolute; inset: 0; opacity: 0; font-size: 22px; }
+.parent .test .tapply { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin: 20px 0 6px; padding: 12px 18px; border-radius: 16px; background: #fff; border: 2px solid #eadcc4; }
+.parent .test .tapply b { color: #3a2a22; }
+.parent .test .tgroup { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 8px 0 14px; }
+.parent .test .tgroup > .note { width: 100%; }
+.parent .test h3 { margin: 26px 0 6px; font-size: 26px; }
 
 /* ---------- 好寶寶印章：印章卡 ---------- */
 .stamp-card { display: inline-flex; align-items: center; gap: 22px; background: #fffdf6; border-radius: 28px; padding: 24px 30px; box-shadow: 0 10px 0 rgba(0, 0, 0, .12); border: 6px solid #ffd34d; }
@@ -409,7 +427,7 @@ html, body {
 .parent h3 { margin: 20px 0 6px; font-size: 26px; }
 .parent select, .parent input[type=date] { font-size: 24px; padding: 6px 10px; border: 2px solid #d9c8a8; border-radius: 10px; }
 .parent button.armed { outline: 5px solid #c9462c; }
-#testbadge { position: fixed; left: 50%; top: 4px; transform: translateX(-50%); z-index: 90; padding: 2px 12px; border-radius: 10px; background: rgba(201, 70, 44, .75); color: #fff; font: 14px sans-serif; pointer-events: none; }
+#testbadge { position: fixed; left: 50%; top: 4px; transform: translateX(-50%); z-index: 90; padding: 2px 12px; border-radius: 10px; background: rgba(201, 70, 44, .8); color: #fff; font: 15px sans-serif; pointer-events: none; }
 
 /* ---------- 陪刷 ---------- */
 .together .t-dirt, .together .germ, .together .t-shine { display: none; }

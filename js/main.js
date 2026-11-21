@@ -1,12 +1,13 @@
 // 進入點：畫面縮放、開場、選人、進場景、角色下班與睡覺時間。
 import { STAGE_W, STAGE_H, PROFILES } from './config.js';
 import { state, save, addPlayTime } from './core/store.js';
-import { isAsleep, testing, dateKey, hour, testSettings } from './core/clock.js';
+import { isAsleep, testSettings } from './core/clock.js';
 import { unlock, sfx, setMusicVolume } from './core/audio.js';
 import { loadVoiceManifest, hush, primeTts, speak, isSpeaking, quietFor } from './core/voice.js';
 import { setupBleed } from './core/bleed.js';
 import { showSplash, showProfiles, showClosed } from './ui/screens.js';
 import { openParent } from './ui/parent.js';
+import { showTestBadge } from './ui/testParent.js';
 import { needInstallGuide, showInstallGuide } from './ui/install.js';
 import { mountBathroom } from './scenes/bathroom.js';
 import { mountDoor } from './scenes/door.js';
@@ -369,18 +370,8 @@ setInterval(() => {
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 window.addEventListener('pagehide', save);
 
-function testBadge() {
-  if (!testing) return;
-  const b = document.createElement('div');
-  b.id = 'testbadge';
-  const h = hour();
-  const t = testSettings();
-  b.textContent = `測試 ${dateKey()} ${String(Math.floor(h)).padStart(2, '0')}:${String(Math.round((h % 1) * 60)).padStart(2, '0')}${t.weather ? ' ' + t.weather : ''}`;
-  document.body.appendChild(b);
-}
-
 async function boot() {
-  testBadge();
+  showTestBadge();
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }

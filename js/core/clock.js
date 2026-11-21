@@ -12,13 +12,21 @@ const dateRaw = params.get('date') || saved.date || '';
 const dateOverride = /^\d{4}-\d{2}-\d{2}$/.test(dateRaw) ? dateRaw.split('-').map(Number) : null;
 export const testing = !!(dateOverride || hourOverride !== null || params.get('weather') || saved.weather || saved.nolimit);
 
-export function now() {
-  const d = new Date();
+// 家長頁設定的測試時間預設「從設定的那一刻往前走」（saved.setAt＝按下套用的真實時間）；
+// 勾選「時間停住」（saved.freeze）或用網址參數時，跟以前一樣停在設定的時間。
+function base() {
+  const d = new Date(saved.setAt && !params.has('hour') && !params.get('date') ? saved.setAt : Date.now());
   if (dateOverride) d.setFullYear(dateOverride[0], dateOverride[1] - 1, dateOverride[2]);
   if (hourOverride !== null && !Number.isNaN(hourOverride)) {
     d.setHours(Math.floor(hourOverride), Math.round((hourOverride % 1) * 60), 0, 0);
   }
   return d;
+}
+const running = !!saved.setAt && !saved.freeze && !params.has('hour') && !params.get('date');
+const offset = running ? base().getTime() - saved.setAt : 0;
+export function now() {
+  if (running) return new Date(Date.now() + offset);
+  return base();
 }
 
 export function hour() {

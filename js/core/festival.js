@@ -65,6 +65,8 @@ const CNY = {
   2026: '2026-02-17', 2027: '2027-02-06', 2028: '2028-01-26', 2029: '2029-02-13', 2030: '2030-02-03',
   2031: '2031-01-23', 2032: '2032-02-11', 2033: '2033-01-31', 2034: '2034-02-19', 2035: '2035-02-08',
 };
+// 初一的國曆日期（家長頁測試快捷用）
+export function cnyDate(y) { return CNY[y] || ''; }
 const ZODIAC = ['rat', 'ox', 'tiger', 'rabbit', 'dragon', 'snake', 'horse', 'goat', 'monkey', 'rooster', 'dog', 'pig'];
 // 回傳 null 或 { stage, offset, year, zodiac }：offset＝今天距離初一幾天
 //   prep：除夕前 7 天到前 2 天（大掃除、貼春聯）；eve：除夕；days：初一到十四（拜年、紅包、煙火）；lantern：元宵節（十五）

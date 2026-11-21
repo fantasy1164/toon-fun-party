@@ -2,15 +2,15 @@
 import { el } from '../core/dom.js';
 import { syncConfig, setSyncConfig, syncNow, syncStatus, onSyncStatus, configured, deviceName } from '../core/sync.js';
 import { state, save, exportData, importData, stampedToday, cardInfo, redeem, restoreDaysAgo, clearAll, snapshotDays } from '../core/store.js';
-import { dateKey, now, hour, testSettings, TEST_KEY, testing } from '../core/clock.js';
+import { dateKey, testing } from '../core/clock.js';
 import { REASONS, reasonIcon, shapeSvg, ensureInkFilter } from '../art/stamps.js';
 import * as weather from '../core/weather.js';
 import { listen } from '../core/mic.js';
 import * as fest from '../core/festival.js';
 import { setMusicVolume, playMusic } from '../core/audio.js';
-import { drillDay } from './quake.js';
 import { englishSection, englishChange, englishClick, englishMounted } from './englishParent.js';
 import { timesSection, timesClick, timesBadge } from './timesParent.js';
+import { testSection, testClick, testChange, testReset } from './testParent.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
 const CLAIM_NAMES = {
@@ -59,35 +59,6 @@ function weatherSection() {
     <span class="note geo-msg"></span>`;
 }
 
-const WX_TEST = [['', '真實天氣'], ['clear', '晴天'], ['cloudy', '多雲'], ['rain', '下雨'], ['storm', '雷雨'], ['fog', '起霧'], ['hot', '很熱'], ['cold', '很冷'], ['windy', '強風']];
-function testSection() {
-  const t = testSettings();
-  const n = now();
-  const p = (x) => String(x).padStart(2, '0');
-  // 沒設定的欄位留空＝用真實的日期或時間
-  const d = t.date || '';
-  const h = t.hour ?? '';
-  return `
-    <p class="note">${testing ? `<b style="color:#c9462c">測試模式中</b>：遊戲時間是 ${dateKey()} ${p(n.getHours())}:${p(n.getMinutes())}${t.weather ? `，天氣假裝成「${WX_TEST.find((w) => w[0] === t.weather)?.[1]}」` : ''}。` : '目前使用真實的日期、時間與天氣。'}
-      測試時的蓋章、領獎、聖誕進度都會真的寫進存檔，測完可用「資料」分頁的「清除資料」回復。</p>
-    <label>日期 <input type="date" data-t="date" value="${d}"></label>
-    <label>時間 <input type="number" data-t="hour" min="0" max="23.5" step="0.5" value="${h}" placeholder="真實"> 點（可用 .5 表示半點）</label>
-    <p class="note">日期或時間留空，就用真實的日期或時間。</p>
-    <label>天氣 <select data-t="weather">${WX_TEST.map(([v, l]) => `<option value="${v}" ${v === (t.weather || '') ? 'selected' : ''}>${l}</option>`).join('')}</select></label><br>
-    <label><input type="checkbox" data-t="nolimit" ${t.nolimit ? 'checked' : ''}> 不限制每次遊玩時間（測試時角色不會下班）</label><br>
-    <button data-act="t-apply">套用並重新開始</button>
-    <button class="quiet" data-act="t-real">恢復真實時間與天氣</button><br>
-    <span class="note">本月地震演習：${+dateKey().slice(5, 7)} 月 ${drillDay(dateKey().slice(0, 7))} 日起，早上 8 點到晚上 7 點第一次進選房間時（${['yh', 'xz'].map((id) => `${id === 'yh' ? '妍卉' : '向澤'}${state.profiles[id].quakeMonth === dateKey().slice(0, 7) ? '已演習' : '還沒演習'}`).join('、')}）</span><br>
-    <button class="quiet small" data-act="sync-test">雲端同步測試</button>
-    <button class="quiet small" data-act="perf-test">立體感效能測試</button><br>
-    <button class="quiet small" data-act="t-quake">${state.quakeForce ? '已設定：下次進選房間會地震演習' : '下次進選房間就地震演習'}</button><br>
-    <span class="note">快速設定：</span>
-    <button class="quiet small" data-act="t-preset" data-d="12-01" data-h="9">12/1 早上</button>
-    <button class="quiet small" data-act="t-preset" data-d="12-24" data-h="19.5">平安夜晚上</button>
-    <button class="quiet small" data-act="t-preset" data-d="12-24" data-h="22">平安夜睡覺</button>
-    <button class="quiet small" data-act="t-preset" data-d="12-25" data-h="8">聖誕節早上</button>`;
-}
-
 // 清除資料（放在「資料」分頁最下面，跟其他按鈕分開）
 function clearSection() {
   const days = snapshotDays();
@@ -133,6 +104,7 @@ function syncSection() {
 
 export function openParent(onClose, { onStamp } = {}) {
   ensureInkFilter();
+  testReset();
   const k = dateKey();
   const rows = ['yh', 'xz'].map((id) => {
     const p = state.profiles[id];
@@ -261,6 +233,7 @@ export function openParent(onClose, { onStamp } = {}) {
 
   node.addEventListener('change', (e) => {
     if (englishChange(e, node)) return;
+    if (testChange(e, node)) return;
     if (e.target.dataset?.xmas === 'real') { fest.setRealGift(e.target.checked); return; }
     if (e.target.dataset?.bd) { fest.setBirthday(e.target.dataset.bd, e.target.value); return; }
     if ('cam' in (e.target.dataset || {})) {
@@ -302,6 +275,7 @@ export function openParent(onClose, { onStamp } = {}) {
     const act = e.target.dataset?.act;
     const id = e.target.dataset?.id;
     if (act && timesClick(act, e, node)) return;
+    if (act && testClick(act, e, node)) return;
     if (act === 'stamp') {
       const row = e.target.closest('.stamp-row');
       const reasons = [...row.querySelectorAll('.chip.on')].map((c) => c.dataset.r);
@@ -314,25 +288,6 @@ export function openParent(onClose, { onStamp } = {}) {
       redeem(id);
       node.remove();
       openParent(onClose, { onStamp });
-      return;
-    }
-    if (act === 't-apply' || act === 't-preset') {
-      const t = {};
-      if (act === 't-preset') {
-        t.date = `${now().getFullYear()}-${e.target.dataset.d}`;
-        t.hour = parseFloat(e.target.dataset.h);
-        t.weather = node.querySelector('[data-t="weather"]').value || undefined;
-        t.nolimit = node.querySelector('[data-t="nolimit"]').checked || undefined;
-      } else {
-        t.date = node.querySelector('[data-t="date"]').value || undefined;
-        const hv = node.querySelector('[data-t="hour"]').value;
-        t.hour = hv === '' ? undefined : parseFloat(hv);
-        t.weather = node.querySelector('[data-t="weather"]').value || undefined;
-        t.nolimit = node.querySelector('[data-t="nolimit"]').checked || undefined;
-      }
-      if (t.nolimit) { state.session.usedMs = 0; state.session.restUntil = 0; save(); }
-      localStorage.setItem(TEST_KEY, JSON.stringify(t));
-      location.reload();
       return;
     }
     if (act === 'sync-test') { location.href = 'sync-test.html'; return; }
@@ -355,17 +310,6 @@ export function openParent(onClose, { onStamp } = {}) {
         // 進度換成雲端的（或合併了）：重新開始，畫面才會是新的
         if (changed) { st.innerHTML = '已載入雲端進度，重新開始…'; setTimeout(() => location.reload(), 700); }
       });
-      return;
-    }
-    if (act === 't-quake') {
-      state.quakeForce = true;
-      save();
-      e.target.textContent = '已設定：下次進選房間會地震演習';
-      return;
-    }
-    if (act === 't-real') {
-      localStorage.removeItem(TEST_KEY);
-      location.reload();
       return;
     }
     if (act === 'c-day' || act === 'c-month' || act === 'c-all') {
