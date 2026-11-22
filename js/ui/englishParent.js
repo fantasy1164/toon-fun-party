@@ -2,7 +2,7 @@
 import { state, save } from '../core/store.js';
 import { now } from '../core/clock.js';
 import { EN_FIRST } from '../config.js';
-import { ROCKET, YT_LIST, YT_COUNT, syncYtList } from '../data/english.js';
+import { ROCKET, YT_LIST, YT_COUNT, syncYtList, isMusic, autoMusic, repeatTimes, keyAudio, keyVideo } from '../data/english.js';
 import { loadYT, noReferrer, ytFetchTitles } from '../scenes/english.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
@@ -11,6 +11,22 @@ const picked = (id) => new Set(state.settings.english?.[id] || []);
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // 影片標題：打開家長頁自動查（ytFetchTitles），查不到的播過一次也會記住（english.js 的 learnTitle）
 const titleOf = (i) => { const id = state.settings.enYtIds?.[i]; return (id && state.settings.enYtTitles?.[id]) || ''; };
+
+// 每一首旁邊的小按鈕：音樂播幾次／不是音樂播 1 次；點了改成另一種（跟自動判斷一樣就拿掉手動設定）
+function kindInfo(kindChar, i) {
+  if (kindChar === 'a') return { key: keyAudio(i), title: ROCKET[i].title };
+  return { key: keyVideo(state.settings.enYtIds?.[i]), title: titleOf(i) };
+}
+function kindChip(kindChar, i) {
+  const { key, title } = kindInfo(kindChar, i);
+  const music = isMusic(state.settings, key, title);
+  const over = !!(key && state.settings.enKind?.[key]);
+  const n = repeatTimes(state.settings);
+  return `<button class="en-kind${music ? ' music' : ''}${over ? ' over' : ''}" data-act="en-kind" data-c="${kindChar}" data-i="${i}" title="${music ? '音樂' : '不是音樂'}${over ? '（手動）' : '（自動判斷）'}，點一下改">${music ? `♪ ${n} 次` : '1 次'}</button>`;
+}
+function refreshChips(node) {
+  node.querySelectorAll('button.en-kind').forEach((b) => { b.outerHTML = kindChip(b.dataset.c, +b.dataset.i); });
+}
 
 function groups() {
   const out = [];
@@ -33,16 +49,20 @@ export function englishSection() {
   const thumb = (i) => (ids[i] ? `<img loading="lazy" src="https://i.ytimg.com/vi/${ids[i]}/mqdefault.jpg" alt="">` : '<i class="en-ph"></i>');
   return `
     <h2>英文複習</h2>
-    <p class="note">每天晚上 8:00–9:30：進臥室選棉棉的「ABC」，或在睡覺／休息畫面點右下角的棉棉。9:30 一到就關。<br>
+    <p class="note">起床後到晚上 9:00 都可以聽：進臥室選棉棉的「ABC」，或在睡覺／休息畫面點右下角的棉棉。9:00 棉棉提醒、9:05 結束。<br>
       今天星期${DAYS[now().getDay()]}：<b>${NAMES[first]}先聽</b>（一、三、五、日向澤先；二、四、六妍卉先）。聽完請按住畫面右下角的勾勾 1 秒，才會換下一個人。<br>
       勾選的課會一直保留，要換課再來改。播放直接連到原本的網站和 YouTube（需要網路），遊戲不會存這些檔案。</p>
+
+    <div class="en-rep"><b>音樂播幾次</b>${[1, 2, 3, 4, 5].map((n) => `<button class="tchip${repeatTimes(state.settings) === n ? ' on' : ''}" data-act="en-rep" data-n="${n}">${n === 1 ? '1 次（不重複）' : `${n} 次`}</button>`).join('')}</div>
+    <p class="note">曲名有 Song、Chant、Kala、Sing、Rhyme、歌、唱的當成音樂，同一首連播幾次再換下一首；故事、對話、遊戲播 1 次。<br>
+      每一首旁邊的小按鈕顯示會播幾次，判斷錯了點一下就改（虛線框＝手動改過的）。影片要等標題載入才判斷得出來。</p>
 
     <h3>向澤：Rocket Book 1 <span class="en-n" data-for="xz">已選 ${xz.size} 首</span></h3>
     <button class="quiet small" data-act="en-clear" data-id="xz">全部取消</button>
     <button class="quiet small" data-act="en-check">檢查連結</button> <span class="note en-check-msg"></span>
     ${groups().map((g) => `<details class="en-g"><summary>${g.title}　<span class="en-gn">${g.list.filter((t) => xz.has(t.i)).length || ''}</span>
         <button class="quiet small" data-act="en-all" data-g="${g.key}">整組勾選</button></summary>
-      ${g.list.map((t) => `<label class="en-row"><input type="checkbox" data-en="xz" data-i="${t.i}" ${xz.has(t.i) ? 'checked' : ''}> ${t.no}　${t.title} <span class="en-st" data-i="${t.i}"></span></label>`).join('')}
+      ${g.list.map((t) => `<label class="en-row"><input type="checkbox" data-en="xz" data-i="${t.i}" ${xz.has(t.i) ? 'checked' : ''}> ${t.no}　${t.title}${kindChip('a', t.i)} <span class="en-st" data-i="${t.i}"></span></label>`).join('')}
     </details>`).join('')}
 
     <h3>妍卉：Max &amp; Mousy Book 3（YouTube） <span class="en-n" data-for="yh">已選 ${yh.size} 支</span></h3>
@@ -51,7 +71,7 @@ export function englishSection() {
     <button class="quiet small" data-act="en-thumbs">重新載入縮圖和標題</button> <span class="note en-yt-msg"></span>
     <p class="note">原本的 CD 網站只有 http，iPad 上不能在遊戲裡播放，所以用 YouTube 播放清單。打開這頁會自動載入縮圖和標題（需要網路）。<br>睡前英文畫面右邊的清單會列出全部課程：勾選的排最上面、會一支接一支自動播；其他課點了才播，播完就停。星星只看勾選的有沒有聽完。</p>
     <div class="en-yt-grid">
-      ${Array.from({ length: YT_COUNT }, (_, i) => `<label class="en-v"><input type="checkbox" data-en="yh" data-i="${i}" ${yh.has(i) ? 'checked' : ''}>${thumb(i)}<b>${i + 1}</b>${titleOf(i) ? `<small>${esc(titleOf(i))}</small>` : ''}</label>`).join('')}
+      ${Array.from({ length: YT_COUNT }, (_, i) => `<label class="en-v"><input type="checkbox" data-en="yh" data-i="${i}" ${yh.has(i) ? 'checked' : ''}>${thumb(i)}<b>${i + 1}</b>${titleOf(i) ? `<small>${esc(titleOf(i))}</small>` : ''}${kindChip('v', i)}</label>`).join('')}
     </div>
     <div class="en-yt-probe"></div>`;
 }
@@ -105,6 +125,7 @@ async function loadThumbs(node) {
       img.src = `https://i.ytimg.com/vi/${ids[i]}/mqdefault.jpg`;
       v.querySelector('img, .en-ph')?.replaceWith(img);
     });
+    refreshChips(node);
     msg.textContent = `共 ${ids.length} 支${ids.length !== YT_COUNT ? `（原本是 ${YT_COUNT} 支，播放清單可能有變動）` : ''}`;
     await fillTitles(node);
   } catch (e) {
@@ -127,10 +148,15 @@ async function fillTitles(node) {
       const box = node.querySelectorAll('.en-v')[i];
       if (!box) return;
       let sm = box.querySelector('small');
-      if (!sm) { sm = document.createElement('small'); box.appendChild(sm); }
+      if (!sm) {
+        sm = document.createElement('small');
+        const chip = box.querySelector('button.en-kind');
+        if (chip) chip.before(sm); else box.appendChild(sm);
+      }
       sm.textContent = state.settings.enYtTitles[id];
     });
   });
+  if (node.isConnected) refreshChips(node);
   const left = missing();
   msg.textContent = `${base ? `${base}，` : ''}${left ? `${left} 支標題查不到（播過一次就會記住）` : '標題都載入了'}`;
 }
@@ -205,6 +231,23 @@ export function englishClick(e, node) {
     const on = boxes.some((x) => !x.checked);
     boxes.forEach((x) => { x.checked = on; setPick('xz', +x.dataset.i, on); });
     refreshCounts(node);
+  }
+  if (act === 'en-rep') {
+    state.settings.enRepeat = +e.target.closest('[data-act]').dataset.n;
+    save();
+    node.querySelectorAll('.en-rep .tchip').forEach((b) => b.classList.toggle('on', +b.dataset.n === state.settings.enRepeat));
+    refreshChips(node);
+  }
+  if (act === 'en-kind') {
+    const b = e.target.closest('[data-act]');
+    const { key, title } = kindInfo(b.dataset.c, +b.dataset.i);
+    if (!key) return true;   // 影片編號還沒載入
+    const music = !isMusic(state.settings, key, title);
+    const k = { ...(state.settings.enKind || {}) };
+    if (music === autoMusic(title)) delete k[key]; else k[key] = music ? 'music' : 'talk';
+    state.settings.enKind = k;
+    save();
+    b.outerHTML = kindChip(b.dataset.c, +b.dataset.i);
   }
   if (act === 'en-thumbs') loadThumbs(node);
   if (act === 'en-check') checkLinks(node);

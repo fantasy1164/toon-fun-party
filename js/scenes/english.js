@@ -13,7 +13,7 @@ import { avatarSvg } from '../art/characters.js';
 import { mianSvg } from '../art/bedroom.js';
 import { tgIcon, backFor } from '../art/together.js';
 import { ICON } from '../ui/screens.js';
-import { ROCKET, YT_LIST, COURSES, trackKind, syncYtList } from '../data/english.js';
+import { ROCKET, YT_LIST, COURSES, trackKind, syncYtList, playsFor, keyAudio, keyVideo } from '../data/english.js';
 
 // 可以進去聽：起床後到 21:00（睡覺時間設得比較早也可以從睡覺畫面進來）
 export const englishOpen = (h = hour()) => h >= (state.settings?.wake ?? DEFAULT_SETTINGS.wake) && h < EN_END.warn;
@@ -164,6 +164,7 @@ export function mountEnglish(stage, { profile, onExit }) {
   let shownPos = -1;
   let kind = 'audio';
   let heard = false;  // 有沒有真的開始聽
+  let rep = 0;        // 這一首已經播完幾次（音樂播 3 次才換下一首）
   let allHeard = null;
 
   // 給家長看的曲目名稱（小孩看書，不看螢幕）
@@ -172,6 +173,12 @@ export function mountEnglish(stage, { profile, onExit }) {
     const n = rows[i];
     const title = ytTitle(n);
     return title ? `${n + 1}. ${title}` : `第 ${n + 1} 支`;
+  }
+  // 這一首要播幾次：音樂（歌、chant）播 3 次，其他 1 次；家長頁可以改
+  function need(i = pos) {
+    if (!rows.length) return 1;
+    if (kind === 'audio') return playsFor(state.settings, keyAudio(rows[i]), ROCKET[rows[i]].title);
+    return playsFor(state.settings, keyVideo(state.settings.enYtIds?.[rows[i]]), ytTitle(rows[i]));
   }
   function iconOf(i) { return kind === 'audio' ? trackKind(ROCKET[rows[i]].title) : 'abc'; }
   function paintDots() {
@@ -190,7 +197,8 @@ export function mountEnglish(stage, { profile, onExit }) {
   }
   function paintNow() {
     const cur = Math.max(0, Math.min(rows.length - 1, pos));
-    nowBox.innerHTML = rows.length ? `<span class="ic">${tgIcon(iconOf(cur), 34)}</span><span class="tx">${label(cur)}</span>` : '';
+    const n = need(cur);
+    nowBox.innerHTML = rows.length ? `<span class="ic">${tgIcon(iconOf(cur), 34)}</span><span class="tx">${label(cur)}</span>${n > 1 && !(doneAll && want < 0) ? `<span class="rep">${Math.min(rep + 1, n)}/${n}</span>` : ''}` : '';
     nowBox.classList.toggle('done', doneAll && want < 0);
   }
   function markDots() {
@@ -239,6 +247,7 @@ export function mountEnglish(stage, { profile, onExit }) {
   // mp3：一首接一首
   function loadTrack(i, autoplay) {
     pos = want = Math.max(0, Math.min(rows.length - 1, i));
+    rep = 0;
     const t = ROCKET[rows[pos]];
     au.src = t.url;
     markDots();
@@ -247,6 +256,8 @@ export function mountEnglish(stage, { profile, onExit }) {
   au.addEventListener('play', () => { heard = true; played.add(pos); setPlaying(true); markDots(); });
   au.addEventListener('pause', () => setPlaying(false));
   au.addEventListener('ended', () => {
+    // 音樂：同一首再播一次（同一個播放器，iOS 允許不用再點）
+    if (++rep < need()) { paintNow(); au.currentTime = 0; au.play().catch(() => setPlaying(false)); return; }
     if (pos < nPick - 1) { loadTrack(pos + 1, true); return; }
     setPlaying(false);
     if (pos === nPick - 1) { doneAll = true; want = -1; markDots(); allHeard?.(); }
@@ -279,7 +290,8 @@ export function mountEnglish(stage, { profile, onExit }) {
     if (e.data === S.PLAYING) { heard = true; if (want >= 0) played.add(want); hostIn.classList.add('listening'); learnTitle(); markDots(); }
     if (e.data === S.PAUSED) { hostIn.classList.remove('listening'); resumeAudio(); }
     if (e.data === S.ENDED) {
-      if (want >= 0 && want < nPick - 1) { pos = ++want; markDots(); yt.playVideoAt(rows[pos]); return; }
+      if (want >= 0 && ++rep < need(want)) { paintNow(); yt.playVideoAt(rows[want]); return; }
+      if (want >= 0 && want < nPick - 1) { pos = ++want; rep = 0; markDots(); yt.playVideoAt(rows[pos]); return; }
       const last = want === nPick - 1;
       want = -1;
       hostIn.classList.remove('listening');
@@ -320,7 +332,7 @@ export function mountEnglish(stage, { profile, onExit }) {
   function jump(n) {
     n = Math.max(0, Math.min(rows.length - 1, n));
     if (kind === 'audio') loadTrack(n, true);
-    else if (yt) { pos = want = n; markDots(); yt.playVideoAt(rows[pos]); }
+    else if (yt) { pos = want = n; rep = 0; markDots(); yt.playVideoAt(rows[pos]); }
   }
   function go(d) {
     sfx('tap');
@@ -388,6 +400,7 @@ export function mountEnglish(stage, { profile, onExit }) {
     played = new Set();
     badRows = new Set();
     heard = false;
+    rep = 0;
     noReferrer(kind === 'audio');
     who.innerHTML = `<div class="en-me">${avatarSvg(id, 150)}</div>${order.filter((k) => k !== id).map((k) => `<div class="en-next-kid">${avatarSvg(k, 70)}</div>`).join('')}`;
     who.style.setProperty('--glow', id === 'yh' ? '#ff8fb8' : '#6fd27a');

@@ -116,3 +116,20 @@ export function trackKind(title) {
   if (/Game|Paste/i.test(title)) return 'game';
   return 'abc';
 }
+
+// ---------- 音樂自動重複（11/22 John）----------
+// 曲名是音樂（歌、韻文 chant、Kala 伴唱）→ 播 settings.enRepeat 次（預設 3）再換下一首；不是音樂播一次。
+// 判斷錯的，家長頁每一首旁邊可以點來改（settings.enKind[key] = 'music' | 'talk'）。
+export const MUSIC_RE = /song|chant|kala|karaoke|\bsing\b|sing-along|rhyme|music|歌|唱|韻文|童謠|律動/i;
+export const REPEAT_DEFAULT = 3;
+export const repeatTimes = (settings) => Math.max(1, Math.min(5, settings.enRepeat ?? REPEAT_DEFAULT));
+// key：mp3 用 a<課程編號>，影片用 v<影片編號>（還不知道編號時沒有 key，只看標題）
+export const keyAudio = (i) => `a${i}`;
+export const keyVideo = (id) => (id ? `v${id}` : '');
+export const autoMusic = (title) => MUSIC_RE.test(title || '');
+export function isMusic(settings, key, title) {
+  const o = key && settings.enKind?.[key];
+  if (o) return o === 'music';
+  return autoMusic(title);
+}
+export const playsFor = (settings, key, title) => (isMusic(settings, key, title) ? repeatTimes(settings) : 1);
