@@ -65,7 +65,8 @@ export const REWARD_SLOTS = {
   park: { day: [8, 18] },
   clinic: { day: [8, 18] },
   stairs: { day: [7, 21] },
-  times: { day: [7, 21] },    // 九九乘法（11/21）   // 樓梯間（11/21）：晚上上樓睡覺前也能領
+  times: { day: [7, 21] },
+  zhuyin: { day: [7, 21] },   // 注音課（11/27）    // 九九乘法（11/21）   // 樓梯間（11/21）：晚上上樓睡覺前也能領
   market: { day: [8, 20] },
   bath: { evening: [17, 22] },
   amuse: { day: [9, 19] },

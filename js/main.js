@@ -38,6 +38,7 @@ import { mountCable } from './scenes/cable.js';
 import { mountSea } from './scenes/sea.js';
 import { mountStairs } from './scenes/stairs.js';
 import { mountTimes } from './scenes/times.js';
+import { mountZhuyin } from './scenes/zhuyin.js';
 import { chooseMode, mountTogether } from './scenes/together.js';
 import { mountEnglish, englishOpen } from './scenes/english.js';
 import { setupTurns, turnsScene } from './core/turns.js';
@@ -229,6 +230,7 @@ async function enterRoom(room, from) {
   if (choice.kind === 'english') { scene = mountEnglish(stage, { profile, onExit }); return; }
   // 九九乘法：算遊玩時間，照輪流
   if (choice.kind === 'times') { startScene(() => mountTimes(stage, { profile, onExit })); return; }
+  if (choice.kind === 'zhuyin') { startScene(() => mountZhuyin(stage, { profile, onExit })); return; }
   startScene(() => (choice.mode === 'together' && choice.kind !== 'brush'
     ? mountTogether(stage, { profile, onExit, kind: choice.kind, host: choice.host })
     : mount(stage, { profile, onExit, charId: choice.host, together: choice.kind === 'brush' })));

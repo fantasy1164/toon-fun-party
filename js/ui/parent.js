@@ -10,6 +10,7 @@ import * as fest from '../core/festival.js';
 import { setMusicVolume, playMusic } from '../core/audio.js';
 import { englishSection, englishChange, englishClick, englishMounted } from './englishParent.js';
 import { timesSection, timesClick, timesBadge } from './timesParent.js';
+import { zhuyinSection, zhuyinClick, zhuyinBadge } from './zhuyinParent.js';
 import { testSection, testClick, testChange, testReset } from './testParent.js';
 
 const NAMES = { yh: '妍卉', xz: '向澤' };
@@ -122,6 +123,7 @@ export function openParent(onClose, { onStamp } = {}) {
     ['stamp', '蓋章', owed ? `<b class="bd">${owed}</b>` : ''],
     ['english', '英文複習', enN ? `<b class="bd soft">${enN}</b>` : ''],
     ['times', '乘法', timesBadge()],
+    ['zhuyin', '注音', zhuyinBadge()],
     ['time', '作息', ''],
     ['fest', '節日', ''],
     ['look', '畫面聲音', ''],
@@ -150,6 +152,7 @@ export function openParent(onClose, { onStamp } = {}) {
       ${pane('english', englishSection())}
 
       ${pane('times', timesSection())}
+      ${pane('zhuyin', zhuyinSection())}
 
       ${pane('time', `
       <h2>時間設定</h2>
@@ -275,6 +278,7 @@ export function openParent(onClose, { onStamp } = {}) {
     const act = e.target.dataset?.act;
     const id = e.target.dataset?.id;
     if (act && timesClick(act, e, node)) return;
+    if (act && zhuyinClick(act, e, node)) return;
     if (act && testClick(act, e, node)) return;
     if (act === 'stamp') {
       const row = e.target.closest('.stamp-row');

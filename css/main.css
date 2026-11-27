@@ -994,6 +994,13 @@ html, body {
 .tg-pick .tg-choices.n3 .tg-choice svg { transform: scale(.8); }
 .tg-pick .tg-choice .badge { position: absolute; right: -14px; top: -14px; width: 104px; height: 104px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 0 rgba(0, 0, 0, .12); }
 .tg-pick .tg-choices.n3 .tg-choice .badge svg { transform: none; }
+/* 四、五個選項（學堂：遊戲、書包、功課、乘法、注音）排兩排 */
+.tg-pick .tg-choices.n4, .tg-pick .tg-choices.n5 { top: 130px; height: 660px; flex-wrap: wrap; align-content: center; gap: 46px 50px; }
+.tg-pick .tg-choices.n4 { padding: 0 110px; }
+.tg-pick .tg-choices.n4 .tg-choice, .tg-pick .tg-choices.n5 .tg-choice { width: 205px; height: 205px; flex: none; }
+.tg-pick .tg-choices.n4 .tg-choice > svg, .tg-pick .tg-choices.n5 .tg-choice > svg { transform: scale(.72); }
+.tg-pick .tg-choices.n4 .tg-choice .badge, .tg-pick .tg-choices.n5 .tg-choice .badge { width: 80px; height: 80px; right: -10px; top: -10px; }
+.tg-pick .tg-choices.n4 .tg-choice .badge svg, .tg-pick .tg-choices.n5 .tg-choice .badge svg { transform: scale(.75); }
 .tg-pick .tg-choice.picked { animation: pulse .25s ease-in-out infinite alternate; box-shadow: 0 0 0 16px #ffd34d, 0 14px 0 16px rgba(0, 0, 0, .12); }
 .parent input[type=radio] { width: 28px; height: 28px; margin: 0; }
 /* 一起玩：一人一份的標示 */
@@ -2133,3 +2140,53 @@ body.turn-xz .tg .tg-ok:not(.play) { right: 150px; background: #19b45a; }
 .parent .tgrid td.wk, .parent .tg-k.wk { background: #ffc2c2; }
 .parent .tg-k { display: inline-block; width: 18px; height: 18px; border-radius: 4px; vertical-align: -2px; margin: 0 4px 0 8px; }
 .parent .tweak { font-size: 20px; line-height: 1.7; }
+
+/* ---------- 注音課（11/27）---------- */
+.zhuyin .chalk { display: none; }
+.zhuyin .kt-cards { top: 420px; }
+.zhuyin .zy-area { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+.zhuyin .zy-area > * { pointer-events: auto; }
+.zhuyin .zy-posture { position: absolute; left: 420px; top: 130px; width: 420px; padding: 20px; border-radius: 30px; background: #fffdf6; box-shadow: 0 10px 0 rgba(0, 0, 0, .15); display: flex; align-items: center; gap: 10px; animation: popin .35s ease-out; }
+.zhuyin .zy-posture svg { display: block; }
+.zhuyin .zy-ready { border: 0; background: none; padding: 0; border-radius: 50%; }
+.zhuyin .zy-birds { position: absolute; left: 330px; top: 120px; width: 560px; height: 180px; border: 0; background: none; padding: 0; border-radius: 40px; }
+.zhuyin .zy-bird { position: absolute; top: 20px; transition: transform 1.4s ease-in-out; }
+.zhuyin .zy-bird.b1 { left: 20px; animation: zy-flap .6s ease-in-out infinite alternate; }
+.zhuyin .zy-bird.b2 { right: 20px; animation: zy-flap .6s .3s ease-in-out infinite alternate; }
+.zhuyin .zy-birds.join .zy-bird.b1 { transform: translate(190px, -10px); }
+.zhuyin .zy-birds.join .zy-bird.b2 { transform: translate(-190px, -10px); }
+@keyframes zy-flap { to { margin-top: -14px; } }
+.zhuyin .zy-jcard { position: absolute; left: 480px; top: 90px; animation: popin .4s ease-out; filter: drop-shadow(0 8px 0 rgba(0, 0, 0, .12)); }
+.zhuyin .zy-wall { position: absolute; left: 330px; top: 110px; width: 600px; padding: 26px 20px; border-radius: 24px; background: #c99560; border: 10px solid #8a5a2b; display: flex; justify-content: center; align-items: center; gap: 26px; animation: popin .4s ease-out; }
+.zhuyin .zy-frame { padding: 10px; background: #fff; box-shadow: 0 6px 0 rgba(0, 0, 0, .2); transform: rotate(-2deg); }
+.zhuyin .zy-frame:nth-child(2) { transform: rotate(2deg); }
+.zhuyin .zy-frame svg { display: block; }
+/* 習字本：在鏡頭外面（z-index 12），寫字位置才準 */
+.wpad { position: absolute; z-index: 12; touch-action: none; animation: popin .35s ease-out; }
+.wpad > svg { display: block; border-radius: 14px; box-shadow: 0 10px 0 rgba(0, 0, 0, .15); background: #fffefa; touch-action: none; }
+.wpad .wp-btn { position: absolute; left: calc(100% + 36px); border: 0; padding: 0; background: none; border-radius: 50%; }
+.wpad .wp-ok { bottom: 10px; }
+.wpad .wp-erase { bottom: 130px; left: calc(100% + 43px); }
+.wpad .wp-btn.hidden { display: none; }
+.wpad .wp-fade { transition: opacity .6s; opacity: .15; }
+.wpad .wp-start { animation: zy-pulse .9s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes zy-pulse { to { transform: scale(1.35); } }
+.zhuyin .zy-birds.glow, .zhuyin .zy-ready.glow, .wpad .wp-ok.glow { filter: drop-shadow(0 0 12px var(--glow, #ffd000)) drop-shadow(0 0 5px var(--glow, #ffd000)); animation: pulse .6s ease-in-out infinite alternate; }
+
+/* 家長頁「注音」分頁 */
+.parent .zg-syms { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.parent .zg-cell { margin: 0; padding: 4px; border-radius: 10px; background: #f1ece2; box-shadow: none; line-height: 0; }
+.parent .zg-cell.lt, .parent .zg-j.lt { background: #bfe6a8; }
+.parent .zg-cell.st, .parent .zg-j.st { background: #ffd34d; }
+.parent .zg-cell.wk, .parent .zg-j.wk { background: #ffc2c2; }
+.parent .zg-jh { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.parent .zg-j { display: inline-block; padding: 4px 8px; border-radius: 10px; background: #f1ece2; line-height: 0; }
+.parent .zg-show { display: flex; align-items: flex-end; gap: 14px; margin: 10px 0; }
+.parent .zg-show.hidden { display: none; }
+.parent .zg-anim { stroke-dasharray: 100; stroke-dashoffset: 100; animation: zg-draw .8s linear forwards; }
+@keyframes zg-draw { to { stroke-dashoffset: 0; } }
+.parent .zg-works { display: flex; flex-wrap: wrap; gap: 12px; }
+.parent .zg-work { margin: 0; padding: 8px; background: #fff; border-radius: 10px; text-align: center; box-shadow: 0 4px 0 rgba(0, 0, 0, .08); }
+.parent .zg-work figcaption { font-size: 16px; color: #8a7a66; }
+/* 家長頁：按鈕裡的圖、小字不接點擊，點到哪裡都算點到按鈕（11/27 修：情境快捷點到下面的小字沒反應） */
+.parent button * { pointer-events: none; }
