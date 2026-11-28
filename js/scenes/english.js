@@ -165,6 +165,8 @@ export function mountEnglish(stage, { profile, onExit }) {
   let kind = 'audio';
   let heard = false;  // 有沒有真的開始聽
   let rep = 0;        // 這一首已經播完幾次（音樂播 3 次才換下一首）
+  let armed = false;  // 這一首真的開始播了：結束才算一次（重複的「結束」通知不重算）
+  let fixes = 0;      // 影片被播放器自己換掉、拉回來的次數（避免一直重來）
   let allHeard = null;
 
   // 給家長看的曲目名稱（小孩看書，不看螢幕）
@@ -217,13 +219,21 @@ export function mountEnglish(stage, { profile, onExit }) {
     const id = state.settings.enYtIds?.[n];
     return (id && state.settings.enYtTitles?.[id]) || '';
   }
+  // 11/28：只用影片編號記標題。原本用「播放清單第幾支」對應，播放清單換下一支的瞬間位置會慢一步，
+  // 把上一支的編號記到下一行，下一首就顯示成上一首的名字（看起來像同一首又從 1/3 開始）
   function learnTitle() {
     try {
       const d = yt?.getVideoData?.();
-      const n = yt?.getPlaylistIndex?.();
-      if (!d?.title || !d.video_id || n == null || n < 0) return;
-      const ids = [...(state.settings.enYtIds || [])];
-      if (ids[n] !== d.video_id) { ids[n] = d.video_id; state.settings.enYtIds = ids; }
+      if (!d?.title || !d.video_id) return;
+      if (!vidOf(rows[want])) {
+        // 還不知道這一行的影片編號（播放清單還沒讀到）：只有確定播的是這一行才記
+        const n = yt?.getPlaylistIndex?.();
+        if (n === rows[want] && !(state.settings.enYtIds || []).includes(d.video_id)) {
+          const ids = [...(state.settings.enYtIds || [])];
+          ids[n] = d.video_id;
+          state.settings.enYtIds = ids;
+        }
+      }
       if (state.settings.enYtTitles?.[d.video_id] === d.title) return;
       state.settings.enYtTitles = { ...(state.settings.enYtTitles || {}), [d.video_id]: d.title };
       save();
@@ -248,14 +258,17 @@ export function mountEnglish(stage, { profile, onExit }) {
   function loadTrack(i, autoplay) {
     pos = want = Math.max(0, Math.min(rows.length - 1, i));
     rep = 0;
+    armed = false;
     const t = ROCKET[rows[pos]];
     au.src = t.url;
     markDots();
     if (autoplay) au.play().catch(() => setPlaying(false));
   }
-  au.addEventListener('play', () => { heard = true; played.add(pos); setPlaying(true); markDots(); });
+  au.addEventListener('play', () => { heard = true; armed = true; played.add(pos); setPlaying(true); markDots(); });
   au.addEventListener('pause', () => setPlaying(false));
   au.addEventListener('ended', () => {
+    if (!armed) return;
+    armed = false;
     // 音樂：同一首再播一次（同一個播放器，iOS 允許不用再點）
     if (++rep < need()) { paintNow(); au.currentTime = 0; au.play().catch(() => setPlaying(false)); return; }
     if (pos < nPick - 1) { loadTrack(pos + 1, true); return; }
@@ -284,14 +297,45 @@ export function mountEnglish(stage, { profile, onExit }) {
   });
 
   // 影片：YouTube 播放清單，只播家長勾選的那幾支
+  // 11/28：知道影片編號就一支一支載入（loadVideoById），不再用播放清單的第幾支：
+  // 播放清單播完會自己接下一支，跟「同一首再播」搶，計數和名字會亂掉
+  function vidOf(row) { return state.settings.enYtIds?.[row] || ''; }
+  function playRow(row) {
+    armed = false;
+    const id = vidOf(row);
+    if (id && yt.loadVideoById) yt.loadVideoById(id);
+    else yt.playVideoAt(row);
+  }
+  // 播放器現在播的是不是該播的那一支
+  function onRight() {
+    try {
+      const id = vidOf(rows[want]);
+      const now = yt.getVideoData?.()?.video_id;
+      if (id && now) return now === id;
+      return yt.getPlaylistIndex() === rows[want];
+    } catch { return true; }
+  }
   function ytState(e) {
     if (!yt) return;
     const S = window.YT.PlayerState;
-    if (e.data === S.PLAYING) { heard = true; if (want >= 0) played.add(want); hostIn.classList.add('listening'); learnTitle(); markDots(); }
+    if (e.data === S.PLAYING) {
+      heard = true;
+      // 播放器自己換到別支（播放清單接下一支）：拉回該播的那一支
+      if (want < 0) { yt.stopVideo(); return; }
+      if (!onRight()) { if (fixes++ < 4) playRow(rows[want]); return; }
+      armed = true;
+      played.add(want);
+      hostIn.classList.add('listening');
+      learnTitle();
+      markDots();
+    }
     if (e.data === S.PAUSED) { hostIn.classList.remove('listening'); resumeAudio(); }
     if (e.data === S.ENDED) {
-      if (want >= 0 && ++rep < need(want)) { paintNow(); yt.playVideoAt(rows[want]); return; }
-      if (want >= 0 && want < nPick - 1) { pos = ++want; rep = 0; markDots(); yt.playVideoAt(rows[pos]); return; }
+      if (want < 0 || !armed) return;   // 不是該播的那支播完、或重複的結束通知
+      armed = false;
+      fixes = 0;
+      if (++rep < need(want)) { paintNow(); playRow(rows[want]); return; }
+      if (want < nPick - 1) { pos = ++want; rep = 0; markDots(); playRow(rows[pos]); return; }
       const last = want === nPick - 1;
       want = -1;
       hostIn.classList.remove('listening');
@@ -301,12 +345,6 @@ export function mountEnglish(stage, { profile, onExit }) {
       markDots();
       if (last) allHeard?.();
       return;
-    }
-    // 播放清單自己跳到下一支（不是家長選的）：跳回該播的那一支
-    if (e.data === S.PLAYING || e.data === S.BUFFERING) {
-      const idx = yt.getPlaylistIndex();
-      if (want < 0) yt.stopVideo();
-      else if (idx >= 0 && idx !== rows[want]) yt.playVideoAt(rows[want]);
     }
   }
   async function setupVideo() {
@@ -332,7 +370,7 @@ export function mountEnglish(stage, { profile, onExit }) {
   function jump(n) {
     n = Math.max(0, Math.min(rows.length - 1, n));
     if (kind === 'audio') loadTrack(n, true);
-    else if (yt) { pos = want = n; rep = 0; markDots(); yt.playVideoAt(rows[pos]); }
+    else if (yt) { pos = want = n; rep = 0; fixes = 0; markDots(); playRow(rows[pos]); }
   }
   function go(d) {
     sfx('tap');
@@ -401,6 +439,8 @@ export function mountEnglish(stage, { profile, onExit }) {
     badRows = new Set();
     heard = false;
     rep = 0;
+    armed = false;
+    fixes = 0;
     noReferrer(kind === 'audio');
     who.innerHTML = `<div class="en-me">${avatarSvg(id, 150)}</div>${order.filter((k) => k !== id).map((k) => `<div class="en-next-kid">${avatarSvg(k, 70)}</div>`).join('')}`;
     who.style.setProperty('--glow', id === 'yh' ? '#ff8fb8' : '#6fd27a');
