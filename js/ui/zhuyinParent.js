@@ -36,7 +36,7 @@ export function zhuyinSection() {
     <p>${weakS.length || weakJ.length ? [...weakS, ...weakJ.map((id) => JIEHE_BY[id].s.join(''))].join('、') : '目前沒有。'}</p>
     <p class="note">遊戲裡只說寫得好的地方和一個小建議，最多再寫一次，不打分數。在家用紙筆寫的時候也一樣：先稱讚一個寫得好的地方，再提醒一件事就好。<br>
       坐姿：頭正、身直、腳平放；眼睛離紙一尺、胸口離桌子一個拳頭、手指離筆尖一寸。握筆：大拇指和食指捏住、中指在下面托著，不要握太緊。<br>
-      直式注音的「ㄧ」寫成直的一筆（由上往下）。筆順照教育部《國語注音符號手冊》，ㄓ、ㄖ 用四畫的寫法；跟學校教的不一樣請告訴 Claude。</p>
+      「ㄧ」寫成橫的一筆（由左往右），直式結合韻裡也是橫的。筆順照教育部《國語注音符號手冊》，ㄓ、ㄖ 用四畫的寫法；跟學校教的不一樣請告訴 Claude。</p>
     ${g && today ? '<button class="quiet" data-act="zy-more">今天可以再上一課</button>' : ''}
     <button class="quiet small" data-act="zy-reset">重新開始（清除注音進度）</button> <span class="note zy-msg"></span>`;
 }
