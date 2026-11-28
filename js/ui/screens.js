@@ -5,7 +5,7 @@ import { sfx, playMusic, stopMusic } from '../core/audio.js';
 import { tgIcon } from '../art/together.js';
 import { speak, hush, cheer } from '../core/voice.js';
 import { opBack, CURTAIN_L, CURTAIN_R, START_STAR, logoSvg, DECOR, POPPER, opCast, OP_SND, confettiRain } from '../art/opening.js';
-import { phase } from '../core/clock.js';
+import { phase, now } from '../core/clock.js';
 import * as weather from '../core/weather.js';
 import * as fest from '../core/festival.js';
 import { NIGHTCAP } from '../art/characters.js';
@@ -165,22 +165,38 @@ export function showProfiles(stage, { onParent }) {
 }
 
 // ---------- 休息／睡覺 ----------
-// 休息時間還剩多少（0–1）
-function restLeft() {
-  const total = Math.max(1, state.settings.restMin) * 60000;
-  return Math.max(0, Math.min(1, (state.session.restUntil - Date.now()) / total));
-}
-
-// 休息倒數：像一片餅乾越吃越小，小孩不用看懂數字
-function restRing(left) {
-  const C = 2 * Math.PI * 35;
-  return `<svg class="rest-ring" viewBox="0 0 200 200" width="190" height="190">
-    <circle cx="100" cy="100" r="92" fill="#fff" opacity=".85"/>
-    <circle class="pie" cx="100" cy="100" r="35" fill="none" stroke="#ffb300" stroke-width="70"
-      stroke-dasharray="${(C * left).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 100 100)"/>
-    <circle cx="100" cy="100" r="72" fill="none" stroke="#e0a800" stroke-width="6"/>
-    <path d="M100 100V44M100 100L136 120" stroke="#7a5230" stroke-width="7" stroke-linecap="round"/>
-    <circle cx="100" cy="100" r="8" fill="#7a5230"/></svg>`;
+// 休息時鐘（11/28 John：要顯示現在的真實時間）：指針是現在幾點幾分；
+// 黃色扇形從長針開始，到休息結束的位置，長針走到黃色的尾巴就可以再玩（像計時器，小孩不用看懂數字）
+function restRing() {
+  const t = now();
+  const m = t.getMinutes() + t.getSeconds() / 60;
+  const h = (t.getHours() % 12) + m / 60;
+  const leftMs = Math.max(0, state.session.restUntil - Date.now());
+  const span = Math.min(359.99, (leftMs / 3600000) * 360);
+  const R = 74;
+  const pt = (deg, r = R) => {
+    const a = (deg - 90) * Math.PI / 180;
+    return `${(100 + r * Math.cos(a)).toFixed(1)} ${(100 + r * Math.sin(a)).toFixed(1)}`;
+  };
+  const a0 = m * 6;
+  const pie = span < 0.5 ? '' : span >= 359.9
+    ? `<circle cx="100" cy="100" r="${R}" fill="#ffd34d"/>`
+    : `<path d="M100 100L${pt(a0)}A${R} ${R} 0 ${span > 180 ? 1 : 0} 1 ${pt(a0 + span)}Z" fill="#ffd34d"/>`;
+  const ticks = Array.from({ length: 60 }, (_, i) => {
+    const big = i % 5 === 0;
+    return `<path d="M${pt(i * 6, 86)}L${pt(i * 6, big ? 76 : 81)}" stroke="#7a5230" stroke-width="${big ? 4 : 1.5}" stroke-linecap="round"/>`;
+  }).join('');
+  const nums = Array.from({ length: 12 }, (_, i) => {
+    const n = i + 1;
+    const [x, y] = pt(n * 30, 64).split(' ');
+    return `<text x="${x}" y="${y}" dy=".35em" text-anchor="middle" font-size="17" font-weight="800" fill="#5a3a1c">${n}</text>`;
+  }).join('');
+  return `<svg class="rest-ring" viewBox="0 0 200 200" width="230" height="230">
+    <circle cx="100" cy="100" r="96" fill="#fff" stroke="#e0a800" stroke-width="7"/>
+    ${pie}${ticks}${nums}
+    <path d="M100 100L${pt(h * 30, 44)}" stroke="#5a3a1c" stroke-width="9" stroke-linecap="round"/>
+    <path d="M100 100L${pt(a0, 70)}" stroke="#7a5230" stroke-width="5.5" stroke-linecap="round"/>
+    <circle cx="100" cy="100" r="8" fill="#5a3a1c"/></svg>`;
 }
 
 // 角色下班：白天天氣好就在公園玩；晚上或下雨在客廳沙發休息。角色是醒著的。
@@ -258,7 +274,7 @@ function showRest(stage, { onParent, ph, onEnglish = null }) {
   const node = el(`
     <div class="screen closed resting ${art.cls}">
       <svg class="art" viewBox="0 0 1200 900">${art.svg}</svg>
-      <div class="rest-clock">${restRing(restLeft())}</div>
+      <div class="rest-clock">${restRing()}</div>
       ${fest.isDecember() && fest.day() <= 25 ? `<div class="closed-tree">${TREE_ICON}</div>` : ''}
     </div>`);
   node.appendChild(lockButton(onParent));
@@ -267,7 +283,7 @@ function showRest(stage, { onParent, ph, onEnglish = null }) {
   stopMusic();
   const tick = setInterval(() => {
     if (!node.isConnected) { clearInterval(tick); return; }
-    $('.rest-clock', node).innerHTML = restRing(restLeft());
+    $('.rest-clock', node).innerHTML = restRing();
   }, 5000);
   let last = 0;
   onTap(node, () => {
